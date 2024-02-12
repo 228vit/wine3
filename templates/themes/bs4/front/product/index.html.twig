@@ -1,0 +1,157 @@
+{% extends 'layout_front.html.twig' %}
+
+{% block title %}
+    Список продукции
+{% endblock %}
+
+{% block breadcrumbs %}
+{#    <ol class="breadcrumb">#}
+{#        <li class="breadcrumb-item">#}
+{#            <a href="{{ path('backend_dashboard') }}"><i class="fa fa-dashboard"></i> Dashboard</a>#}
+{#        </li>#}
+{#        <li class="breadcrumb-item active">#}
+{#            <a href="javascript:;"><i class="fa fa-table"></i> {{ entity_name }}</a>#}
+{#        </li>#}
+{#    </ol>#}
+{% endblock %}
+
+{% block body %}
+
+    <p>
+        <button class="btn btn-primary" id="searchFormToggler">Поиск
+            <i id="searchTogglerArrow" class="fa fa-angle-down"></i></button>
+    </p>
+    <div class="row">
+        <div class="col" id="searchForm" style="display: none;">
+            <div class="card card-body">
+                {{ form_start(filter_form, {'attr': {'id': 'product_filter'}}) }}
+                <div class="row">
+                    <div class="col">{{ form_row(filter_form.name) }}</div>
+                    <div class="col">{{ form_row(filter_form.year) }}</div>
+                </div>
+                <div class="row">
+                    <div class="col">{{ form_row(filter_form.type) }}</div>
+                    <div class="col">{{ form_row(filter_form.country) }}</div>
+                </div>
+                <div class="row">
+                    <div class="col">{{ form_row(filter_form.color) }}</div>
+                    <div class="col">{{ form_row(filter_form.vendor) }}</div>
+                </div>
+                {{ form_rest(filter_form) }}
+                    <button class="btn btn-success" type="submit">
+                        <i class="fa fa-search"></i> искать</button>
+
+                {{ form_end(filter_form) }}
+            </div>
+        </div>
+    </div>
+
+    <h1 class="page-header">Список продукции</h1>
+
+    {% include 'admin/flashes.html.twig' %}
+
+    {% if current_filters|length %}
+        <div class="alert alert-secondary" role="alert">
+            <i class="fa fa-filter"></i> Filters:
+            {% for field, filter in current_filters_string %}
+                {% if filter is iterable %}
+                    <span class="badge badge-secondary">{{ field }}: {{ filter|join(', ') }}</span>
+                {% else %}
+                    <span class="badge badge-secondary">{{ field }}: {{ filter }}</span>
+                {% endif %}
+            {% endfor %}
+            |
+            <a href="{{ path('cabinet_reset_product_filter') }}"><i class="fa fa-times"></i> сбросить фильтры</a>
+        </div>
+    {% endif %}
+
+    <table class="table table-striped">
+        <tr>
+            <th>Pic</th>
+            <th{% if pagination.isSorted('a.name') %} class="sorted"{% endif %}>
+                {{ knp_pagination_sortable(pagination, 'Name', 'product.name') }}
+            </th>
+            <th>Производитель<br/>
+                <small>Страна/регион</small>
+            </th>
+            <th{% if pagination.isSorted('a.price') %} class="sorted"{% endif %}>
+                {{ knp_pagination_sortable(pagination, 'Price', 'product.price') }}
+            </th>
+            <th>Status</th>
+        </tr>
+
+        {# table body #}
+        {% for row in pagination %}
+            <tr>
+                <td>
+                    {% if row.announcePic %}
+                        <a data-fancybox="gallery" target="_blank" href="{{ asset('/uploads/' ~ row.announcePic) }}"><img
+                                    src="{{ asset('/uploads/' ~ row.announcePic) | imagine_filter('thumb_square_50') }}" /></a>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ path('cabinet_product_show', { 'id': row.id }) }}">{{ row.name }}</a>
+                    <br />
+                    <small>{{ row.shortSummary }}</small>
+                </td>
+                <td>{{ row.vendor }}
+                    <br />
+                    <small>{{ row.country }}</small>
+                </td>
+                <td>{{ row.price }}</td>
+
+{#                <td>#}
+{#                    {% if row.contentPic %}#}
+{#                    <a data-lightbox="gallery" target="_blank" href="{{ asset('/uploads/' ~ row.contentPic) }}"><img#}
+{#                                src="{{ asset('/uploads/' ~ row.contentPic) | imagine_filter('thumb_square_50') }}" /></a>#}
+{#                    {% endif %}#}
+{#                </td>#}
+
+{#                <td>#}
+{#                    {% if row.extraPic %}#}
+{#                        <a data-lightbox="gallery" target="_blank" href="{{ asset('/uploads/' ~ row.extraPic) }}"><img#}
+{#                                    src="{{ asset('/uploads/' ~ row.extraPic) | imagine_filter('thumb_square_50') }}" /></a>#}
+{#                    {% endif %}#}
+{#                </td>#}
+
+                <td><span class="badge badge-pill badge-{{ row.isActive ? 'success' : 'danger' }}"><i
+                                class="fa fa-{{ row.isActive ? 'check-square' : 'window-close' }}"></i></span>
+                </td>
+
+            </tr>
+        {% endfor %}
+    </table>
+
+    {# display navigation #}
+    <div class="navigation">
+        {{ knp_pagination_render(pagination) }}
+        <div class="count">
+            Total rows: {{ pagination.getTotalItemCount }}
+        </div>
+    </div>
+<br/>
+
+{% endblock %}
+
+
+{% block filter_form %}
+    {% include 'admin/common/filter_form.html.twig' with {'filter_form': filter_form} %}
+{% endblock %}
+
+{% block extra_scripts %}
+    <script>
+        $(document).ready(function() {
+            $('#searchFormToggler').click(function () {
+                if ($('#searchTogglerArrow').hasClass('fa-angle-down')) {
+                    $('#searchTogglerArrow').removeClass('fa-angle-down').addClass('fa-angle-up')
+                } else {
+                    $('#searchTogglerArrow').removeClass('fa-angle-up').addClass('fa-angle-down')
+                }
+                $('#searchForm').toggle('slow', function () {
+                });
+            });
+            // $('.collapse').collapse()
+        //
+        })
+    </script>
+{% endblock %}

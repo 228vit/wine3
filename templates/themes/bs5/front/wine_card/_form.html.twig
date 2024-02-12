@@ -1,0 +1,32 @@
+{% for flash in app.flashes('error') %}
+    <div class="alert alert-danger" role="alert">
+        {{ flash }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+{% endfor %}
+
+{% for flash in app.flashes('success') %}
+    <div class="alert alert-success" role="alert">
+        {{ flash }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+{% endfor %}
+
+{{ form_start(form) }}
+    <div class="form-group row">
+        <label class="col-form-label col-sm-4 required" for="cabinet_wine_card_name">Название ресторана</label>
+        <div class="col-sm-8">
+            {{ form_widget(form.name) }}
+        </div>
+    </div>
+
+    {{ form_rest(form) }}
+
+    <hr/>
+    <button class="btn p-3"><i class="fa fa-check"></i> {{ button_label|default('Save') }}</button>
+    <a class="" href="{{ path('cabinet_wine_card_index') }}"><i class="fa fa-arrow-left"></i> назад к списку винных карт</a>
+{{ form_end(form) }}

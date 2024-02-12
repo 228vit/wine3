@@ -1,0 +1,98 @@
+{% extends 'layout_front.html.twig' %}
+
+{% block title %}Список продукции{% endblock %}
+
+{% block breadcrumbs %}
+{% endblock %}
+
+{% block body %}
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true"
+         style="color: #000;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Привязать к винным картам</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="productWineCardsModal">
+                    ...
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary p-3" data-bs-dismiss="modal">закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{ include('front/product/onlyProducts.html.twig') }}
+
+{% endblock %}
+
+{% block extra_scripts %}
+    <script>
+        $(document).ready(function() {
+            $('.product_order').on('click', function () {
+                console.log($(this).attr('href'));
+            })
+
+            var myModal = new bootstrap.Modal(document.getElementById('exampleModal'), {
+                keyboard: true
+            })
+
+            $('.addToWineCard').click(function () {
+                var product_id = $(this).attr('data-rel');
+               // ajax: get list of my wine cards
+                var url = '{{ path("ajax_user_winecards") }}';
+                var data = {
+                    'product_id': product_id
+                };
+
+                $.ajax({
+                    url: url,
+                    data: data
+                }).done(function(html) {
+                    $('#productWineCardsModal').html(html);
+                    bindClickLinkWineCards();
+                    myModal.show();
+                });
+            });
+
+            bindClickLinkWineCards();
+
+            function bindClickLinkWineCards() {
+                $('.winecard').click(function () {
+                    var product_id = $(this).attr('data-rel');
+                    var winecard_id = $(this).prop('value');
+                    var checked = $(this).is(':checked');
+                    var url = '{{ path("ajax_product_winecard") }}';
+                    var data = {
+                        'product_id': product_id,
+                        'winecard_id': winecard_id,
+                        'checked': checked ? 1 : 0
+                    };
+
+                    $.ajax({
+                        url: url,
+                        data: data
+                    }).done(function(json) {
+                        if (json.status == 'added') {
+                            $('#result_' + winecard_id).html('<span class="alert-success p-1">добавлено</span>');
+                        } else {
+                            $('#result_' + winecard_id).html('<span class="alert-danger p-1">удалено</span>');
+                        }
+
+                        if (json.wineCardsCount > 0) {
+                            $('#productWineCardsStar_' + product_id).addClass('active');
+                        } else {
+                            $('#productWineCardsStar_' + product_id).removeClass('active');
+                        }
+                    });
+                });
+            }
+
+
+        })
+    </script>
+{% endblock %}

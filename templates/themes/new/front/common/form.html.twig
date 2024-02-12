@@ -1,0 +1,84 @@
+<div class="h2">Регистрация</div>
+<form id="registerForm" action="{{ path('app_register') }}">
+    <div class="line">{#<div class="line -error">#}
+        <label>Ваш номер телефона</label>
+        <div class="input-group">
+            <div class="tel-code">
+                <input type="hidden" value="+7" name="code">
+                <button class="trigger">
+                    <img width="36" src="{{ asset('img/flags/ru.png') }}" alt="">
+                    +7
+                </button>
+                {# <div class="code-popup">#}
+                {# <a href="#"><img width="36" src="{{ asset('svg/flags/ru.svg') }}" alt=""> Рус</a>#}
+                {# <a href="#"><img width="36" src="{{ asset('svg/flags/gb.svg') }}" alt=""> En</a>#}
+                {# <a href="#"><img width="36" src="{{ asset('svg/flags/de.svg') }}" alt=""> De</a>#}
+                {# </div>#}
+
+            </div>
+            <div class="input">
+                {{ form_widget('phone', {'attr': {'type': 'tel', 'class': 'phoneNumber', 'required': true, 'autofocus': true}}) }}
+                {# <div class="error-message">неверный номер</div>#}
+            </div>
+        </div>
+    </div>
+    <div class="line">
+        <label>Ваш пароль</label>
+        <div class="input">
+            <input type="password" name="registration_form[plainPassword]" required>
+            {# <div class="error-message">неверный пароль</div>#}
+        </div>
+    </div>
+
+    <div class="line">
+        <label>Ваши ФИО</label>
+        <div class="input">
+            <input type="text" name="registration_form[name]" required>
+            <div class="error-message">введите ФИО</div>
+        </div>
+    </div>
+
+    <div class="line">
+        <label>Ваш Instagram</label>
+        <div class="input">
+            <input type="text" name="registration_form[instagram]">
+        </div>
+    </div>
+    <div class="line">
+        <label>Ваш Facebook</label>
+        <div class="input">
+            <input type="text" name="registration_form[facebook]">
+        </div>
+    </div>
+    <div class="line">
+        <label>Дата рождения</label>
+        <div class="input">
+            <input type="text" name="registration_form[birthDate]">
+        </div>
+    </div>
+    <div class="line">
+        <label>Место работы</label>
+        <div class="input">
+            <input type="text" name="registration_form[company]">
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="form-check">
+            <input type="checkbox" id="registration_form_agreeTerms" name="registration_form[agreeTerms]" required="required" class="form-check-input" value="1">
+            <label class="form-check-label required" for="registration_form_agreeTerms">принимаю
+                <a href="javascript:;">условия пользования сервисом</a></label>
+        </div>
+    </div>
+    {#    <div class="line">#}
+    {#        <label>Опыт работы</label>#}
+    {#        <div class="input">#}
+    {#            <input type="text">#}
+    {#        </div>#}
+    {#    </div>#}
+    <div class="line -center">
+        <button type="submit" class="btn">Зарегистрироваться</button>
+        <div class="links">
+            Есть аккаунт? <a href="{{ path('app_login') }}" class="js-popup-auth">Войти.</a>
+        </div>
+    </div>
+</form>

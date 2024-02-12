@@ -1,0 +1,56 @@
+{% extends 'layout_front.html.twig' %}
+
+{% block title %}Просмотр заказа{% endblock %}
+
+{% block body %}
+    <h1>Заказ № {{ order.id }}</h1>
+    <h4>Ресторан: {{ wineCard.summary }}</h4>
+    <hr />
+    <p>Метод доставки: {{ order.delivery }}
+    <p>Адрес доставки: {{ order.address }}
+    <p>Примечание: {{ order.note }}
+    <hr/>
+    <h4>Состав заказа</h4>
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th></th>
+            <th>Название</th>
+            <th>Объем(л)</th>
+            <th>Поставщик</th>
+            <th>Цена</th>
+            <th>Кол-во</th>
+            <th>Сумма</th>
+        </tr>
+        </thead>
+        {% set totalAmount = 0 %}
+        {% for orderItem in order.orderItems %}
+            <tr>
+                <td>
+                    {% if orderItem.offer.product.announcePic %}
+                        <a data-fancybox="gallery" target="_blank" href="{{ asset('/uploads/' ~ orderItem.offer.product.announcePic) }}"><img
+                                    src="{{ asset('/uploads/' ~ orderItem.offer.product.announcePic) | imagine_filter('thumb_square_50') }}" /></a>
+                    {% endif %}
+                </td>
+                <td>
+                    {{ orderItem.offer.product.name }}<br />
+                    <small>{{ orderItem.offer.product.shortSummary }}</small>
+                </td>
+                <td>{{ orderItem.offer.volume }}(л)</td>
+                <td>{{ orderItem.offer.supplier }}</td>
+                <td class="text-right">{{ orderItem.price }}</td>
+                <td class="text-center">{{ orderItem.quantity }}</td>
+                {% set subTotal = orderItem.quantity * orderItem.price %}
+                {% set totalAmount = totalAmount + subTotal %}
+                <td class="text-right">{{ subTotal | number_format(2, '.', ',') }}</td>
+            </tr>
+        {% endfor %}
+        <tr>
+            <th colspan="6">Итого:</th>
+            <th class="text-right">{{ totalAmount | number_format(2, '.', ',') }}</th>
+        </tr>
+    </table>
+    <hr />
+    <a class="btn btn-secondary"><i class="fa fa-arrow-left"></i> назад к списку заказов</a>
+{% endblock %}

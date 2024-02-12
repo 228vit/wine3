@@ -1,0 +1,9 @@
+{% for wineCard in wineCards %}
+    <div class="custom-control custom-checkbox">
+        <input data-rel="{{ product.id }}" type="checkbox" class="winecard custom-control-input"
+               value="{{ wineCard.id }}" id="winecard_{{ wineCard.id }}"
+               {% if wineCard.id in product.winecardIds %}checked{% endif %} />
+        <label class="custom-control-label" for="winecard_{{ wineCard.id }}">{{ wineCard.summary }}</label>
+        <span id="result_{{ wineCard.id }}"></span>
+    </div>
+{% endfor %}

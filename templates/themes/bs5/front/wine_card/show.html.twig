@@ -1,0 +1,87 @@
+{% extends 'layout_front_blank.html.twig' %}
+
+{% block title %}Просмотр винной карты{% endblock %}
+
+{% block body %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1>Винная карта ресторана</h1>
+            <h4 style="display: block;">{{ wineCard.summary }}</h4>
+        </div>
+    </div>
+
+    {% if wineCard is defined and wineCard.products|length > 0 %}
+    <div class="row">
+        <div class="col-12">
+            <form action="{{ path('cabinet_wine_card_add_to_cart', { id: wineCard.id }) }}" method="post">
+
+                <table class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        <th>Название / параметры</th>
+                        <th>Объем(л)</th>
+                        <th>Страна</th>
+                        <th>Поставщик</th>
+                        <th>Цена</th>
+                        <th>Заказ</th>
+                    </tr>
+                    </thead>
+                    {% for product in wineCard.products %}
+                        <tr>
+                            <td><a data-fancybox data-type="ajax" data-src="{{ path('cabinet_product_show', { id: product.id }) }}"
+                                   href="javascript:;">
+                                    {{ product.name }}
+                                    <i class="fa fa-search"></i>
+                                </a>
+                                <br />
+                                <small>{{ product.shortSummary }}</small>
+                            </td>
+                            <td>{{ product.volume }}</td>
+                            <td>{{ product.country }}</td>
+                            <td colspan="3">
+                                <table class="table table-bordered table-warning table-sm m-0">
+                                {% for offer in product.offers %}
+                                    <tr>
+                                        <td>{{ offer.supplier }}</td>
+                                        <td>{{ offer.price }}</td>
+                                        <td><input type="number" name="offer[{{ offer.id }}]" value="0" size="3" /></td>
+                                    </tr>
+                                {% endfor %}
+                                </table>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+
+                <div class="row">
+                    <div class="col">
+                        <a class="btn btn-secondary" href="{{ path('cabinet_wine_card_index') }}">
+                            <i class="fa fa-arrow-left"></i>
+                            назад к списку
+                        </a>
+                    </div>
+
+                    <div class="col text-right">
+                        <button class="btn btn-success"><i class="fa fa-cart-plus"></i> Создать заказ</button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    {% endif %}
+    <div class="row">
+        <div class="col-12">
+            <hr />
+            <a href="{{ path('cabinet_product_index') }}" class="btn">Добавить вина в карту</a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+{% endblock %}

@@ -1,0 +1,47 @@
+{% if showSearchForm %}
+    <form id="headerSearchForm" class="search">
+        <input id="headerSearchField" class="form-control" type="text" placeholder="Поиск">
+        <button type="submit"></button>
+    </form>
+{% else %}
+    <span style="height: 46px">&nbsp;</span>
+{% endif %}
+<div class="aside">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navigation" aria-controls="navigation" aria-expanded="false" aria-label="Показать меню">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+</div>
+<div class="collapse navbar-collapse" id="navigation">
+    <ul class="navbar-nav me-auto mb-2">
+        <li class="nav-item">
+            <a class="nav-link active" href="{{ path('homepage') }}">Главная</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ path('cabinet_product_index') }}">Список вин</a>
+        </li>
+
+        {% if is_granted('IS_AUTHENTICATED_FULLY') or is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+            <li class="nav-item">
+                <a class="nav-link" href="{{ path('cabinet_wine_card_index') }}">Мои винные карты</a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-bs-toggle="dropdown"
+                   aria-expanded="false">Профиль</a>
+                <ul class="dropdown-menu" aria-labelledby="dropdown01">
+                    <li><a class="dropdown-item" href="{{ path('user_profile') }}">Профиль</a></li>
+                    <li><a class="dropdown-item" href="{{ path('app_forget_password') }}">Сменить пароль</a></li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ path('app_logout') }}">Выход</a>
+            </li>
+        {% else %}
+            <li class="nav-item">
+                <a class="nav-link"  href="{{ path('app_login') }}">
+                    <i class="fa fa-fw fa-user"></i> Авторизация
+                </a>
+            </li>
+        {% endif %}
+    </ul>
+</div>
+

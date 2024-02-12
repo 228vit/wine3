@@ -1,0 +1,27 @@
+{% extends 'layout_front_login.html.twig' %}
+
+{% block title %}Welcome!{% endblock %}
+
+{% block body %}
+
+    <h2>Добро пожаловать в наш сервис.</h2>
+    <p class="welcome">
+        Приветственный текст о том зачем нужен этот сервис и как классно им пользоваться.
+    </p>
+    <div class="clearfix"></div>
+
+    <hr>
+
+    {% if is_granted('IS_AUTHENTICATED_FULLY') or is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+        <div class="text-center">
+            <a href="{{ path('cabinet_product_index') }}" class="btn p-3">список вин</a>
+            <a href="{{ path('cabinet_wine_card_index') }}" class="btn p-3">мои винные карты</a>
+        </div>
+    {% else %}
+        <div class="text-center">
+            <a href="{{ path('app_login') }}" class="btn p-3">авторизация</a>
+            <a href="{{ path('app_register') }}" class="btn p-3">регистрация</a>
+        </div>
+    {% endif %}
+
+{% endblock %}

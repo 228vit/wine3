@@ -1,0 +1,147 @@
+<div class="h2">Регистрация</div>
+<form id="registerForm" action="{{ path('app_register') }}" method="post">
+    <div class="line">{#<div class="line -error">#}
+        <label>Ваш номер телефона</label>
+        <div class="input-group">
+            <div class="tel-code">
+                <input type="hidden" value="+7" name="code">
+                <button class="trigger">
+                    <img width="36" src="{{ asset('img/flags/ru.png') }}" alt="">
+                    +7
+                </button>
+                {# <div class="code-popup">#}
+                {# <a href="#"><img width="36" src="{{ asset('svg/flags/ru.svg') }}" alt=""> Рус</a>#}
+                {# <a href="#"><img width="36" src="{{ asset('svg/flags/gb.svg') }}" alt=""> En</a>#}
+                {# <a href="#"><img width="36" src="{{ asset('svg/flags/de.svg') }}" alt=""> De</a>#}
+                {# </div>#}
+
+            </div>
+            <div class="input" rel="phone">
+                {{ form_widget(form.phone, {'attr': {'type': 'tel', 'id': 'username', 'class': 'phoneNumber', 'required': true, 'autofocus': true}}) }}
+                 <div class="error-message" id="phoneError">неверный номер</div>
+            </div>
+        </div>
+    </div>
+    <div class="line">
+        <label>Ваш пароль</label>
+        <div class="input" rel="password">
+            {{ form_widget(form.plainPassword, {'attr': {'type': 'password', 'required': true}}) }}
+{#            <input type="password" name="registration_form[plainPassword]" required>#}
+             <div class="error-message" id="passwordError">неверный пароль</div>
+        </div>
+    </div>
+
+    <div class="line">
+        <label>Ваши ФИО</label>
+        <div class="input" rel="name">
+            {{ form_widget(form.name, {'attr': {'type': 'text', 'required': true}}) }}
+{#            <input type="text" name="registration_form[name]" required>#}
+            <div class="error-message" id="nameError">введите ФИО</div>
+        </div>
+    </div>
+
+    <div class="line" rel="email">
+        <label>EMail</label>
+        <div class="input">
+            {{ form_widget(form.email, {'attr': {'type': 'text', 'required': false}}) }}
+            <div class="error-message" id="emailError"></div>
+        </div>
+    </div>
+
+    <div class="line">
+        <label>Ваш Instagram</label>
+        <div class="input">
+            {{ form_widget(form.instagram, {'attr': {'type': 'text'}}) }}
+{#            <input type="text" name="registration_form[instagram]">#}
+        </div>
+    </div>
+    <div class="line">
+        <label>Ваш Facebook</label>
+        <div class="input">
+            {{ form_widget(form.facebook, {'attr': {'type': 'text'}}) }}
+{#            <input type="text" name="registration_form[facebook]">#}
+        </div>
+    </div>
+    <div class="line">
+        <label>Дата рождения</label>
+        <div class="input">
+            {{ form_widget(form.birthDay) }}
+{#            {{ form_widget(form.birthDay, {'attr': {'type': 'text', 'class': 'inputDate'}}) }}#}
+{#            <input type="text" name="registration_form[birthDate]">#}
+        </div>
+    </div>
+    <div class="line">
+        <label>Место работы</label>
+        <div class="input">
+            {{ form_widget(form.company, {'attr': {'type': 'text'}}) }}
+{#            <input type="text" name="registration_form[company]">#}
+        </div>
+    </div>
+{#    <div class="form-group">#}
+{#        <div class="form-check">#}
+{#            {{ form_widget(form.agreeTerms) }}#}
+{#            <input type="checkbox" id="registration_form_agreeTerms" name="registration[agreeTerms]" required="required" class="form-check-input" value="1">#}
+{#            <label class="form-check-label required" for="registration_form_agreeTerms">принимаю#}
+{#                <a href="javascript:;">условия пользования сервисом</a></label>#}
+{#        </div>#}
+{#    </div>#}
+{#    <div class="line">#}
+{#        <label>Опыт работы</label>#}
+{#        <div class="input">#}
+{#            <input type="text">#}
+{#        </div>#}
+{#    </div>#}
+    <div class="line -center">
+        <button type="submit" class="btn">Зарегистрироваться</button>
+        <div class="links">
+            Есть аккаунт? <a href="{{ path('app_login') }}" class="js-popup-auth">Войти.</a>
+        </div>
+    </div>
+    {{ form_rest(form) }}
+</form>
+
+<script>
+    $(document).ready(function() {
+        $('#registerForm').on('submit', function (e) {
+            e.preventDefault();
+            var form = $(this);
+            var url = form.attr('action');
+            var phone = $('#username').val().replace(/[^0-9]/g, '');
+
+            // var data = {
+            //     'username': phone,
+            //     'password': $('#password').val()
+            // };
+            // var jsonData = JSON.stringify(data);
+            // console.log(jsonData);
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: form.serialize(),
+                dataType: 'json'
+            }).done(function (data) {
+                console.log(data);
+                if (typeof data.redirect !== 'undefined') {
+                    window.location = data.redirect;
+                }
+
+                if (typeof data.errors !== 'undefined') {
+                    alert('Возникли ошибки при отправке формы!')
+                    data.errors.forEach(function (item) {
+                        $('div[rel='+item.name+']').addClass('-error');
+                        $('#'+item.name+'Error').show().html(item.message);
+                    });
+                }
+
+            }).fail(function (data) {
+                console.log(data);
+
+                console.log(response);
+            });
+
+            return false;
+        });
+
+    });
+</script>

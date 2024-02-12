@@ -1,0 +1,9 @@
+{% if wineCards|length %}
+    <select id="wineCardSelector" style="font-size: 20px;">
+        {% for wineCard in wineCards %}
+            <option value="{{ wineCard.id }}" {{ null != currentWineCard and wineCard.id == currentWineCard.id ? 'selected' : '' }}>{{ wineCard.name }}</option>
+        {% endfor %}
+    </select>
+{% else %}
+    <a href="{{ path('cabinet_wine_card_new') }}">создать карту</a>
+{% endif %}

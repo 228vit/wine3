@@ -1,0 +1,108 @@
+    <aside class="favourite">
+        <div class="title">
+            Выбрано вин: {{ totalWines }}
+        </div>
+    </aside>
+    <aside class="stats">
+
+        <div class="title">Статистика</div>
+
+        <div class="stats-block">
+            <div class="subtitle">Тип</div>
+            <div class="block-content">
+                {% for name, percent in wineColors %}
+                    {{ name }}: {{ percent }}%<br>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="stats-block">
+            <div class="subtitle">Сахаристость</div>
+            <div class="block-content">
+                {% for name, percent in wineSugars %}
+                    {{ name }}: {{ percent }}%<br>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="stats-block">
+            <div class="subtitle">Сорта винограда</div>
+            <div class="block-content">
+                {% for name, percent in grapeSorts %}
+                    {{ name }}: {{ percent }}%<br>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="stats-block">
+            <div class="subtitle">Страны</div>
+            <div class="block-content">
+                {% for name, percent in countries %}
+                    {{ name }}: {{ percent }}%<br>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="stats-block">
+            <div class="subtitle">Импортеры</div>
+            <div class="block-content">
+                {% for name, percent in suppliers %}
+                    {{ name }}: {{ percent }}%<br>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="stats-block">
+            <div class="subtitle">Цены</div>
+            <div class="block-content">
+                {% for name, percent in winePrices %}
+                    {{ name }}: {{ percent }}%<br>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="stats-block">
+            <div class="subtitle">Объёмы</div>
+            <div class="block-content">
+                {% for name, percent in volumes %}
+                    {{ name }}л.: {{ percent }}%<br>
+                {% endfor %}
+            </div>
+        </div>
+
+{#        <div class="stats-block">#}
+{#            <div class="subtitle">Рейтинг</div>#}
+{#            <div class="block-content">#}
+{#                Сухое — 80%<br>#}
+{#                Полусухое — 20%#}
+{#            </div>#}
+{#        </div>#}
+{#        <div class="stats-block">#}
+{#            <div class="subtitle">Градус</div>#}
+{#            <div class="block-content">#}
+{#                Красное — 80%<br>#}
+{#                Белое — 20%#}
+{#            </div>#}
+{#        </div>#}
+{#        <div class="stats-block">#}
+{#            <div class="subtitle">Объем</div>#}
+{#            <div class="block-content">#}
+{#                Красное — 80%<br>#}
+{#                Белое — 20%#}
+{#            </div>#}
+{#        </div>#}
+{#        <div class="stats-block">#}
+{#            <div class="subtitle">Выдержка</div>#}
+{#            <div class="block-content">#}
+{#                Сухое — 80%<br>#}
+{#                Полусухое — 20%#}
+{#            </div>#}
+{#        </div>#}
+{#        <div class="stats-block">#}
+{#            <div class="subtitle">Оз Кларк</div>#}
+{#            <div class="block-content">#}
+{#                Красное — 80%<br>#}
+{#                Белое — 20%#}
+{#            </div>#}
+{#        </div>#}
+    </aside>

@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <title>{% block title %}Welcome!{% endblock %}</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="{{ asset('winedows2/scss/style.css') }}">
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}" />
+
+    <script src="{{ asset('js/jquery.min.js') }}"></script>
+
+</head>
+
+<body>
+<div class="container">
+    {% include('front/common/login_header.html.twig') %}
+
+    {% block body %}
+    {% endblock %}
+
+    <footer class="body-footer">
+        <div class="left">
+            <div class="logo">winedows</div>
+            <a href="#" class="profile">Кабинет</a>
+        </div>
+        <div class="contacts">
+            <a href="#">+7 123 456 78 90</a>
+            <a href="#">pochta@gmail.com</a>
+            <div class="line">address, 27</div>
+        </div>
+        <nav class="footer-navigation">
+            <ul>
+                <li><a href="#">О нас</a></li>
+                <li><a href="#">Новости</a></li>
+                <li><a href="#">Наши клиенты</a></li>
+                <li><a href="#">Подобрать вина</a></li>
+            </ul>
+        </nav>
+    </footer>
+</div>
+
+<div class="popup-bg"></div>
+
+<div class="popup -forgot">
+    <div class="h2">Восстановить пароль</div>
+    <div class="subtitle">Ссылка на восстановление пароля придет на ваш номер телефона</div>
+    <form action="#">
+        <div class="line">
+            <label>Ваш номер телефона</label>
+            <div class="input-group">
+                <div class="tel-code">
+                    <input type="hidden" value="+7" name="code">
+                    <button class="trigger">
+                        <img src="{{ asset('img/flags/ru.png') }}" alt="">
+                        +7
+                    </button>
+                    <div class="code-popup">
+                        <a href="#"><img src="{{ asset('svg/flags/ru.svg') }}" alt=""> Рус</a>
+                        <a href="#"><img src="{{ asset('svg/flags/gb.svg') }}" alt=""> En</a>
+                        <a href="#"><img src="{{ asset('svg/flags/de.svg') }}" alt=""> De</a>
+                    </div>
+
+                </div>
+                <div class="input">
+                    <input type="tel">
+                    <div class="error-message">неверный номер</div>
+                </div>
+            </div>
+        </div>
+        <div class="line -center">
+            <button type="submit" class="btn">Восстановить</button>
+        </div>
+    </form>
+</div>
+
+<div class="popup -register">
+    {% block registration_form %}
+    {% endblock %}
+</div>
+
+<div class="popup -auth">
+    {% include('front/security/login_modal.html.twig') %}
+    {% block login_form %}
+    {% endblock %}
+</div>
+
+
+<div class="popup -newpass">
+    <div class="h2">Введите новый пароль</div>
+    <form action="#">
+        <div class="line">
+            <label>Новый пароль</label>
+            <div class="input">
+                <input type="password">
+                <div class="error-message">неверный пароль</div>
+            </div>
+        </div>
+        <div class="line">
+            <label>Повторите пароль</label>
+            <div class="input">
+                <input type="password">
+                <div class="error-message">неверный пароль</div>
+            </div>
+        </div>
+        <div class="line -center">
+            <button type="submit" class="btn">Сохранить</button>
+        </div>
+    </form>
+</div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/7.0.8/swiper-bundle.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/7.0.8/swiper-bundle.min.js"></script>
+<script src="{{ asset('js/script.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery.maskedinput@1.4.1/src/jquery.maskedinput.min.js" type="text/javascript"></script>
+
+<script>
+    $(document).ready(function() {
+        $(".phoneNumber").mask("(999) 999-99-99", {autoclear: false});
+        $(".inputDate").mask("99.99.9999", {autoclear: false});
+    });
+</script>
+
+{% block extra_scripts %}
+{% endblock %}
+
+</body>
+
+</html>

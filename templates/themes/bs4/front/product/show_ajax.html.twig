@@ -1,0 +1,90 @@
+    <div class="container w-75">
+    <div class="row">
+        <div class="gallery-wrap col-3">
+            <div class="img-big-wrap">
+                {% if row.announcePic %}
+                    <a data-fancybox="gallery" target="_blank" href="{{ asset('/uploads/' ~ row.announcePic) }}"><img
+                                class="img-thumbnail"
+                                src="{{ asset('/uploads/' ~ row.announcePic) | imagine_filter('product_preview') }}" /></a>
+                {% else %}
+                    <img src="{{ asset('images/nopic.png') | imagine_filter('product_preview') }}" />
+                {% endif %}
+            </div> <!-- img-big-wrap.// -->
+
+            <div class="thumbs-wrap">
+                {% if row.contentPic %}
+                    <a data-fancybox="gallery" target="_blank" href="{{ asset('/uploads/' ~ row.contentPic) }}"><img
+                                class="img-thumbnail"
+                                src="{{ asset('/uploads/' ~ row.contentPic) | imagine_filter('thumb_square_100') }}" /></a>
+                {% endif %}
+
+                {% if row.extraPic %}
+                    <a data-fancybox="gallery" target="_blank" href="{{ asset('/uploads/' ~ row.extraPic) }}"><img
+                                class="img-thumbnail"
+                                src="{{ asset('/uploads/' ~ row.extraPic) | imagine_filter('thumb_square_100') }}" /></a>
+                {% endif %}
+            </div> <!-- thumbs-wrap.// -->
+
+        </div>
+
+        <div class="col-6">
+            <h1>{{ row.name }}</h1>
+
+            <table class="table table-striped table-bordered">
+                <tr><td>Тип / цвет</td>
+                    <td>{{ row.type }} {{ row.color }}</td>
+                </tr>
+                <tr><td>Алкоголь(%)</td>
+                    <td>{{ row.alcohol }}</td>
+                </tr>
+                <tr><td>Выдержка</td>
+                    <td>{{ row.aging }}</td>
+                </tr>
+                <tr><td>Тип выдержки</td>
+                    <td>{{ row.agingType }}</td>
+                </tr>
+                <tr><td>Тип ферментации</td>
+                    <td>{{ row.fermentation }}</td>
+                </tr>
+                <tr><td>Сорт(а) винограда</td>
+                    <td>{{ row.grapeSort }}</td>
+                </tr>
+                <tr><td>Рейтинги</td>
+                    <td>{{ row.ratings }}</td>
+                </tr>
+                <tr><td>Страна, регион</td>
+                    <td>{{ row.country }}, <small>{{ row.region }}</small></td>
+                </tr>
+                <tr><td>Объем(л)</td>
+                    <td>{{ row.volume }}</td>
+                </tr>
+                <tr><td>Упаковка</td>
+                    <td>{{ row.packing }}</td>
+                </tr>
+                <tr><td>Темперарура подачи(гр Ц)</td>
+                    <td>{{ row.serveTemperature }}</td>
+                </tr>
+                <tr><td>Декантация</td>
+                    <td>{{ row.decantation }}</td>
+                </tr>
+                <tr><td>Апелясьон</td>
+                    <td>{{ row.appellation }}</td>
+                </tr>
+            </table>
+
+        </div>
+    </div>
+
+    <hr/>
+
+    <div class="row">
+        <div class="col-2"></div>
+        <div class="col-8 justify-content-md-center">
+            <h4>Описание</h4>
+            {{ row.content | raw }}
+        </div>
+        <div class="col-2"></div>
+    </div>
+</div>
+
+

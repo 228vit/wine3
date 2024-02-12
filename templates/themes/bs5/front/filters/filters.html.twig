@@ -1,0 +1,125 @@
+{#{{ dump(productFilters) }}#}
+{{ dump(sessionFilters) }}
+
+<div class="accordion-item">
+    <div class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#filter_suppliers" aria-expanded="false" aria-controls="filter_suppliers">
+            Импортеры
+        </button>
+    </div>
+    <div id="filter_suppliers" class="accordion-collapse collapse show">
+        <div class="accordion-body">
+            <div class="scroll-block">
+                {% for supplier in suppliers %}
+                    <div class="form-check">
+                        <input class="form-check-input ch" type="checkbox" name="product_filter[supplier]"
+                               value="{{ supplier.id }}" id="filter_supplier_{{ supplier.id }}">
+                        <label class="form-check-label" for="filter_supplier_{{ supplier.id }}">
+                            {{ supplier.name }}
+                        </label>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="accordion-item">
+    <div class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#filter_wineColors" aria-expanded="false" aria-controls="filter_wineColors">
+            Цвет вина
+        </button>
+    </div>
+    <div id="filter_wineColors" class="accordion-collapse collapse {{ sessionFilters.product.wineColor|length > 0 ? 'show' : '' }}">
+        <div class="accordion-body">
+            <div class="scroll-block">
+                {{ dump(productFilters) }}
+                {% for wineColor in wineColors %}
+                    <div class="form-check">
+                        <input class="form-check-input ch" type="checkbox" name="product_filter[wineColor][]"
+                               value="{{ wineColor.id }}" id="filter_wineColor_{{ wineColor.id }}"
+                               {{ wineColor.id in sessionFilters.product.wineColor ? 'checked' : '' }}
+                        >
+                        <label class="form-check-label" for="filter_wineColor_{{ wineColor.id }}">
+                            {{ wineColor.name }}
+                        </label>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="accordion-item">
+    <div class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#filter_wineSugars" aria-expanded="false" aria-controls="filter_wineSugars">
+            Тип вина(сахаристость)
+        </button>
+    </div>
+    <div id="filter_wineSugars" class="accordion-collapse collapse">
+        <div class="accordion-body">
+            <div class="scroll-block">
+                {% for wineSugar in wineSugars %}
+                    <div class="form-check">
+                        <input class="form-check-input ch" type="checkbox" name="product_filter[wineSugar]"
+                               value="{{ wineSugar.id }}" id="filter_wineSugar_{{ wineSugar.id }}">
+                        <label class="form-check-label" for="filter_wineSugar_{{ wineSugar.id }}">
+                            {{ wineSugar.name }}
+                        </label>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="accordion-item">
+    <div class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#filter_countries" aria-expanded="false" aria-controls="filter_countries">
+            Страна
+        </button>
+    </div>
+    <div id="filter_countries" class="accordion-collapse collapse">
+        <div class="accordion-body">
+            <div class="scroll-block">
+                {% for country in countries %}
+                    <div class="form-check">
+                        <input class="form-check-input ch" type="checkbox" name="product_filter[country]"
+                               value="{{ country.id }}" id="filter_country_{{ country.id }}">
+                        <label class="form-check-label" for="filter_country_{{ country.id }}">
+                            {{ country.name }}
+                        </label>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="accordion-item">
+    <div class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#filter_grapeSorts" aria-expanded="false" aria-controls="filter_grapeSorts">
+            Сорт винограда
+        </button>
+    </div>
+    <div id="filter_grapeSorts" class="accordion-collapse collapse">
+        <div class="accordion-body">
+            <div class="scroll-block">
+                {% for grapeSort in grapeSorts %}
+                    <div class="form-check">
+                        <input class="form-check-input ch" type="checkbox" name="product_filter[grapeSort]"
+                               value="{{ grapeSort.id }}" id="filter_grapeSort_{{ grapeSort.id }}">
+                        <label class="form-check-label" for="filter_grapeSort_{{ grapeSort.id }}">
+                            {{ grapeSort.name }}
+                        </label>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>

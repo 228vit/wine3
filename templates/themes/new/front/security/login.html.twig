@@ -1,0 +1,85 @@
+{% extends 'layout_cabinet.html.twig' %}
+
+{% block body %}
+
+<div class="h2">Вход</div>
+<div class="subtitle">Войдите, чтобы продолжить</div>
+
+<form id="loginForm" method="post" action="{{ path('new_login') }}">
+    <div class="line">
+        <label>Ваш номер телефона</label>
+        <div class="input-group">
+            <div class="tel-code">
+                <input type="hidden" value="+7" name="code">
+                <button class="trigger">
+                    <img src="{{ asset('img/flags/ru.png') }}" alt="">
+                    <span id="countryCode">+7</span>
+                </button>
+{#                <div class="code-popup">#}
+{#                    <a href="#"><img src="{{ asset('svg/flags/ru.svg') }}" alt=""> Рус</a>#}
+{#                    <a href="#"><img src="{{ asset('svg/flags/gb.svg') }}" alt=""> En</a>#}
+{#                    <a href="#"><img src="{{ asset('svg/flags/de.svg') }}" alt=""> De</a>#}
+{#                </div>#}
+            </div>
+            <div class="input">
+                <input type="tel" class="phoneNumber" id="username" name="username"
+                       value="{{ last_username }}" required autofocus>
+                <div class="error-message">неверный номер</div>
+            </div>
+        </div>
+    </div>
+    <div class="line">
+        <label>Ваш пароль</label>
+        <div class="input">
+            <input id="password" type="password" name="password" />
+            <div class="error-message">неверный пароль</div>
+        </div>
+        <div class="help">
+            <a href="#" class="js-popup-forgot">Забыли пароль?</a>
+        </div>
+    </div>
+    <div class="line -center">
+        <button type="submit" class="btn">Войти</button>
+        <div class="links">
+            Нет аккаунта? <a href="{{ 'app_register' }}" class="js-popup-register">Зарегистрируйтесь.</a>
+        </div>
+    </div>
+</form>
+
+<script>
+    $(document).ready(function() {
+        $('#loginForm').on('submit', function (e) {
+            e.preventDefault();
+            var form = $(this);
+            var url = form.attr('action');
+            var phone = $('#username').val().replace(/[^0-9]/g, '');
+
+            var data = {
+                'username': phone,
+                'password': $('#password').val()
+            };
+            var jsonData = JSON.stringify(data);
+            console.log(jsonData);
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: jsonData,
+                dataType: 'json',
+                contentType: "application/json"
+            }).done(function (data) {
+                console.log(data);
+                if (typeof data.redirect !== 'undefined') {
+                    window.location = data.redirect;
+                }
+            }).fail(function (response) {
+                alert('Error');
+                console.log(response);
+            });
+
+            return false;
+        });
+
+    });
+</script>
+{% endblock %}

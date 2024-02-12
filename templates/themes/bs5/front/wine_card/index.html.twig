@@ -1,0 +1,40 @@
+{% extends 'layout_front_blank.html.twig' %}
+
+{% block title %}Мои винные карты{% endblock %}
+
+{% block body %}
+
+    <h1>Мои винные карты ресторанов</h1>
+
+    {% include 'front/common/flashes.html.twig' %}
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Название ресторана</th>
+                <th>Винная карта</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for wine_card in wine_cards %}
+            <tr>
+                <td><a href="{{ path('cabinet_wine_card_edit', {'id': wine_card.id}) }}">{{ wine_card.summary }}</a></td>
+                <td><a class="btn btn-sm btn-primary" href="{{ path('cabinet_wine_card_show', { id: wine_card.id }) }}">
+                        винная карта ресторана
+                        <span class="badge rounded-pill badge-light">{{ wine_card.products | length }}</span>
+                    </a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <hr />
+
+    <a class="btn btn-success" href="{{ path('cabinet_wine_card_new') }}">
+        <i class="fa fa-plus"></i> добавить винную карту</a>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% form_theme form 'bootstrap_4_horizontal_layout.html.twig' %}
+
+{% extends 'layout_front_blank.html.twig' %}
+
+{% block title %}New WineCard{% endblock %}
+
+{% block body %}
+    <h1>Создать винную карту для ресторана</h1>
+    <div class="container">
+    <div class="row">
+        <div class="col-8">
+            {{ include('front/wine_card/_form.html.twig', {'button_label': 'Создать'}) }}
+        </div>
+    </div>
+    </div>
+{% endblock %}

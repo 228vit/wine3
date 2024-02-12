@@ -1,0 +1,14 @@
+{% form_theme form 'bootstrap_4_horizontal_layout.html.twig' %}
+
+{% extends 'layout_front_blank.html.twig' %}
+
+{% block title %}Edit WineCard{% endblock %}
+
+{% block body %}
+    <h1>Редактировать винную карту</h1>
+    <hr/>
+    <div class="col-lg-6">
+        {{ include('front/wine_card/_form.html.twig', {'button_label': 'Сохранить', 'wineCard': wineCard}) }}
+    </div>
+
+{% endblock %}
