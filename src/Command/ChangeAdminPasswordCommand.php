@@ -32,7 +32,7 @@ class ChangeAdminPasswordCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('user:password')
+            ->setName('admin:password')
             ->setDescription('Change password')
             ->addArgument('email', InputArgument::REQUIRED, 'Email - must be unique')
             ->addArgument('password', InputArgument::REQUIRED, 'Password - use any symbols')
@@ -45,18 +45,18 @@ class ChangeAdminPasswordCommand extends Command
         $email = $input->getArgument('email');
         $password = $input->getArgument('password');
 
-        $user = $this->repository->findOneBy([
+        $admin = $this->repository->findOneBy([
             'email' => $email
         ]);
 
-        if (null === $user) {
+        if (null === $admin) {
             throw new NotFoundHttpException('bad email');
         }
 
-        $password = $this->passwordEncoder->encodePassword($user, $password);
-        $user->setPassword($password);
+        $password = $this->passwordEncoder->encodePassword($admin, $password);
+        $admin->setPassword($password);
 
-        $this->em->persist($user);
+        $this->em->persist($admin);
 
         try {
             $this->em->flush();
