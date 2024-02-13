@@ -1,0 +1,26 @@
+{% extends 'layout_front_blank.html.twig' %}
+
+{% block title %}Welcome!{% endblock %}
+
+{% block body %}
+    <h2>Добро пожаловать в наш сервис.</h2>
+    <p class="welcome">
+    Приветственный текст о том зачем нужен этот сервис и как классно им пользоваться.
+    </p>
+    <div class="clearfix"></div>
+
+    <hr />
+    {% if is_granted('IS_AUTHENTICATED_FULLY') or is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+        <div class="text-center">
+            <a href="{{ path('cabinet_product_index') }}" class="btn btn-lg btn-primary">список вин</a>
+            <a href="{{ path('cabinet_wine_card_index') }}" class="btn btn-lg btn-success">мои винные карты</a>
+        </div>
+    {% else %}
+        <div class="text-center">
+            <a href="{{ path('app_login') }}" class="btn btn-lg btn-primary"><i class="fa fa-user"></i> авторизация</a>
+            <a href="{{ path('app_register') }}" class="btn btn-lg btn-success"><i class="fa fa-pencil"></i> регистрация</a>
+        </div>
+    {% endif %}
+
+
+{% endblock %}

@@ -1,0 +1,26 @@
+{#{% form_theme form 'bootstrap_4_layout.html.twig' %}#}
+{% form_theme form 'bootstrap_4_horizontal_layout.html.twig' %}
+{% extends 'layout_admin.html.twig' %}
+
+{% block title %}
+    Create {{ model }} :: admin
+{% endblock %}
+
+{% block breadcrumbs %}
+    {% include 'admin/breadcrumb.html.twig' with {'last': 'Create new'} %}
+{% endblock %}
+
+{% block body %}
+    <h1>{{ entity_name }} creation</h1>
+
+    {% include 'admin/flashes.html.twig' %}
+
+    {{ form_start(form, {'attr': {'id': 'create_form'}}) }}
+        {{ form_rest(form) }}
+
+        <a class="btn btn-primary" href="{{ path('backend_' ~ model ~ '_index') }}"><i class="fa fa-list"></i> Back to the list</a>
+        {#submission in admin.js#}
+        <button id="submit_create_form" class="btn btn-success" type="submit"><i class="fa fa-check"></i> Create</button>
+    {{ form_end(form) }}
+{% endblock %}
+

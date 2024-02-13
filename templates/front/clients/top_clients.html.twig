@@ -1,0 +1,33 @@
+
+
+    <div class="swiper-container">
+        <button class="prev" type="button" title="Предыдущий слайд"></button>
+        <div class="swiper">
+            <div class="swiper-wrapper">
+
+                {% for row in topClients %}
+                    <div class="swiper-slide">
+                        {% if row.pic %}
+                            <div class="img">
+                                <a data-lightbox="gallery" class="img" href="{{ asset('/uploads/' ~ row.pic) }}"><img
+                                            src="{{ asset('/uploads/' ~ row.pic) | imagine_filter('thumb_client') }}" /></a>
+                            </div>
+                        {% else %}
+                            <div class="img">
+                                <img src="{{ asset('img/client1.png') }}" alt="">
+                            </div>
+                        {% endif %}
+                        <div class="name">{{ row.name }}</div>
+                    </div>
+                {% endfor %}
+
+                <div class="swiper-slide">
+                    <div class="img">
+                        <img src="{{ asset('img/client1.png') }}" alt="">
+                    </div>
+                    <div class="name">Lorem ipsum</div>
+                </div>
+            </div>
+        </div>
+        <button class="next" type="button" title="Следующий слайд"></button>
+    </div>

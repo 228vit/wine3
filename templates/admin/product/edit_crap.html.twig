@@ -1,0 +1,67 @@
+
+{#            <div class="row">#}
+{#                <div class="col-2">#}
+{#                </div>#}
+{#                <div class="col-4">#}
+{#                    <ul id="ratingsList" class="list-unstyled"><b>Рейтинги</b>#}
+{#                        {% for rating, value in ratings %}#}
+{#                        <li id="rating_{{ loop.index }}">#}
+{#                            <input name="rating[{{ loop.index }}][name]" value="{{ rating }}" size="5">#}
+{#                            <input name="rating[{{ loop.index }}][value]" value="{{ value }}" size="3">#}
+{#                            <a class="kill badge badge-pill badge-danger" rel="rating_{{ loop.index }}" href="javascript:;">x</a>#}
+{#                        </li>#}
+{#                        {% endfor %}#}
+{#                        <script>#}
+{#                            var newIndex = {{ ratings|length }} + 1;#}
+{#                        </script>#}
+{#                    </ul>#}
+{#                    <a id="addNewRating" class="btn btn-sm btn-success"><i class="fa fa-plus"></i> add new</a>#}
+{#                </div>#}
+{#                <div class="col-6">#}
+{#                    <ul id="grapeSorts" class="list-unstyled"><b>Сорта винограда</b>#}
+{#                        {% for sort, value in grapeSorts %}#}
+{#                            <li id="grapeSort_{{ loop.index }}">#}
+{#                                <input name="grapeSort[{{ loop.index }}][name]" value="{{ sort }}" size="30">#}
+{#                                <input name="grapeSort[{{ loop.index }}][value]" value="{{ value }}" size="3">#}
+{#                                <a class="kill badge badge-pill badge-danger" rel="rating_{{ loop.index }}" href="javascript:;">x</a>#}
+{#                            </li>#}
+{#                        {% endfor %}#}
+{#                        <script>#}
+{#                            var newGrapeSort = {{ grapeSorts|length }} + 1;#}
+{#                        </script>#}
+{#                    </ul>#}
+{#                    <a id="addNewGrapeSort" class="btn btn-sm btn-success"><i class="fa fa-plus"></i> add new</a>#}
+{#                    <hr />#}
+{#                </div>#}
+{#            </div>#}
+
+{#<script>#}
+{#    function bind() {#}
+{#        $('.kill').click(function () {#}
+{#            if (!confirm('Are you sure?')) {#}
+{#                return false;#}
+{#            }#}
+{#            var rel = $(this).attr('rel');#}
+
+{#            $('#'+rel).remove();#}
+{#        })#}
+{#    }#}
+{#    $('#addNewRating').click(function () {#}
+{#        $('#ratingsList').append('<li id="rating_'+newIndex+'">\n' +#}
+{#            '<input name="rating['+newIndex+'][name]" value="" size="3">\n' +#}
+{#            '<input name="rating['+newIndex+'][value]" value="" size="3">\n' +#}
+{#            '<a class="kill badge badge-pill badge-danger" rel="rating_'+newIndex+'" href="javascript:;">x</a></li>');#}
+{#        newIndex++;#}
+{#        bind();#}
+{#    });#}
+{#    $('#addNewGrapeSort').click(function () {#}
+{#        $('#grapeSorts').append('<li id="grapeSort_'+newGrapeSort+'">\n' +#}
+{#            '<input name="grapeSort['+newGrapeSort+'][name]" value="" size="30">\n' +#}
+{#            '<input name="grapeSort['+newGrapeSort+'][value]" value="" size="3">\n' +#}
+{#            '<a class="kill badge badge-pill badge-danger" rel="grapeSort_'+newGrapeSort+'" href="javascript:;">x</a></li>');#}
+{#        newGrapeSort++;#}
+{#        bind();#}
+{#    });#}
+
+{#    bind();#}
+{#</script>#}

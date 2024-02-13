@@ -1,0 +1,56 @@
+{% form_theme form 'bootstrap_4_horizontal_layout.html.twig' %}
+
+{% extends 'layout_admin.html.twig' %}
+
+{% block title %}
+    View product :: admin
+{% endblock %}
+
+{% block breadcrumbs %}
+    {% include 'admin/breadcrumb.html.twig' with {'last': 'Edit "' ~ row ~ '"'} %}
+{% endblock %}
+
+{% block body %}
+    <h1>{{ entity_name }} edit</h1>
+
+    {% include 'admin/flashes.html.twig' %}
+
+    {{ form_start(form) }}
+
+    {{ form_row(form.name) }}
+    {{ form_row(form.slug) }}
+    {{ form_row(form.content) }}
+
+    <div class="form-group row">
+        {{ form_label(form.picFile) }}
+        <div class="col-8">
+            {{ form_widget(form.picFile) }}
+        </div>
+        <div class="col-2">
+            {% if row.pic %}
+                <a data-lightbox="gallery" target="_blank" href="{{ asset('uploads/' ~ row.pic) }}"><img
+                            src="{{ asset('uploads/' ~ row.pic) | imagine_filter('thumb_square_50') }}" /></a>
+            {% endif %}
+        </div>
+    </div>
+
+    {{ form_rest(form) }}
+
+    <hr />
+
+    <div class="row">
+        <div class="col-8">
+            <a class="btn btn-primary" href="{{ path('backend_' ~ model ~ '_index') }}"><i class="fa fa-arrow-left"></i> Back to the list</a>
+            <button class="btn btn-success" type="submit"><i class="fa fa-check"></i> Update</button>
+            {{ form_end(form) }}
+        </div>
+    </div>
+
+    <br />
+    <br />
+
+{% endblock %}
+
+{% block extra_scripts %}
+
+{% endblock %}

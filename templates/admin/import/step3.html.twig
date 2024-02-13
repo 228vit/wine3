@@ -1,0 +1,108 @@
+{#{% form_theme form 'bootstrap_4_layout.html.twig' %}#}
+{#{% form_theme form 'bootstrap_4_horizontal_layout.html.twig' %}#}
+{% extends 'layout_admin.html.twig' %}
+
+{% block title %}
+    Start import, step3 :: admin
+{% endblock %}
+
+{% block breadcrumbs %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{ path('backend_dashboard') }}"><i class="fa fa-dashboard"></i>  Dashboard</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{{ path('backend_import_index') }}"><i class="fa fa-table"></i>  Imports</a>
+        </li>
+        <li class="breadcrumb-item">
+            <span><i class="fa fa-pencil"></i> Import Step4</span>
+        </li>
+    </ol>
+{% endblock %}
+
+{% block body %}
+    <style>
+        .table-responsive{
+            height: 500px;
+            overflow: scroll;
+        }
+        thead tr:nth-child(1) th{
+            color: #fff;
+            background-color: #343a40;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+    </style>
+
+    <form method="post" action="{{ path('backend_import_step3', {'id': importLog.id}) }}">
+        <h3>Import / step3 / view import results
+            <a class="btn btn-secondary" href="{{ path('backend_import_step2', {'id': importLog.id}) }}">
+                <i class="fa fa-arrow-left"></i> Back to step2</a>
+            <button class="btn btn-success" type="submit" name="next">
+                <i class="fa fa-arrow-right"></i> Start import ({{ dataToReview|length }} rows</button>
+        </h3>
+        <hr />
+
+        {% include 'admin/flashes.html.twig' %}
+
+{#        {{ dump(csvColumnMapping) }}#}
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Название</th>
+                        <th>Цвет / сахар</th>
+                        <th>Цена</th>
+                        <th>Объём, упак.</th>
+                        <th>Производитель</th>
+                        <th>Страна<br/>регион</th>
+                        <th>Сорта Винограда</th>
+                        <th>Сочетания</th>
+                        <th>Рейтинги</th>
+                        <th>Выдерж, тип.в,фермент.</th>
+                    </tr>
+                </thead>
+                {% for columnNum, data in dataToReview %}
+                    <tr>
+                        <td width="1">{{ data.productCode }}</td>
+                        <td width="1">{{ data.name }}</td>
+                        <td width="1">{{ data.color ~ ' ' ~ data.type }}</td>
+                        <td width="1">{{ data.price }}</td>
+                        <td width="1">{{ data.volume }}<br />{{ data.packing }}</td>
+                        <td width="1">{{ data.vendorName }}<br /><small>{{ data.vendorUrl }}</small></td>
+                        <td width="1">{{ data.country }} <br /><small> {{  data.region }}</small></td>
+                        <td width="1">{{ data.grapeSort | raw }}</td>
+                        <td width="1">{{ data.foods | raw }}</td>
+                        <td width="1">{{ data.ratings | raw }}</td>
+                        <td width="1">{{ data.aging }} <br /><small>{{ data.agingType }}<br />{{ data.fermentation }}</small> </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </form>
+
+    {#    {{ form_start(form) }}#}
+{#    {{ form_rest(form) }}#}
+{#    {{ form_end(form) }}#}
+
+
+    <br />
+
+    <script>
+        $(document).ready(function () {
+            $('.delete_row').on('click', function (e) {
+                var rel = $(this).attr('rel');
+                var $this = $(this);
+                // console.log('remove ' + rel);
+                $('#' + rel).addClass('alert-danger');
+                setTimeout(function() {
+                    $('#'+rel).remove();
+                    console.log('remove ' + rel);
+                }, 200);
+
+            })
+        })
+    </script>
+{% endblock %}

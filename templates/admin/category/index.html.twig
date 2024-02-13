@@ -1,0 +1,83 @@
+{% extends 'layout_admin.html.twig' %}
+
+{% block title %}
+    {{ entity_name }} :: admin
+{% endblock %}
+
+{% block breadcrumbs %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <i class="fa fa-dashboard"></i> <a href="{{ path('backend_dashboard') }}">Dashboard</a>
+        </li>
+        <li class="breadcrumb-item active">
+            <i class="fa fa-table"></i> {{ entity_name }}
+        </li>
+    </ol>
+{% endblock %}
+
+{% block body %}
+
+    <h1 class="page-header">{{ entity_name }} list</h1>
+
+    {% include 'admin/flashes.html.twig' %}
+
+    {% if current_filters|length %}
+        <div class="alert alert-secondary" role="alert">
+            <i class="fa fa-filter"></i> Filters:
+            {% for field, filter in current_filters %}
+                <span class="badge badge-secondary">{{ field }}: {{ filter }}</span>
+            {% endfor %}
+            |
+            <a href="{{ path('backend_reset_filter', {'model': model}) }}"><i class="fa fa-times"></i> reset all</a>
+        </div>
+    {% endif %}
+
+    <table class="table table-striped">
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Slug</th>
+            <th>Active?</th>
+            <th>Actions</th>
+        </tr>
+
+        {# table body #}
+        {% for row in pagination %}
+            <tr>
+                <td>{{ row.id }}</td>
+                <td><a href="{{ path('backend_' ~ model ~ '_edit', { 'id': row.id }) }}">{{ row }}</a></td>
+                <td>{{ row.slug }}</td>
+
+                <td>
+                    {% if row.isActive %}
+                        <span class="badge badge-pill badge-success"><i class="fa fa-check-square"></i></span>
+                    {% else %}
+                        <span class="badge badge-pill badge-danger"><i class="fa fa-window-close"></i></span>
+                    {% endif %}
+                </td>
+
+                <td>
+                    <a class="btn btn-sm btn-success" href="{{ path('backend_' ~ model ~ '_edit', { 'id': row.id }) }}">
+                        <i class="fa fa-pencil" aria-hidden="true"></i> edit</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    {# display navigation #}
+    <div class="navigation">
+        {{ knp_pagination_render(pagination) }}
+        <div class="count">
+            Total rows: {{ pagination.getTotalItemCount }}
+        </div>
+    </div>
+
+    <p>
+        <a class="btn btn-success" href="{{ path('backend_' ~ model ~ '_new') }}">
+            <span class="fa fa-plus" aria-hidden="true"></span> Create a new {{ model }}</a>
+    </p>
+{% endblock %}
+
+
+{% block filter_form %}
+    {% include 'admin/common/filter_form.html.twig' with {'filter_form': filter_form} %}
+{% endblock %}

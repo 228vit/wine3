@@ -1,0 +1,71 @@
+# See dos how to configure the bundle: https://symfony.com/doc/current/bundles/LiipImagineBundle/basic-usage.html
+liip_imagine:
+    # valid drivers options include "gd" or "gmagick" or "imagick"
+    driver: "gd"
+
+    resolvers:
+        default:
+            web_path: ~
+
+    filter_sets:
+        thumb_square_50:
+            jpeg_quality: 75
+            png_compression_level: 8
+            filters:
+                thumbnail: { size: [50, 50], mode: inset, allow_upscale: true }
+                background: { size: [50, 50], position: center, color: '#ffffff' }
+        thumb_square_100:
+            jpeg_quality: 75
+            png_compression_level: 8
+            filters:
+                thumbnail: { size: [100, 100], mode: inset, allow_upscale: true }
+                background: { size: [100, 100], position: center, color: '#ffffff' }
+        thumb_square_160:
+            jpeg_quality: 75
+            png_compression_level: 8
+            filters:
+                thumbnail: { size: [160, 160], mode: inset, allow_upscale: true }
+                background: { size: [160, 160], position: center, color: '#ffffff' }
+        thumb_rect_210:
+            jpeg_quality: 75
+            png_compression_level: 8
+            filters:
+                thumbnail: { size: [210, 140], mode: inset }
+        thumb_square_210:
+            jpeg_quality: 75
+            png_compression_level: 8
+            filters:
+                thumbnail: { size: [210, 210], mode: inset }
+        thumb_square_450:
+            jpeg_quality: 75
+            png_compression_level: 8
+            filters:
+                thumbnail: { size: [450, 450], mode: inset }
+
+        thumb_news:
+            jpeg_quality: 75
+            png_compression_level: 8
+            filters:
+                thumbnail: { size: [228, 154], mode: inset }
+        thumb_client:
+            jpeg_quality: 75
+            png_compression_level: 8
+            filters:
+                thumbnail: { size: [146, 146], mode: inset }
+
+        product_preview:
+            jpeg_quality: 75
+            png_compression_level: 8
+            filters:
+                thumbnail: { size: [400, 400], mode: inset }
+                background: { size: [400, 400], position: center, color: '#ffffff' }
+
+        widen_400:
+            filters:
+                relative_resize:
+                    widen: 400
+        fixed_400:
+            filters:
+                fixed:
+                    width: 400
+                    height: 400

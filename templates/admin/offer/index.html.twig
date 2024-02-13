@@ -1,0 +1,129 @@
+{% extends 'layout_admin.html.twig' %}
+
+{% block title %}
+    {{ entity_name }} :: admin
+{% endblock %}
+
+{% block breadcrumbs %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{ path('backend_dashboard') }}"><i class="fa fa-dashboard"></i> Dashboard</a>
+        </li>
+        <li class="breadcrumb-item active">
+            <a href="javascript:;"><i class="fa fa-table"></i> {{ entity_name }}</a>
+        </li>
+    </ol>
+{% endblock %}
+
+{% block body %}
+
+    <h1 class="page-header">{{ entity_name }} list </h1>
+
+    {% include 'admin/flashes.html.twig' %}
+
+    {% if current_filters|length %}
+        <div class="alert alert-secondary" role="alert">
+            <i class="fa fa-filter"></i> Filters:
+            {% for field, filter in current_filters_string %}
+                {% if filter is iterable %}
+                    <span class="badge badge-secondary">{{ field }}: {{ filter|join(', ') }}</span>
+                {% else %}
+                    <span class="badge badge-secondary">{{ field }}: {{ filter }}</span>
+                {% endif %}
+            {% endfor %}
+            |
+            <a href="{{ path('backend_reset_filter', {'model': model}) }}"><i class="fa fa-times"></i> reset all</a>
+        </div>
+    {% endif %}
+
+    <form action="{{ path('backend_products_update') }}" method="post">
+    <table class="table table-striped">
+        <tr>
+            <th{% if pagination.isSorted('a.id') %} class="sorted"{% endif %}>
+                {{ knp_pagination_sortable(pagination, 'ID', 'offer.id') }}
+            </th>
+            <th{% if pagination.isSorted('a.name') %} class="sorted"{% endif %}>
+                {{ knp_pagination_sortable(pagination, 'Name', 'offer.name') }}
+            </th>
+            <th>Поставщик</th>
+            <th>Vendor</th>
+            <th{% if pagination.isSorted('a.price') %} class="sorted"{% endif %}>
+                {{ knp_pagination_sortable(pagination, 'Price', 'offer.price') }}
+            </th>
+            <th>Actions</th>
+        </tr>
+
+        {# table body #}
+        {% for row in pagination %}
+            <tr>
+                <td>{{ row.id }}</td>
+                <td>
+                    <a href="{{ path('backend_' ~ model ~ '_edit', { 'id': row.id }) }}">{{ row.name }}</a>
+                    ::
+                    <small>{{ row.shortSummary }}</small>
+                    <br />
+                    {% if row.product %}
+                        <a class="btn btn-sm btn-outline-primary" href="javascript:;"
+                           data-fancybox data-type="ajax" data-src="{{ path('backend_product_show', { id: row.product.id }) }}"><i class="fa fa-search"></i> смотреть карточку товара</a>
+                    {% else %}
+                        <a class="btn btn-sm btn-primary" href="{{ path('backend_offer_link', { id: row.id }) }}"><i class="fa fa-plus"></i> привязать к карточке</a>
+                    {% endif %}
+                </td>
+                <td>{{ row.supplier }}</td>
+                <td>{{ row.vendor }}
+                    <br />
+                    <small>{{ row.country }}</small>
+                </td>
+                <td>{{ row.price }}</td>
+
+                <td>
+                    <a class="btn btn-sm btn-success" href="{{ path('backend_offer_link', { 'id': row.id }) }}">
+                        <i class="fa fa-pencil" aria-hidden="true"></i> edit</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    {# display navigation #}
+    <div class="navigation">
+        {{ knp_pagination_render(pagination) }}
+        <div class="count">
+            Total rows: {{ pagination.getTotalItemCount }}
+        </div>
+    </div>
+
+    <p></p>
+    </form>
+
+    <div id="modalWindow" class="modal-dialog modal-dialog-scrollable"> </div>
+
+{% endblock %}
+
+
+{% block filter_form %}
+    {% include 'admin/common/filter_form.html.twig' with {'filter_form': filter_form} %}
+{% endblock %}
+
+{% block extra_scripts %}
+    <script>
+        $(document).ready(function() {
+            var myModal = new bootstrap.Modal(document.getElementById('modalWindow'), {
+                keyboard: true
+            });
+
+            $('.productView').click(function () {
+                var href = $(this).attr('href');
+                console.log(href);
+                $.ajax({
+                    url: href
+                }).done(function(html) {
+                    $('#modalWindow').html(html);
+                });
+
+                myModal.toggle();
+
+                return false;
+            });
+        })
+    </script>
+{% endblock %}

@@ -1,0 +1,125 @@
+{% form_theme form 'bootstrap_4_horizontal_layout.html.twig' %}
+
+{% extends 'layout_admin.html.twig' %}
+
+{% block title %}
+    Edit {{ model }} :: admin
+{% endblock %}
+
+{% block breadcrumbs %}
+    {% include 'admin/breadcrumb.html.twig' with {'last': 'Edit "' ~ row ~ '"'} %}
+{% endblock %}
+
+{% block body %}
+    <h1>Wine sugar edit</h1>
+
+    {% include 'admin/flashes.html.twig' %}
+
+    {{ form_start(form) }}
+    <div class="row">
+        <div class="col-6">
+            {{ form_row(form.name) }}
+            {{ form_row(form.position) }}
+            {{ form_row(form.description) }}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-4">
+            <h4>Алиасы</h4>
+            <table class="table table-bordered table-striped">
+                <thead class="thead-light">
+                <tr>
+                    <th>Псевдоним</th>
+                    <th>actions</th>
+                </tr>
+                </thead>
+                <tbody class="wineSugarAliasItems" data-prototype="{{ include('admin/wine_sugar/wineSugarAliasPrototype.html.twig', { 'form': form.aliases.vars.prototype })|e('html_attr') }}">
+                {% for id, alias in form.aliases %}
+                    <tr class="itemRow" id="wineSugarAliasItem-{{ id }}" rel="{{ id }}">
+                        <td>
+                            {{ form_errors(alias) }}
+                            {{ form_widget(alias.name) }}
+                        </td>
+                        <td><button type="button" class="btn btn-danger deleteRow" rel="wineSugarAliasItem-{{ id }}">delete</button>
+                            {{ form_rest(alias) }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                <tfoot id="tableFooterAliases"></tfoot>
+            </table>
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-8">
+            <a class="btn btn-primary" href="{{ path('backend_' ~ model ~ '_index') }}"><i class="fa fa-arrow-left"></i> Back to the list</a>
+            <button class="btn btn-success" type="submit"><i class="fa fa-check"></i> Update</button>
+            {{ form_end(form) }}
+        </div>
+        <div class="col-4 text-right">
+            {{ form_start(delete_form) }}
+            <button class="btn btn-danger delete-button" type="submit"><i class="fa fa-exclamation"></i> Delete</button>
+            {{ form_end(delete_form) }}
+        </div>
+    </div>
+
+    <br/>
+    <br/>
+{% endblock %}
+
+{% block extra_scripts %}
+    <script>
+        $(document).ready(function() {
+
+            bindClickDeleteBtn();
+
+            var $collectionHolderAliases;
+            var $addAliasButton = $('<td colspan="2"><button type="button" class="btn btn-sm btn-success addRow add_tag_link"><i class="fa fa-plus"></i> add new row</button></td>');
+            var $newLink = $('<tr></tr>').append($addAliasButton);
+            $collectionHolderAliases = $('tbody.wineSugarAliasItems');
+            var $collectionFooter = $('tfoot#tableFooterAliases');
+
+            $collectionFooter.append($newLink);
+
+            var lastId = parseInt($('.wineSugarAliasItems > tr.itemRow').last().attr('rel')) + 1;
+            if (isNaN(lastId)) {
+                lastId = 0;
+            }
+            $collectionHolderAliases.data('index', lastId);
+
+            $addAliasButton.on('click', function(e) {
+                addAliasForm($collectionHolderAliases, $newLink);
+                bindClickDeleteBtn();
+            });
+
+        })
+
+        function bindClickDeleteBtn() {
+            $('.deleteRow').on('click', function () {
+                if (confirm('Are you sure?')) {
+                    let rel = $(this).attr('rel');
+                    console.log(rel);
+                    $('#'+rel).slideUp('slow');
+                    $('#'+rel).remove();
+
+                    return false;
+                }
+            });
+        }
+
+        function addAliasForm($collectionHolderAliases, $newLinkLi) {
+            var prototype = $collectionHolderAliases.data('prototype');
+            var index = $collectionHolderAliases.data('index');
+
+            var newForm = prototype;
+            newForm = newForm.replace(/__name__/g, index);
+            $collectionHolderAliases.data('index', index + 1);
+
+            $('.wineSugarAliasItems').append(newForm);
+        }
+    </script>
+{% endblock %}
+

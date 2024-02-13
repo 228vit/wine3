@@ -1,0 +1,79 @@
+{% form_theme form 'bootstrap_4_horizontal_layout.html.twig' %}
+
+{% extends 'layout_admin.html.twig' %}
+
+{% block title %}
+    Edit {{ model }} :: admin
+{% endblock %}
+
+{% block breadcrumbs %}
+    {% include 'admin/breadcrumb.html.twig' with {'last': 'Edit "' ~ row ~ '"'} %}
+{% endblock %}
+
+{% block body %}
+    <h1>Wine color edit</h1>
+
+    {% include 'admin/flashes.html.twig' %}
+
+    {{ form_start(form) }}
+
+    {{ form_rest(form) }}
+
+    <div class="row">
+        <div class="col-2">
+        </div>
+        <div class="col-4">
+            <ul id="aliassList" class="list-unstyled"><b>Aliases</b>
+                {% for alias in aliases %}
+                    <li id="alias_{{ loop.index }}">
+                        <input name="alias[{{ loop.index }}]" value="{{ alias.alias }}" size="20">
+                        <a class="kill badge badge-pill badge-danger" rel="alias_{{ loop.index }}" href="javascript:;">x</a>
+                    </li>
+                {% endfor %}
+                <script>
+                    var newIndex = {{ aliases|length }} + 1;
+                </script>
+            </ul>
+            <a id="addNewAlias" class="btn btn-sm btn-success"><i class="fa fa-plus"></i> add new</a>
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col-8">
+            <a class="btn btn-primary" href="{{ path('backend_' ~ model ~ '_index') }}"><i class="fa fa-arrow-left"></i> Back to the list</a>
+            <button class="btn btn-success" type="submit"><i class="fa fa-check"></i> Update</button>
+            {{ form_end(form) }}
+        </div>
+        <div class="col-4 text-right">
+            {{ form_start(delete_form) }}
+            <button class="btn btn-danger delete-button" type="submit"><i class="fa fa-exclamation"></i> Delete</button>
+            {{ form_end(delete_form) }}
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+    <script>
+        function bind() {
+            $('.kill').click(function () {
+                if (!confirm('Are you sure?')) {
+                    return false;
+                }
+                var rel = $(this).attr('rel');
+
+                $('#'+rel).remove();
+            })
+        }
+        $('#addNewAlias').click(function () {
+            $('#aliassList').append('<li id="alias_'+newIndex+'">\n' +
+                '<input name="alias['+newIndex+']" value="" size="20">\n' +
+                '<a class="kill badge badge-pill badge-danger" rel="alias_'+newIndex+'" href="javascript:;">x</a></li>');
+            newIndex++;
+            bind();
+        });
+
+        bind();
+    </script>
+{% endblock %}
+

@@ -1,0 +1,112 @@
+{% extends 'layout_admin.html.twig' %}
+
+{% block title %}
+    {{ entity_name }} :: admin
+{% endblock %}
+
+{% block breadcrumbs %}
+<ol class="breadcrumb">
+    <li class="breadcrumb-item">
+        <a href="{{ path('backend_dashboard') }}"><i class="fa fa-dashboard"></i> Dashboard</a>
+    </li>
+    <li class="breadcrumb-item active">
+        <span><i class="fa fa-table"></i> Imports</span>
+    </li>
+</ol>
+{% endblock %}
+
+{% block body %}
+
+    <h1 class="page-header">{{ entity_name }} list</h1>
+
+    {% include 'admin/flashes.html.twig' %}
+
+    {% if current_filters|length %}
+        <div class="alert alert-secondary" role="alert">
+            <i class="fa fa-filter"></i> Filters:
+            {% for field, filter in current_filters %}
+                <span class="badge badge-secondary">{{ field }}: {{ filter }}</span>
+            {% endfor %}
+            |
+            <a href="{{ path('backend_reset_filter', {'model': model}) }}"><i class="fa fa-times"></i> reset all</a>
+        </div>
+    {% endif %}
+
+    <table class="table table-striped">
+        <tr>
+            <th{% if pagination.isSorted('a.id') %} class="sorted"{% endif %}>
+                {{ knp_pagination_sortable(pagination, 'ID', 'import.id') }}
+            </th>
+            <th{% if pagination.isSorted('a.name') %} class="sorted"{% endif %}>
+                {{ knp_pagination_sortable(pagination, 'Name', 'import.name') }}
+            </th>
+            <th>Поставщик</th>
+            <th>Дата</th>
+            <th>Стадия</th>
+            <th>Завершён?</th>
+
+            <th>Actions</th>
+        </tr>
+
+        {# table body #}
+        {% for row in pagination %}
+            <tr>
+                <td>{{ row.id }}</td>
+                <td>
+                    <a href="{{ path('backend_import_step' ~ row.stage, {'id': row.id}) }}">{{ row.name }}</a>
+                    {% if row.isComplete %}
+                        <br />
+                        <a class="badge badge-success" href="{{ path('backend_offer_set_filter', { import: row.id }) }}">
+                            <i class="fa fa-list"></i> offers</a>
+                    {% endif %}
+                </td>
+                <td>{{ row.supplier }}</td>
+                <td>{{ row.createdAt | date('d.m.Y') }}</td>
+                <td>{{ row.stage }} из 4</td>
+                <td>
+                    {% if row.isComplete %}
+                        <span class="badge badge-success">завершён</span>
+                    {% else %}
+                        <span class="badge badge-warning">в процессе</span>
+                    {% endif %}
+                    <br><small>{{ row.note | raw }}</small>
+                </td>
+
+{#                {% for query_field, params in list_fields %}#}
+{#                    <td>{{ attribute(row, params.row_field) }}</td>#}
+{#                {% endfor %}#}
+                <td>
+                    <a class="btn btn-sm btn-success" href="{{ path('backend_import_step' ~ row.stage, {'id': row.id} ) }}">
+                        <i class="fa fa-pencil" aria-hidden="true"></i> edit</a>
+                    <a class="btn btn-sm btn-primary copy-import" href="{{ path('backend_import_copy', {'id': row.id} ) }}">
+                        <i class="fa fa-copy" aria-hidden="true"></i> copy</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    {# display navigation #}
+    <div class="navigation">
+        {{ knp_pagination_render(pagination) }}
+        <div class="count">
+            Total rows: {{ pagination.getTotalItemCount }}
+        </div>
+    </div>
+
+    <p>
+        <a class="btn btn-success" href="{{ path('backend_' ~ model ~ '_new') }}">
+            <span class="fa fa-plus" aria-hidden="true"></span> Create a new {{ model }}</a>
+    </p>
+
+    <script>
+        $(document).ready(function () {
+            $('.copy-import').on('click', function () {
+                return confirm('Вы уверены?');
+            })
+        })
+    </script>
+{% endblock %}
+
+
+{% block filter_form %}
+    {% include 'admin/common/filter_form.html.twig' with {'filter_form': filter_form} %}
+{% endblock %}

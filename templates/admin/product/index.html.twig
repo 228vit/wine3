@@ -1,0 +1,204 @@
+{% extends 'layout_admin.html.twig' %}
+
+{% block title %}
+    {{ entity_name }} :: admin
+{% endblock %}
+
+{% block breadcrumbs %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{ path('backend_dashboard') }}"><i class="fa fa-dashboard"></i> Dashboard</a>
+        </li>
+        <li class="breadcrumb-item active">
+            <a href="javascript:;"><i class="fa fa-table"></i> {{ entity_name }}</a>
+        </li>
+    </ol>
+{% endblock %}
+
+{% block body %}
+
+    <h1 class="page-header">{{ entity_name }} list</h1>
+
+    {% include 'admin/flashes.html.twig' %}
+
+    {% if current_filters|length %}
+        <div class="alert alert-secondary" role="alert">
+            <i class="fa fa-filter"></i> Filters:
+            {% for field, filter in current_filters_string %}
+                {% if filter is iterable %}
+                    <span class="badge badge-secondary">{{ field }}: {{ filter|join(', ') }}</span>
+                {% else %}
+                    <span class="badge badge-secondary">{{ field }}: {{ filter }}</span>
+                {% endif %}
+            {% endfor %}
+            |
+            <a href="{{ path('backend_reset_filter', {'model': model}) }}"><i class="fa fa-times"></i> reset all</a>
+        </div>
+    {% endif %}
+
+    <form action="{{ path('backend_products_update') }}" method="post">
+    <table class="table table-striped">
+        <tr>
+            <th{% if pagination.isSorted('a.id') %} class="sorted"{% endif %}>
+                {{ knp_pagination_sortable(pagination, 'ID', 'product.id') }}
+            </th>
+            <th{% if pagination.isSorted('a.name') %} class="sorted"{% endif %}>
+                {{ knp_pagination_sortable(pagination, 'Name', 'product.name') }}
+            </th>
+            <th>Vendor</th>
+            <th>Summary</th>
+            <th{% if pagination.isSorted('a.wineSugar') %} class="sorted"{% endif %}>
+                {{ knp_pagination_sortable(pagination, 'Sugar', 'product.wineSugar') }}
+            </th>
+            <th{% if pagination.isSorted('a.price') %} class="sorted"{% endif %}>
+                {{ knp_pagination_sortable(pagination, 'Price', 'product.price') }}
+            </th>
+            <th>Ann</th>
+            <th>Cont</th>
+            <th>Extra</th>
+            <th>Upd</th>
+            <th>Act</th>
+            <th>Actions</th>
+        </tr>
+
+        {# table body #}
+        {% for row in pagination %}
+            <tr>
+                <td>{{ row.id }}</td>
+                <td>
+                    <a href="{{ path('backend_' ~ model ~ '_edit', { 'id': row.id }) }}">{{ row.name }}</a>
+                    <br />
+                    <small>{{ row.slug }}</small>
+                </td>
+                <td>{{ row.vendor }}
+                    <br />
+                    <small>{{ row.country }}</small>
+                </td>
+                <td>{{ row.shortSummary }}</td>
+                <td>{{ row.wineSugar }}</td>
+                <td>
+                    <input type="number" class="input-group-sm" size="5"
+                           name="product[{{ row.id }}][price]"
+                           value="{{ row.price }}" />
+                </td>
+
+                <td>
+                    {% if row.announcePic %}
+                    <a data-lightbox="gallery" target="_blank" href="{{ asset('/uploads/' ~ row.announcePic) }}"><img
+                                src="{{ asset('/uploads/' ~ row.announcePic) | imagine_filter('thumb_square_50') }}" /></a>
+                    {% endif %}
+                </td>
+
+                <td>
+                    {% if row.contentPic %}
+                    <a data-lightbox="gallery" target="_blank" href="{{ asset('/uploads/' ~ row.contentPic) }}"><img
+                                src="{{ asset('/uploads/' ~ row.contentPic) | imagine_filter('thumb_square_50') }}" /></a>
+                    {% endif %}
+                </td>
+
+                <td>
+                    {% if row.extraPic %}
+                        <a data-lightbox="gallery" target="_blank" href="{{ asset('/uploads/' ~ row.extraPic) }}"><img
+                                    src="{{ asset('/uploads/' ~ row.extraPic) | imagine_filter('thumb_square_50') }}" /></a>
+                    {% endif %}
+                </td>
+
+                <td><span class="badge badge-pill badge-{{ row.isEdited ? 'success' : 'danger' }}"><i
+                            class="fa fa-{{ row.isEdited ? 'check-square' : 'window-close' }}"></i></span>
+                </td>
+
+                <td><a href="javascript:;" class="toggle_field" id="isactive_{{ row.id }}" rel="{{ row.id }}" field="isActive">
+                    <span class="badge badge-pill badge-{{ row.isActive ? 'success' : 'danger' }}"><i
+                                class="fa fa-{{ row.isActive ? 'check-square' : 'window-close' }}"></i></span></a>
+                </td>
+
+                <td>
+                    <a class="btn btn-sm btn-success" href="{{ path('backend_' ~ model ~ '_edit', { 'id': row.id }) }}">
+                        <i class="fa fa-pencil" aria-hidden="true"></i> edit</a>
+{#                    <a class="btn btn-sm btn-primary" href="{{ path('backend_' ~ model ~ '_clone', { 'id': row.id }) }}">#}
+{#                        <i class="fa fa-copy" aria-hidden="true"></i> clone</a>#}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    {# display navigation #}
+    <div class="navigation">
+        {{ knp_pagination_render(pagination) }}
+        <div class="count">
+            Total rows: {{ pagination.getTotalItemCount }}
+        </div>
+    </div>
+
+    <p>
+        <button type="submit" class="btn btn-primary"><span class="fa fa-save" aria-hidden="true"></span>
+            Update prices</button>
+        <a class="btn btn-success" href="{{ path('backend_' ~ model ~ '_new') }}">
+            <span class="fa fa-plus" aria-hidden="true"></span> Create a new {{ model }}</a>
+    </p>
+    </form>
+{% endblock %}
+
+
+{% block filter_form %}
+    {% include 'admin/common/filter_form.html.twig' with {'filter_form': filter_form} %}
+{% endblock %}
+
+{% block extra_scripts %}
+    <script>
+        $(document).ready(function() {
+
+            $('.toggle_field').on('click', function() {
+                var product_id = $(this).attr('rel');
+                var field = $(this).attr('field');
+                var url = '{{ path('ajax_product_toggle_field') }}';
+                var data = {
+                    'id': product_id,
+                    'field': field
+                };
+                status_id = $(this).attr('id');
+                $.ajax({
+                    url: url,
+                    data: data
+                }).done(function(html) {
+                    console.log(html);
+                    // console.log($(status_id);
+                    $('#'+status_id).html(html);
+                });
+            })
+
+            $.wait = function( callback, seconds){
+                return window.setTimeout( callback, seconds * 1000 );
+            }
+
+            $('.change_status').on('change', function() {
+                var product_id = $(this).attr('rel');
+                var product_status = $(this).val();
+                var url = '{{ path('ajax_product_status') }}';
+                var data = {
+                    'id': product_id,
+                    'status': product_status
+                };
+                $.ajax({
+                    url: url,
+                    data: data
+                }).done(function(data) {
+                    console.log(data);
+                    // $("#semafore").addClass('text-green');
+                    $("#semafore")
+                        .fadeOut( 200, function () {
+                                $(this).addClass('text-green')
+                            })
+                        .delay( 200 )
+                        .fadeIn( 200 )
+                        .fadeOut( 200, function () {
+                                $(this).removeClass('text-green')
+                            } )
+                        .delay( 200 )
+                        .fadeIn( 200 );
+                });
+            })
+
+        })
+    </script>
+{% endblock %}

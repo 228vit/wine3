@@ -1,0 +1,14 @@
+{% form_theme filter_form 'bootstrap_4_horizontal_layout.html.twig' %}
+
+{{ form_start(filter_form, {'attr': {'id': 'item_filter'}}) }}
+<div class="modal-body">
+    {{  form_rest(filter_form) }}
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" type="submit" id="apply_filter">Apply Filter</button>
+    {% if model is defined %}
+        <a class="btn btn-info" href="{{ path('backend_reset_filter', {'model': model}) }}">Reset Filter</a>
+    {% endif %}
+    <button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>
+</div>
+{{ form_end(filter_form) }}

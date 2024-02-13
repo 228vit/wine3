@@ -1,0 +1,112 @@
+{#{% form_theme form 'bootstrap_4_layout.html.twig' %}#}
+{#{% form_theme form 'bootstrap_4_horizontal_layout.html.twig' %}#}
+{% extends 'layout_admin.html.twig' %}
+
+{% block title %}
+    Start import, step2 :: admin
+{% endblock %}
+
+{% block breadcrumbs %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{ path('backend_dashboard') }}"><i class="fa fa-dashboard"></i>  Dashboard</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{{ path('backend_import_index') }}"><i class="fa fa-table"></i>  Imports</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{{ path('backend_import_step1', {'id': importLog.id}) }}"><i
+                        class="fa fa-pencil"></i> Import Step2</a>
+        </li>
+    </ol>
+{% endblock %}
+
+{% block body %}
+    <style>
+        .table-responsive{
+            height: 600px;
+            overflow: scroll;
+        }
+        thead tr:nth-child(1) th{
+            color: #fff;
+            background-color: #343a40;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+    </style>
+
+    <form method="post" action="{{ path('backend_import_step2', {'id': importLog.id}) }}">
+        <h3>Import / step2 / parse CSV file
+            <a class="btn btn-secondary" href="{{ path('backend_import_step1', {'id': importLog.id}) }}">
+                <i class="fa fa-arrow-left"></i> Back to step2</a>
+            <button class="btn btn-primary" type="submit"><i class="fa fa-check"></i> Update</button>
+            <button class="btn btn-success" type="submit" name="next">
+                <i class="fa fa-arrow-right"></i> Next to step3</button>
+
+        </h3>
+        <hr />
+
+        {% include 'admin/flashes.html.twig' %}
+
+{#        {{ dump(csvColumnMapping) }}#}
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Столбец в CSV</th>
+                        <th>Значение</th>
+                        <th>Поле в базе</th>
+                    </tr>
+                </thead>
+                {% for columnNum, columnName in exampleDataRow %}
+                    <tr id="row_{{ columnNum }}">
+                        <td width="1">
+                            <a href="javascript:;" class="delete_row" rel="row_{{ columnNum }}"><span
+                                        class="badge badge-pill badge-danger"><i class="fa fa-window-close"></i></span></a>
+                        </td>
+                        <td width="1" class="text-nowrap">
+{#                            <input type="hidden" name="csvColNum[]" value="{{ id }}">#}
+                            {{ headerArr[columnNum] is defined ? headerArr[columnNum] : '---'}}
+                        </td>
+                        <td width="1" class="text-nowrap">{{ columnName }}</td>
+                        <td>
+                            <select name="csvColumnMapping[{{ columnNum }}]">
+                                <option value=""></option>
+                                {% for fieldLabel, fieldName in importFields %}
+                                    {% set selected = csvColumnMapping[columnNum] is defined and csvColumnMapping[columnNum] == fieldName ? 1 : 0 %}
+                                    <option value="{{ fieldName }}" {{ selected == 1 ? ' selected="selected"' : '' }}>{{ fieldLabel }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </form>
+
+    {#    {{ form_start(form) }}#}
+{#    {{ form_rest(form) }}#}
+{#    {{ form_end(form) }}#}
+
+
+    <br />
+
+    <script>
+        $(document).ready(function () {
+            $('.delete_row').on('click', function (e) {
+                var rel = $(this).attr('rel');
+                var $this = $(this);
+                // console.log('remove ' + rel);
+                $('#' + rel).addClass('alert-danger');
+                setTimeout(function() {
+                    $('#'+rel).remove();
+                    console.log('remove ' + rel);
+                }, 200);
+
+            })
+        })
+    </script>
+{% endblock %}

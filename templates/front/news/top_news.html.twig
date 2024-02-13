@@ -1,0 +1,52 @@
+<div class="other-articles">
+    {% for news in topNews %}
+        <div class="news-item">
+            <a href="#" class="title">{{ news.title }}</a>
+            <div class="excerpt">{{ news.announce | raw }}</div>
+            <div class="more">
+                <a href="#">читать</a>
+            </div>
+            <div class="line"></div>
+            {% if news.pic %}
+                <a data-lightbox="gallery" class="img" href="{{ asset('/uploads/' ~ news.pic) }}"><img
+                            src="{{ asset('/uploads/' ~ news.pic) | imagine_filter('thumb_news') }}" /></a>
+            {% else %}
+                <a href="#" class="img"><img src="/img/news1.png" alt=""></a>
+            {% endif %}
+            <div class="date">{{ news.publishedAt | date('d.m.Y') }}</div>
+        </div>
+    {% endfor %}
+
+
+    <div class="news-item">
+        <a href="#" class="title">Lorem ipsum dolor sit amet</a>
+        <div class="excerpt">Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet...</div>
+        <div class="more">
+            <a href="#">читать</a>
+        </div>
+        <div class="line"></div>
+        <a href="#" class="img"><img src="/img/news1.png" alt=""></a>
+        <div class="date">06.10.2021</div>
+    </div>
+
+{#    <div class="news-item">#}
+{#        <a href="#" class="title">Lorem ipsum dolor sit amet</a>#}
+{#        <div class="excerpt">Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet...</div>#}
+{#        <div class="more">#}
+{#            <a href="#">читать</a>#}
+{#        </div>#}
+{#        <div class="line"></div>#}
+{#        <a href="#" class="img"><img src="/img/news2.png" alt=""></a>#}
+{#        <div class="date">06.10.2021</div>#}
+{#    </div>#}
+{#    <div class="news-item">#}
+{#        <a href="#" class="title">Lorem ipsum dolor sit amet</a>#}
+{#        <div class="excerpt">Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet...</div>#}
+{#        <div class="more">#}
+{#            <a href="#">читать</a>#}
+{#        </div>#}
+{#        <div class="line"></div>#}
+{#        <a href="#" class="img"><img src="/img/news3.png" alt=""></a>#}
+{#        <div class="date">06.10.2021</div>#}
+{#    </div>#}
+</div>

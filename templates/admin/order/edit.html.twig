@@ -1,0 +1,80 @@
+{% form_theme form 'bootstrap_4_horizontal_layout.html.twig' %}
+
+{% extends 'layout_admin.html.twig' %}
+
+{% block title %}
+    Edit {{ model }} :: admin
+{% endblock %}
+
+{% block breadcrumbs %}
+    {% include 'admin/breadcrumb.html.twig' with {'last': 'Edit "' ~ row ~ '"'} %}
+{% endblock %}
+
+{% block body %}
+    <h1>{{ entity_name }} edit</h1>
+
+    {% include 'admin/flashes.html.twig' %}
+
+    {{ form_start(form) }}
+
+    {{ form_rest(form) }}
+
+    <hr />
+
+    <h4>Состав заказа</h4>
+
+    <table class="table table-striped">
+        {% set totalAmount = 0 %}
+        {% set currentSupplier = '' %}
+        {% for supplierName, orderProducts in supplierProducts %}
+            <tr>
+                <td colspan="7"><h4>{{ supplierName }}</h4></td>
+            </tr>
+            <tr>
+                <th></th>
+                <th>Название</th>
+                <th>Объем(л)</th>
+                <th>Страна</th>
+                <th>Цена</th>
+                <th>Кол-во</th>
+                <th>Сумма</th>
+            </tr>
+
+            {% for orderProduct in orderProducts %}
+                {% set row = orderProduct.product %}
+                <tr>
+                    <td>
+                        {% if row.announcePic %}
+                            <a data-fancybox="gallery" target="_blank" href="{{ asset('/uploads/' ~ row.announcePic) }}"><img
+                                        src="{{ asset('/uploads/' ~ row.announcePic) | imagine_filter('thumb_square_50') }}" /></a>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ row.name }}<br />
+                        <small><strong>{{ row.shortSummary }}</strong></small>
+                    </td>
+                    <td>{{ row.volume }}(л)</td>
+                    <td class="text-center">{{ row.country }}</td>
+                    <td class="text-right">{{ row.price }}</td>
+                    <td class="text-center">{{ orderProduct.quantity }}</td>
+                    {% set subTotal = orderProduct.quantity * row.price %}
+                    {% set totalAmount = totalAmount + subTotal %}
+                    <td class="text-right">{{ subTotal | number_format(2, '.', ',') }}</td>
+                </tr>
+            {% endfor %}
+        {% endfor %}
+        <tr>
+            <th colspan="6">Итого:</th>
+            <th class="text-right">{{ totalAmount | number_format(2, '.', ',') }}</th>
+        </tr>
+    </table>
+
+    <div class="row">
+        <div class="col-8">
+            <a class="btn btn-primary" href="{{ path('backend_' ~ model ~ '_index') }}"><i class="fa fa-arrow-left"></i> Back to the list</a>
+            <button class="btn btn-success" type="submit"><i class="fa fa-check"></i> Update</button>
+            {{ form_end(form) }}
+        </div>
+    </div>
+
+{% endblock %}

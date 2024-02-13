@@ -1,0 +1,11 @@
+<ol class="breadcrumb">
+    <li class="breadcrumb-item">
+        <a href="{{ path('backend_dashboard') }}"><i class="fa fa-dashboard"></i>  Dashboard</a>
+    </li>
+    <li class="breadcrumb-item">
+        <a href="{{ path('backend_' ~ model ~ '_index') }}"><i class="fa fa-table"></i> {{ entity_name }}</a>
+    </li>
+    <li class="breadcrumb-item active">
+        <i class="fa fa-pencil"></i> {{ last }}
+    </li>
+</ol>

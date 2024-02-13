@@ -1,0 +1,46 @@
+{% extends 'layout_front.html.twig' %}
+
+{% block title %}Мои винные карты{% endblock %}
+
+{% block body %}
+
+    <h1>Мои заказы</h1>
+
+    {% include 'front/common/flashes.html.twig' %}
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Номер заказа</th>
+            <th>Ресторан</th>
+            <th>Позиций / бутылок</th>
+            <th>Сумма</th>
+            <th>Дата</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in result %}
+            <tr>
+                <td><a href="{{ path('cabinet_order_show', {'uuid': item.order.uuid}) }}">
+                        {{ item.order.id }}</a></td>
+                <td>{{ item.order.wineCard.summary }}</td>
+                <td>{{ item.order.orderItems | length }} / {{ item.bottleCnt }}</td>
+                <td>{{ item.orderAmount }}</td>
+                <td>{{ item.order.createdAt | date('d.m.Y') }}</td>
+
+                <td>
+                    <a class="btn btn-sm btn-primary" href="{{ path('cabinet_order_show', {'uuid': item.order.uuid}) }}">
+                        <i class="fa fa-search"></i>
+                        просмотр</a>
+                </td>
+{#            </tr>#}
+{#        {% else %}#}
+{#            <tr>#}
+{#                <td colspan="3">no records found</td>#}
+{#            </tr>#}
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

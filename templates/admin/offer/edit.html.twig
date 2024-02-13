@@ -1,0 +1,145 @@
+{% form_theme form 'bootstrap_4_horizontal_layout.html.twig' %}
+
+{% extends 'layout_admin.html.twig' %}
+
+{% block title %}
+    Edit {{ model }} :: admin
+{% endblock %}
+
+{% block breadcrumbs %}
+    {% include 'admin/breadcrumb.html.twig' with {'last': 'Edit "' ~ row ~ '"'} %}
+{% endblock %}
+
+{% block body %}
+    <h1>{{ entity_name }} edit</h1>
+
+    {% include 'admin/flashes.html.twig' %}
+
+    {{ form_start(form) }}
+    <div class="row">
+        <div class="col-6">
+            {{ form_row(form.product) }}
+            {{ form_row(form.name) }}
+            {{ form_row(form.slug) }}
+            {{ form_row(form.category) }}
+            {{ form_row(form.supplier) }}
+            {{ form_row(form.vendor) }}
+            {{ form_row(form.country) }}
+            {{ form_row(form.region) }}
+            {{ form_row(form.price) }}
+            {{ form_row(form.priceStatus) }}
+            {{ form_row(form.color) }}
+            {{ form_row(form.type) }}
+            {{ form_row(form.alcohol) }}
+
+            <!-- ratings and grape sorts -->
+            <div class="row">
+                <div class="col-4">
+                    <ul id="ratingsList" class="list-unstyled"><b>Рейтинги</b>
+                        {% for rating, value in ratings %}
+                            <li id="rating_{{ loop.index }}">
+                                <input name="rating[{{ loop.index }}][name]" value="{{ rating }}" size="5">
+                                <input name="rating[{{ loop.index }}][value]" value="{{ value }}" size="3">
+                                <a class="kill badge badge-pill badge-danger" rel="rating_{{ loop.index }}" href="javascript:;">x</a>
+                            </li>
+                        {% endfor %}
+                        <script>
+                            var newIndex = {{ ratings|length }} + 1;
+                        </script>
+                    </ul>
+                    <a id="addNewRating" class="btn btn-sm btn-success"><i class="fa fa-plus"></i> add new</a>
+                </div>
+
+                <div class="col-8">
+                    <ul id="grapeSorts" class="list-unstyled"><b>Сорта винограда</b>
+                        {% for sort, value in grapeSorts %}
+                            <li id="grapeSort_{{ loop.index }}">
+                                <input name="grapeSort[{{ loop.index }}][name]" value="{{ sort }}" size="20">
+                                <input name="grapeSort[{{ loop.index }}][value]" value="{{ value }}" size="3">
+                                <a class="kill badge badge-pill badge-danger" rel="rating_{{ loop.index }}" href="javascript:;">x</a>
+                            </li>
+                        {% endfor %}
+                        <script>
+                            var newGrapeSort = {{ grapeSorts|length }} + 1;
+                        </script>
+                    </ul>
+                    <a id="addNewGrapeSort" class="btn btn-sm btn-success"><i class="fa fa-plus"></i> add new</a>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-6">
+            {{ form_row(form.year) }}
+            {{ form_row(form.volume) }}
+            {{ form_row(form.packing) }}
+            {{ form_row(form.serveTemperature) }}
+            {{ form_row(form.fermentation) }}
+            {{ form_row(form.agingType) }}
+            {{ form_row(form.appellation) }}
+
+            {{ form_row(form.foods) }}
+            {{ form_row(form.decantation) }}
+        </div>
+    </div>
+
+    {{ form_rest(form) }}
+
+    <hr />
+
+    <div class="row">
+        <div class="col-8">
+            <a class="btn btn-primary" href="{{ path('backend_' ~ model ~ '_index') }}"><i class="fa fa-arrow-left"></i> Back to the list</a>
+            <button class="btn btn-success" type="submit"><i class="fa fa-check"></i> Update</button>
+            {{ form_end(form) }}
+        </div>
+        <div class="col-4 text-right">
+            {{ form_start(delete_form) }}
+            <button class="btn btn-danger delete-button" id="deleteOffer" type="submit"><i class="fa fa-exclamation"></i> Delete</button>
+            {{ form_end(delete_form) }}
+        </div>
+    </div>
+
+    <br />
+    <br />
+
+{% endblock %}
+
+{% block extra_scripts %}
+    <script>
+        $(document).ready(function() {
+            $('#deleteOffer').click(function () {
+                return confirm('Вы уверены?');
+            })
+            $('.select2-container').css({'width': 'auto'});
+
+            function bind() {
+                $('.kill').click(function () {
+                    if (!confirm('Are you sure?')) {
+                        return false;
+                    }
+                    var rel = $(this).attr('rel');
+
+                    $('#'+rel).remove();
+                })
+            }
+            $('#addNewRating').click(function () {
+                $('#ratingsList').append('<li id="rating_'+newIndex+'">\n' +
+                    '<input name="rating['+newIndex+'][name]" value="" size="5">\n' +
+                    '<input name="rating['+newIndex+'][value]" value="" size="3">\n' +
+                    '<a class="kill badge badge-pill badge-danger" rel="rating_'+newIndex+'" href="javascript:;">x</a></li>');
+                newIndex++;
+                bind();
+            });
+            $('#addNewGrapeSort').click(function () {
+                $('#grapeSorts').append('<li id="grapeSort_'+newGrapeSort+'">\n' +
+                    '<input name="grapeSort['+newGrapeSort+'][name]" value="" size="20">\n' +
+                    '<input name="grapeSort['+newGrapeSort+'][value]" value="" size="3">\n' +
+                    '<a class="kill badge badge-pill badge-danger" rel="grapeSort_'+newGrapeSort+'" href="javascript:;">x</a></li>');
+                newGrapeSort++;
+                bind();
+            });
+
+            bind();
+        })
+    </script>
+{% endblock %}

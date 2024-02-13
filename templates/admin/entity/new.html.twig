@@ -1,0 +1,22 @@
+{#{% form_theme form 'bootstrap_4_layout.html.twig' %}#}
+{% form_theme form 'bootstrap_4_horizontal_layout.html.twig' %}
+{% extends 'layout_admin.html.twig' %}
+
+{% block title %}
+    Create page :: admin
+{% endblock %}
+
+{% block breadcrumbs %}
+    {% include 'admin/page/breadcrumb.html.twig' with {'last': 'Create new'} %}
+{% endblock %}
+
+{% block body %}
+    <h1>Page creation</h1>
+
+    {% include 'admin/flashes.html.twig' %}
+
+    {{ form(form) }}
+    <a class="btn btn-primary" href="{{ path('backend_page_index') }}"><i class="fa fa-list"></i> Back to the list</a>
+    <button class="btn btn-success" type="submit"><i class="fa fa-check"></i> Create</button>
+
+{% endblock %}

@@ -1,0 +1,281 @@
+{% form_theme form 'bootstrap_4_horizontal_layout.html.twig' %}
+
+{% extends 'layout_admin.html.twig' %}
+
+{% block title %}
+    Create {{ model }} :: admin
+{% endblock %}
+
+{% block breadcrumbs %}
+    {% include 'admin/breadcrumb.html.twig' with {'last': 'Edit "' ~ row ~ '"'} %}
+{% endblock %}
+
+{% block body %}
+    <h1>{{ entity_name }} create</h1>
+
+    {% include 'admin/flashes.html.twig' %}
+
+    {{ form_start(form, {'action': path('backend_product_new'), 'method': 'POST'}) }}
+    <div class="row">
+        <div class="col-6">
+            {{ form_row(form.productCode) }}
+            {{ form_row(form.name) }}
+            {{ form_row(form.slug) }}
+            {{ form_row(form.category) }}
+            {{ form_row(form.vendor) }}
+            {{ form_row(form.country) }}
+            {{ form_row(form.region) }}
+            {{ form_row(form.price) }}
+            {{ form_row(form.priceStatus) }}
+            <div class="form-group row">
+                {{ form_errors(form.wineColor) }}
+                {{ form_label(form.wineColor) }}
+                <div class="col-sm-5">
+                    {{ form_widget(form.wineColor) }}
+                </div>
+                <div class="col-sm-5">
+                    ({{ row.color }})
+                </div>
+            </div>
+            <div class="form-group row">
+                {{ form_errors(form.wineSugar) }}
+                {{ form_label(form.wineSugar) }}
+                <div class="col-sm-5">
+                    {{ form_widget(form.wineSugar) }}
+                </div>
+                <div class="col-sm-5">
+                    ({{ row.type }})
+                </div>
+            </div>
+{#            {{ form_row(form.color) }}#}
+{#            {{ form_row(form.type) }}#}
+
+            {{ form_row(form.alcohol, {label_attr: {class: 'radio-custom'} }) }}
+
+            <!-- ratings and grape sorts -->
+        </div>
+        <div class="col-6">
+
+            {{ form_row(form.year) }}
+            {{ form_row(form.volume) }}
+            {{ form_row(form.packing) }}
+            {{ form_row(form.serveTemperature) }}
+            {{ form_row(form.fermentation) }}
+            {{ form_row(form.agingType) }}
+            {{ form_row(form.appellation) }}
+
+            {{ form_row(form.metaKeywords) }}
+            {{ form_row(form.metaDescription) }}
+
+            {{ form_row(form.foods) }}
+            {{ form_row(form.decantation) }}
+            {{ form_row(form.isActive) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-4">
+            <h4>Рейтинги</h4>
+            <table class="table table-bordered table-striped">
+                <thead class="thead-light">
+                <tr>
+                    <th>Сорт</th>
+                    <th>Процент</th>
+                    <th>actions</th>
+                </tr>
+                </thead>
+                <tbody class="productRatingItems" data-prototype="{{ include('admin/product/ratingPrototype.html.twig', { 'form': form.productRatings.vars.prototype })|e('html_attr') }}">
+                {% for id, rating in form.productRatings %}
+                    <tr class="itemRow" id="productRatingItem-{{ id }}" rel="{{ id }}">
+                        <td>
+                            {{ form_errors(rating) }}
+                            {{ form_widget(rating.rating) }}
+                        </td>
+                        <td>
+                            {{ form_widget(rating.value) }}
+                        </td>
+                        <td><button type="button" class="btn btn-danger deleteRow" rel="productRatingItem-{{ id }}">delete</button>
+                            {{ form_rest(rating) }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                <tfoot id="tableFooterRating"></tfoot>
+            </table>
+        </div>
+
+        <div class="col-8">
+            <h4>Сорта винограда</h4>
+
+            <table class="table table-bordered table-striped">
+                <thead class="thead-light">
+                <tr>
+                    <th>Сорт</th>
+                    <th>Процент</th>
+                    <th>actions</th>
+                </tr>
+                </thead>
+                <tbody class="productGrapeSortItems" data-prototype="{{ include('admin/product/grapeSortPrototype.html.twig', { 'form': form.productGrapeSorts.vars.prototype })|e('html_attr') }}">
+                {% for id, grapeSort in form.productGrapeSorts %}
+                    <tr class="itemRow" id="productGrapeSortItem-{{ id }}" rel="{{ id }}">
+                        <td>
+                            {{ form_errors(grapeSort) }}
+                            {{ form_widget(grapeSort.grapeSort) }}
+                        </td>
+                        <td>
+                            {{ form_widget(grapeSort.value) }}
+                        </td>
+                        <td><button type="button" class="btn btn-danger deleteRow" rel="productGrapeSortItem-{{ id }}">delete</button>
+                            {{ form_rest(grapeSort) }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                <tfoot id="tableFooterGrapeSort"></tfoot>
+            </table>
+        </div>
+    </div>
+
+
+    <hr />
+
+    {{ form_row(form.content) }}
+
+    <div class="form-group row">
+        {{ form_label(form.announcePicFile) }}
+        <div class="col-8">
+            {{ form_widget(form.announcePicFile) }}
+        </div>
+        <div class="col-2">
+            {% if row.announcePic %}
+                <a data-lightbox="gallery" target="_blank" href="{{ asset('uploads/' ~ row.announcePic) }}"><img
+                            src="{{ asset('uploads/' ~ row.announcePic) | imagine_filter('thumb_square_50') }}" /></a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="form-group row">
+        {{ form_label(form.contentPicFile) }}
+        <div class="col-8">
+            {{ form_widget(form.contentPicFile) }}
+        </div>
+        <div class="col-2">
+            {% if row.contentPic %}
+                <a data-lightbox="gallery" target="_blank" href="{{ asset('uploads/' ~ row.contentPic) }}"><img
+                            src="{{ asset('uploads/' ~ row.contentPic) | imagine_filter('thumb_square_50') }}?q=q" /></a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="form-group row">
+        {{ form_label(form.extraPicFile) }}
+        <div class="col-8">
+            {{ form_widget(form.extraPicFile) }}
+        </div>
+        <div class="col-2">
+            {% if row.extraPic %}
+                <a data-lightbox="gallery" target="_blank" href="{{ asset('uploads/' ~ row.extraPic) }}"><img
+                            src="{{ asset('uploads/' ~ row.extraPic) | imagine_filter('thumb_square_50') }}" /></a>
+            {% endif %}
+        </div>
+    </div>
+
+
+    {{ form_rest(form) }}
+
+    <hr />
+
+    <div class="row">
+        <div class="col-8">
+            <a class="btn btn-primary" href="{{ path('backend_' ~ model ~ '_index') }}"><i class="fa fa-arrow-left"></i> Back to the list</a>
+            <button class="btn btn-success" type="submit"><i class="fa fa-check"></i> Create</button>
+            {{ form_end(form) }}
+        </div>
+    </div>
+
+    <br />
+    <br />
+
+{% endblock %}
+
+{% block extra_scripts %}
+    <script>
+        $(document).ready(function() {
+
+            bindClickDeleteBtn();
+
+            var $collectionHolderGrapeSort;
+            var $addGrapeSortButton = $('<td colspan="2"><button type="button" class="btn btn-sm btn-success addRow add_tag_link"><i class="fa fa-plus"></i> add new row</button></td>');
+            var $newLinkGrapeSort = $('<tr></tr>').append($addGrapeSortButton);
+            $collectionHolderGrapeSort = $('tbody.productGrapeSortItems');
+            var $collectionGrapeSortFooter = $('tfoot#tableFooterGrapeSort');
+
+            $collectionGrapeSortFooter.append($newLinkGrapeSort);
+
+            var lastId = parseInt($('.productGrapeSortItems > tr.itemRow').last().attr('rel')) + 1;
+            if (isNaN(lastId)) {
+                lastId = 0;
+            }
+            $collectionHolderGrapeSort.data('index', lastId);
+
+            $addGrapeSortButton.on('click', function(e) {
+                addGrapeSortForm($collectionHolderGrapeSort, $newLinkGrapeSort);
+                bindClickDeleteBtn();
+            });
+
+            // ---- ratings ---- //
+
+            var $collectionHolderRating;
+            var $addRatingButton = $('<td colspan="2"><button type="button" class="btn btn-sm btn-success addRow add_tag_link"><i class="fa fa-plus"></i> add new row</button></td>');
+            var $newLink = $('<tr></tr>').append($addRatingButton);
+            $collectionHolderRating = $('tbody.productRatingItems');
+            var $collectionRatingFooter = $('tfoot#tableFooterRating');
+
+            $collectionRatingFooter.append($newLink);
+
+            var lastId = parseInt($('.productRatingItems > tr.itemRow').last().attr('rel')) + 1;
+            if (isNaN(lastId)) {
+                lastId = 0;
+            }
+            $collectionHolderRating.data('index', lastId);
+
+            $addRatingButton.on('click', function(e) {
+                addRatingForm($collectionHolderRating, $newLink);
+                bindClickDeleteBtn();
+            });
+
+        })
+
+        function bindClickDeleteBtn() {
+            $('.deleteRow').on('click', function () {
+                if (confirm('Are you sure?')) {
+                    let rel = $(this).attr('rel');
+                    console.log(rel);
+                    $('#'+rel).slideUp('slow');
+                    $('#'+rel).remove();
+
+                    return false;
+                }
+            });
+        }
+
+        function addGrapeSortForm($collectionHolderGrapeSort, $newLinkLi) {
+            var prototype = $collectionHolderGrapeSort.data('prototype');
+            var index = $collectionHolderGrapeSort.data('index');
+
+            var newForm = prototype;
+            newForm = newForm.replace(/__name__/g, index);
+            $collectionHolderGrapeSort.data('index', index + 1);
+
+            $('.productGrapeSortItems').append(newForm);
+        }
+
+        function addRatingForm($collectionHolderRating, $newLinkLi) {
+            var prototype = $collectionHolderRating.data('prototype');
+            var index = $collectionHolderRating.data('index');
+
+            var newForm = prototype;
+            newForm = newForm.replace(/__name__/g, index);
+            $collectionHolderRating.data('index', index + 1);
+
+            $('.productRatingItems').append(newForm);
+        }
+    </script>
+{% endblock %}
