@@ -1,0 +1,17 @@
+/*li.nav-item {*/
+/*    border: 1px solid rgba(0,0,0,.125);*/
+/*}*/
+
+li.nav-item-inner {
+    font-size: smaller;
+    line-height: 1.1;
+}
+
+/*li.nav-item:first-child {*/
+/*    border-top-radius(4px);*/
+/*}*/
+
+/*li.nav-item:last-child {*/
+/*    margin-bottom: 0;*/
+/*    border-bottom-radius(4px);*/
+/* }*/

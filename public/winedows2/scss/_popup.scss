@@ -1,0 +1,110 @@
+.popup {
+	background: $popup-bg url(../img/popup-bg.png) no-repeat center / cover;
+	display: none;
+	position: fixed;
+	top: 10%;
+	left: calc(50% - 496.5px);
+	z-index: 1000;
+	padding: 99px 116px 100px;
+	width: 993px;
+	height: auto;
+	max-height: 100%;
+	text-align: left;
+	color: #000;
+	overflow: auto;
+    scrollbar-width: thin;
+    scrollbar-color: $brand $bg;
+    * {
+        scrollbar-width: thin;
+    }
+    &::-webkit-scrollbar, ::-webkit-scrollbar {
+        width: 6px;
+    }
+    &::-webkit-scrollbar-track, ::-webkit-scrollbar-track {
+        background: $bg;
+    }
+    &::-webkit-scrollbar-thumb, ::-webkit-scrollbar-thumb {
+        background: $brand;
+    }
+	&.-visible {
+		display: block;
+		animation: fade-in-top $ease both;
+	}
+	.h2 {
+		text-align: center;
+		margin-bottom: 12px;
+	}
+	.h3 {
+		margin-bottom: 60px;
+		text-align: center;
+	}
+	.subtitle {
+		font-size: 20px;
+		text-align: center;
+		margin-bottom: 23px;
+	}
+	.text {
+		text-align: center;
+	}
+	form {
+		max-width: 561px;
+		margin: 0 auto;
+	}
+	.line {
+		.input {
+			input {
+
+			}
+			.error-message {
+
+			}
+		}
+		.help {
+			a {
+
+			}
+		}
+		.links {
+			a {
+
+			}
+		}
+	}
+	&.-register {
+		padding-top: 52px;
+		padding-bottom: 52px;
+	}
+	&.-forgot {
+		overflow: visible;
+		padding-bottom: 142px;
+	}
+	&.-result {
+		background-image: none;
+		padding: 66px;
+	}
+}
+
+.popup-bg {
+	display: none;
+	background: rgba(54, 54, 54, 0.4);
+	transition: backdrop-filter $ease;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 999;
+	&.-visible {
+
+	}
+}
+
+body.-fixed {
+	overflow: hidden;
+	padding-right: 18px;
+	.popup-bg {
+		display: block;
+		animation: fade-in $ease both;
+		backdrop-filter: blur(10px);
+	}
+}

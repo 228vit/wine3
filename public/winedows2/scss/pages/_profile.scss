@@ -1,0 +1,37 @@
+.edit-profile {
+	border-bottom: 1px solid #000;
+	padding-bottom: 45px;
+	form {
+		max-width: 561px;
+		margin: 0 auto;
+		.line {
+			.links {
+				margin-top: 35px;
+			}
+		}
+	}
+}
+
+.your-cards {
+	padding: 45px 0;
+	.h2 {
+		margin-bottom: 67px;
+	}
+	.list {
+		margin: 0 -15px;
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: flex-start;
+		.card {
+			position: relative;
+			background: #c4c4c4;
+			flex: 0 0 calc(33.333333% - 30px);
+			margin: 0 15px 30px;
+			&::before {
+				content: '';
+				display: block;
+				padding-top: percentage(402/370);
+			}
+		}
+	}
+}

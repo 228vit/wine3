@@ -1,0 +1,38 @@
+body {
+    font-family: $primary-font;
+    background: $bg url(../img/bg.png) no-repeat top center;
+    line-height: 1.3;
+    font-size: 16px;
+}
+
+.body-main {
+    padding-top: 116px;
+}
+
+.container {
+    max-width: 1200px;
+    min-width: 1024px;
+    padding: 0 15px;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+}
+
+body:not(.user-is-tabbing) button:focus,
+body:not(.user-is-tabbing) input:focus,
+body:not(.user-is-tabbing) select:focus,
+body:not(.user-is-tabbing) span:focus,
+body:not(.user-is-tabbing) textarea:focus {
+    outline: none;
+}
+
+::selection {
+    background: $brand;
+    color: $white;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+

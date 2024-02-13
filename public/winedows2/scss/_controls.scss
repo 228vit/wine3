@@ -1,0 +1,283 @@
+.btn {
+	display: inline-block;
+	text-align: center;
+	border: none;
+	background: $brand;
+	color: $white;
+	font-size: 18px;
+	line-height: (23.52/18);
+	font-weight: 600;
+	padding: 23.4px 38.6px;
+	border-radius: 35px;
+	box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.25);
+	transition: background $ease;
+	min-width: 248px;
+	&:hover {
+		text-decoration: none;
+		color: $white;
+		background: darken($brand, 8%);
+	}
+	&:active {
+		background: darken($brand, 16%);
+	}
+}
+
+.tel-code {
+	position: relative;
+	.trigger {
+		border: none;
+		background: $white;
+		width: 61px;
+		height: 61px;
+		display: block;
+		line-height: 61px;
+		position: relative;
+		border-radius: 50%;
+		margin-right: 7px;
+		box-shadow: $default-shadow;
+		font-size: 20px;
+		img {
+			position: absolute;
+			left: -11px;
+			top: -9px;
+			border-radius: 50%;
+			filter: drop-shadow($default-shadow);
+		}
+		&:hover {
+			color: $brand;
+			img {
+			}
+		}
+	}
+	.code-popup {
+		display: none;
+		position: absolute;
+		top: calc(100% + 8px);
+		left: -11px;
+		background: $bg;
+		box-shadow: $default-shadow;
+		width: 83px;
+		height: auto;
+		padding: 3px 0 0;
+		z-index: 10;
+		a {
+			display: flex;
+			align-items: center;
+			padding: 4px 9px;
+			justify-content: flex-start;
+			margin-bottom: 0;
+			font-size: 18px;
+			color: $black;
+			transition: background-color $ease;
+			&:last-child {
+				margin-bottom: 0;
+			}
+			img {
+				width: 22px;
+				height: 22px;
+				margin-right: 10px;
+				flex: 0 0 22px;
+			}
+			&:hover {
+				text-decoration: none;
+				background: $white;
+			}
+		}
+	}
+	&.-active {
+		.code-popup {
+			display: block;
+			animation: fade-in-top $ease;
+		}
+	}
+}
+
+
+.line {
+	display: block;
+	margin-bottom: 25px;
+	&:last-child {
+		margin-bottom: 0;
+	}
+	label {
+		font-size: 20px;
+		display: block;
+		margin-bottom: 10px;
+	}
+	.tel-code {
+
+	}
+	.input-group {
+		display: flex;
+		align-items: flex-start;
+		justify-content: flex-start;
+		.input {
+			margin-bottom: 0;
+		}
+	}
+	.input {
+		margin-bottom: 10px;
+	}
+	.help {
+		a {
+			color: #000;
+		}
+	}
+	.btn {
+		margin-bottom: 20px;
+	}
+	.links {
+		font-size: 18px;
+		a {
+			color: $brand;
+			font-weight: bold;
+		}
+	}
+	&.-center {
+		text-align: center;
+	}
+	&.-error {
+		.input {
+			input {
+				color: $brand;
+				border-color: $brand;
+			}
+			.error-message {
+				display: flex;
+			}
+		}
+	}
+}
+
+.input {
+	flex: 1 1 auto;
+	position: relative;
+
+	input {
+		width: 100%;
+		border-radius: 30px;
+		height: 60px;
+		padding: 10px 20px;
+		font-size: 20px;
+		border: 1px solid $white;
+		background: $white;
+		margin: 0;
+		box-shadow: $default-shadow;
+	}
+	.error-message {
+		display: none;
+		position: absolute;
+		right: 20px;
+		top: 0;
+		height: 100%;
+		text-align: center;
+		justify-content: center;
+		align-items: center;
+		font-size: 14px;
+		font-weight: 600;
+		color: $brand;
+		max-width: 78px;
+	}
+
+	.search-results {
+		position: absolute;
+		top: calc(100% + 15px);
+		left: 33px;
+		width: calc(100% - 66px);
+		background: $white;
+		box-shadow: $default-shadow;
+		padding: 9.5px 0 2.5px;
+		z-index: 20;
+		.place {
+			padding: 7.5px 90px 7.5px 40px;
+			background: $white;
+			transition: background-color $ease;
+			display: block;
+			position: relative;
+			color: #000;
+			&:hover {
+				background: $bg;
+				text-decoration: none;
+			}
+			.title {
+				display: block;
+				font-size: 18px;
+				font-weight: 600;
+				margin-bottom: 5px;
+			}
+			.address {
+				font-size: 16px;
+			}
+			.img {
+				position: absolute;
+				right: 40px;
+				top: 7.5px;
+				width: 50px;
+				height: 50px;
+				border-radius: 50%;
+				overflow: hidden;
+				img {
+					width: 100%;
+					height: 100%;
+					object-fit: cover;
+				}
+			}
+		}
+		.nothing-found {
+			text-align: center;
+			font-size: 18px;
+			padding: 7.5px 15px 10.5px;
+			.new-place {
+				font-weight: bold;
+				color: $brand;
+				display: block;
+				margin: 30px auto 0;
+			}
+		}
+	}
+}
+
+
+.inputfile {
+	width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
+	& + label {
+		display: flex;
+		align-items: center;
+		justify-content: flex-start;
+		font-size: 18px;
+		cursor: pointer;
+		&::before {
+			content: '+';
+			display: block;
+			width: 64px;
+			height: 64px;
+			flex: 0 0 64px;
+			font-size: 50px;
+			color: #000;
+			line-height: 64px;
+			background: $white;
+			box-shadow: $default-shadow;
+			margin-right: 10px;
+			border-radius: 50%;
+			text-align: center;
+			transition: color $ease;
+		}
+		&:hover {
+			&::before {
+				color: $brand;
+			}
+		}
+	}
+	&:focus {
+		& + label {
+			&::before {
+				color: $brand;
+			}
+		}
+	}
+}

@@ -1,0 +1,74 @@
+body .black_on_white {
+    background: #fff;
+    color: #000 ;
+}
+
+.sidebar_gray {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.btn {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.pr20 {
+    padding-right: 28px;
+    overflow: hidden;
+}
+
+.main .products-accordion .accordion-item .accordion-header .fav {
+    position: absolute;
+    right: 28px;
+    top: 26px;
+    background: url(../img/star.svg) no-repeat center / contain;
+    width: 24px;
+    height: 24px;
+    border: none;
+}
+.main .products-accordion .accordion-item .accordion-header .fav:hover {
+    background: url(../img/star.svg) no-repeat center / contain;
+}
+
+.main .products-accordion .accordion-item .accordion-header .fav.active {
+  background-image: url(../img/star-active.svg);
+}
+
+.main .products-accordion .accordion-item .accordion-header .params .param img.rounded_svg {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    object-fit: cover;
+    overflow: hidden;
+}
+
+input[type="text"]:focus,
+input[type="checkbox"]:focus {
+    border-color: #6d2231;
+    box-shadow: 0 3px 3px rgba(0, 0, 0, 0.075) inset, 0 0 8px #6d2231;
+    outline: 0 none;
+}
+
+.btn-check:focus + .btn-outline-secondary, .btn-outline-secondary:focus {
+    box-shadow: none;
+}
+/*textarea:focus,*/
+/*input[type="text"]:focus,*/
+/*input[type="password"]:focus,*/
+/*input[type="datetime"]:focus,*/
+/*input[type="datetime-local"]:focus,*/
+/*input[type="date"]:focus,*/
+/*input[type="month"]:focus,*/
+/*input[type="time"]:focus,*/
+/*input[type="week"]:focus,*/
+/*input[type="number"]:focus,*/
+/*input[type="email"]:focus,*/
+/*input[type="url"]:focus,*/
+/*input[type="search"]:focus,*/
+/*input[type="tel"]:focus,*/
+/*input[type="color"]:focus,*/
+/*.uneditable-input:focus {*/
+/*    border-color: #6d2231;*/
+/*    box-shadow: 0 3px 3px rgba(0, 0, 0, 0.075) inset, 0 0 8px #6d2231;*/
+/*    outline: 0 none;*/
+/*}*/

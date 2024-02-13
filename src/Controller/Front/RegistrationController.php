@@ -38,7 +38,7 @@ class RegistrationController extends AbstractController
         $this->formErrorService = $formErrorService;
     }
 
-    public function renderForm(): Response
+    public function renderRegistrationForm(): Response
     {
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);

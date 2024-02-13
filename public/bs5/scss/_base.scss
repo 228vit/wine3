@@ -1,0 +1,25 @@
+body {
+    display: flex;
+    min-height: 100vh;
+    .sidebar {
+        flex: 0 1 323px;
+        padding: 22px 34px 26px 40px;
+    }
+    .content {
+        flex: 1 1 1117px;
+        background: #000;
+    }
+}
+
+body:not(.user-is-tabbing) button:focus,
+body:not(.user-is-tabbing) input:focus,
+body:not(.user-is-tabbing) select:focus,
+body:not(.user-is-tabbing) span:focus,
+body:not(.user-is-tabbing) textarea:focus {
+    box-shadow: none;
+}
+
+::selection {
+    background: $accent;
+    color: $white;
+}

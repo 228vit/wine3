@@ -1,0 +1,25 @@
+.form-check-input[type=checkbox] {
+	border: 1px solid #B0B0B0;
+	border-radius: 2px;
+	&:checked {
+		background: url(../img/checkbox.svg) no-repeat center / 10px $accent;
+		border-color: $accent;
+		&+.form-check-label {
+			color: $accent;
+		}
+	}
+}
+
+.btn {
+	background: $accent;
+	color: $white;
+	font-size: 18px;
+	line-height: (20.45/18);
+	font-weight: bold;
+	padding: 15px 0;
+	border-radius: 5px;
+	&:hover {
+		color: $white;
+		background: darken($accent, 10%);
+	}
+}
