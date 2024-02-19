@@ -64,6 +64,11 @@ class Admin implements UserInterface
         $this->products = new ArrayCollection();
     }
 
+    public function getUserIdentifier(): ?int
+    {
+        return $this->id;
+    }
+
     public function getId(): ?int
     {
         return $this->id;

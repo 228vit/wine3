@@ -6,20 +6,20 @@ use App\Repository\ImportLogRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Knp\DoctrineBehaviors\Model\Timestampable\TimestampableTrait;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Validator\Constraints as Assert;
-//use Knp\DoctrineBehaviors\Contract\Entity\TimestampableInterface;
-//use Knp\DoctrineBehaviors\Model\Timestampable\Timestampable;
+use Knp\DoctrineBehaviors\Contract\Entity\TimestampableInterface;
 
 
 /**
  * @ORM\Entity(repositoryClass=ImportLogRepository::class)
  */
-class ImportLog // implements TimestampableInterface
+class ImportLog implements TimestampableInterface
 {
     public const TOTAL_STAGES = 4;
 
-//    use Timestampable;
+    use TimestampableTrait;
     /**
      * @ORM\Id
      * @ORM\GeneratedValue

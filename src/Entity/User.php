@@ -106,6 +106,11 @@ class User implements UserInterface, TimestampableInterface, UuidableInterface
         $this->orders = new ArrayCollection();
     }
 
+    public function getUserIdentifier(): ?int
+    {
+        return $this->id;
+    }
+
     public function getId(): ?int
     {
         return $this->id;
