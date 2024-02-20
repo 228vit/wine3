@@ -2,6 +2,10 @@
 #    path: /
 #    controller: App\Controller\DefaultController::index
 login_check:
-  path: /login_check
+    path: /login_check
 backend_login_check:
-  path: /backend/login_check
+    path: /backend/login_check
+
+_sirian_suggest:
+    resource: "@SirianSuggestBundle/Resources/config/routing.yml"
+    prefix:   /suggest

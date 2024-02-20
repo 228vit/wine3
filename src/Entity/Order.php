@@ -6,17 +6,20 @@ use App\Repository\OrderRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-//use Knp\DoctrineBehaviors\Contract\Entity\TimestampableInterface;
-//use Knp\DoctrineBehaviors\Contract\Entity\UuidableInterface;
-//use Knp\DoctrineBehaviors\Model\Timestampable\TimestampableTrait;
-//use Knp\DoctrineBehaviors\Model\Uuidable\UuidableMethodsTrait;
+use Knp\DoctrineBehaviors\Contract\Entity\TimestampableInterface;
+use Knp\DoctrineBehaviors\Contract\Entity\UuidableInterface;
+use Knp\DoctrineBehaviors\Model\Timestampable\TimestampableTrait;
+use Knp\DoctrineBehaviors\Model\Uuidable\UuidableMethodsTrait;
 
 /**
  * @ORM\Entity(repositoryClass=OrderRepository::class)
  * @ORM\Table(name="orders")
  */
-class Order //implements TimestampableInterface, UuidableInterface
+class Order implements TimestampableInterface, UuidableInterface
 {
+    use TimestampableTrait;
+    use UuidableMethodsTrait;
+
     public const STATUSES = [
         0 => 'new',
         1 => 'in process',
