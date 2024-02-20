@@ -1,0 +1,12 @@
+sirian_suggest:
+  orm:
+    product:
+      class: "AppBundle:Product"
+      property: name
+
+#    user:
+#      class: "MainBundle:User"
+#      property: username
+#      search:
+#        email: ~
+#        username: ~
