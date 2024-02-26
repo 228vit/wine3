@@ -81,6 +81,34 @@ class AdminProductController extends AbstractController
 
 
     /**
+     * @Route("backend/ajax/product/search", name="backend_ajax_product_search", methods={"GET"})
+     */
+    public function ajaxSearchElements(Request $request,
+                                       ProductRepository $repository)
+    {
+        $searchString = $request->query->get('q', null);
+
+        if (null === $searchString) {
+            $elements = $repository->getTopTen();
+        } else {
+            $elements = $repository->ajaxSearch($searchString);
+        }
+
+        $res = [];
+
+        /** @var Element $element */
+        foreach ($elements as $element) {
+            $res[] = [
+                'id' => $element->getId(),
+                'text' => $element->getName(),
+                'extra' => [],
+            ];
+        }
+
+        return $this->json(['items' => $res, 'hasMore' => false]);
+    }
+
+    /**
      * @Route("backend/product/ajax/price", name="ajax_product_get_price", methods={"GET"})
      */
     public function ajaxGetProductPriceAction(Request $request)

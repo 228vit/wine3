@@ -271,6 +271,11 @@ class Product implements TimestampableInterface
      */
     private $isEdited;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Event::class, mappedBy="products")
+     */
+    private $events;
+
     public function __construct()
     {
         $this->viewsCount = 0;
@@ -282,6 +287,7 @@ class Product implements TimestampableInterface
         $this->offers = new ArrayCollection();
         $this->productGrapeSorts = new ArrayCollection();
         $this->productRatings = new ArrayCollection();
+        $this->events = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -986,6 +992,33 @@ class Product implements TimestampableInterface
         foreach ($this->productGrapeSortsAsArray() as [$key, $value]) {
             yield sprintf('%s: %s%%', $key, $value);
         };
+    }
+
+    /**
+     * @return Collection<int, Event>
+     */
+    public function getEvents(): Collection
+    {
+        return $this->events;
+    }
+
+    public function addEvent(Event $event): self
+    {
+        if (!$this->events->contains($event)) {
+            $this->events[] = $event;
+            $event->addProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEvent(Event $event): self
+    {
+        if ($this->events->removeElement($event)) {
+            $event->removeProduct($this);
+        }
+
+        return $this;
     }
 
 }

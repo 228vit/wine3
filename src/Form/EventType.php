@@ -3,8 +3,8 @@
 namespace App\Form;
 
 use App\Entity\Event;
-use App\Entity\Vendor;
-use App\Repository\VendorRepository;
+use App\Entity\Supplier;
+use App\Repository\SupplierRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -20,9 +20,9 @@ class EventType extends AbstractType
             ->add('address')
             ->add('coordinates')
             ->add('description')
-            ->add('vendors', EntityType::class, array(
-                'class' => Vendor::class,
-                'query_builder' => function (VendorRepository $er) {
+            ->add('suppliers', EntityType::class, array(
+                'class' => Supplier::class,
+                'query_builder' => function (SupplierRepository $er) {
                     return $er->createQueryBuilder('v')
                         ->addOrderBy('v.name', 'ASC');
                 },
@@ -30,7 +30,7 @@ class EventType extends AbstractType
                 'required' => false,
                 'expanded' => true,
                 'multiple' => true,
-                'label' => 'Партнёры',
+                'label' => 'Поставщики',
             ))
 
         ;

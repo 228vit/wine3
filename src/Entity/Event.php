@@ -54,9 +54,21 @@ class Event
      */
     private $slug;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Supplier::class, inversedBy="events")
+     */
+    private $suppliers;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Product::class, inversedBy="events")
+     */
+    private $products;
+
     public function __construct()
     {
         $this->vendors = new ArrayCollection();
+        $this->suppliers = new ArrayCollection();
+        $this->products = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -163,5 +175,53 @@ class Event
     public function __toString()
     {
         return $this->getName();
+    }
+
+    /**
+     * @return Collection<int, Supplier>
+     */
+    public function getSuppliers(): Collection
+    {
+        return $this->suppliers;
+    }
+
+    public function addSupplier(Supplier $supplier): self
+    {
+        if (!$this->suppliers->contains($supplier)) {
+            $this->suppliers[] = $supplier;
+        }
+
+        return $this;
+    }
+
+    public function removeSupplier(Supplier $supplier): self
+    {
+        $this->suppliers->removeElement($supplier);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Product>
+     */
+    public function getProducts(): Collection
+    {
+        return $this->products;
+    }
+
+    public function addProduct(Product $product): self
+    {
+        if (!$this->products->contains($product)) {
+            $this->products[] = $product;
+        }
+
+        return $this;
+    }
+
+    public function removeProduct(Product $product): self
+    {
+        $this->products->removeElement($product);
+
+        return $this;
     }
 }

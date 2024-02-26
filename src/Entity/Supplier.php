@@ -60,11 +60,17 @@ class Supplier
      */
     private $email;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Event::class, mappedBy="suppliers")
+     */
+    private $events;
+
     public function __construct()
     {
         $this->products = new ArrayCollection();
         $this->offers = new ArrayCollection();
         $this->imports = new ArrayCollection();
+        $this->events = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -215,6 +221,33 @@ class Supplier
     public function setEmail(?string $email): self
     {
         $this->email = $email;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Event>
+     */
+    public function getEvents(): Collection
+    {
+        return $this->events;
+    }
+
+    public function addEvent(Event $event): self
+    {
+        if (!$this->events->contains($event)) {
+            $this->events[] = $event;
+            $event->addSupplier($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEvent(Event $event): self
+    {
+        if ($this->events->removeElement($event)) {
+            $event->removeSupplier($this);
+        }
 
         return $this;
     }

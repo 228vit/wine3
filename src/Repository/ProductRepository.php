@@ -28,6 +28,32 @@ class ProductRepository extends ServiceEntityRepository
         return $this->createQueryBuilder($alias);
     }
 
+
+    public function getTopTen()
+    {
+        return $this->createQueryBuilder('e')
+            ->orderBy('e.name', 'ASC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function ajaxSearch(string $value)
+    {
+        return $this->createQueryBuilder('e')
+            ->leftJoin('e.aliases', 'alias')
+            ->where('e.name LIKE :val')
+            ->setParameter('val', "%$value%")
+            ->orWhere('alias.name LIKE :alias')
+            ->setParameter('alias', "%$value%")
+            ->orderBy('e.name', 'ASC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
     public function getJoinedQuery($alias = 'product')
     {
         return $this->createQueryBuilder($alias)
@@ -143,22 +169,5 @@ class ProductRepository extends ServiceEntityRepository
         ;
     }
 
-
-    // /**
-    //  * @return Product[] Returns an array of Product objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('p.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
 
 }
