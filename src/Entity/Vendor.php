@@ -39,9 +39,15 @@ class Vendor
      */
     private $slug;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Event::class, mappedBy="vendors")
+     */
+    private $events;
+
     public function __construct()
     {
         $this->products = new ArrayCollection();
+        $this->events = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -118,5 +124,32 @@ class Vendor
     public function __toString(): string
     {
         return $this->getName();
+    }
+
+    /**
+     * @return Collection<int, Event>
+     */
+    public function getEvents(): Collection
+    {
+        return $this->events;
+    }
+
+    public function addEvent(Event $event): self
+    {
+        if (!$this->events->contains($event)) {
+            $this->events[] = $event;
+            $event->addVendor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEvent(Event $event): self
+    {
+        if ($this->events->removeElement($event)) {
+            $event->removeVendor($this);
+        }
+
+        return $this;
     }
 }
