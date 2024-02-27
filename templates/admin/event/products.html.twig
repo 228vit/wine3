@@ -1,0 +1,18 @@
+{% for row in products %}
+    <tr id="product_{{ row.id }}">
+        <td>
+            {% if row.product.announcePic %}
+                <a data-lightbox="gallery" target="_blank" href="{{ asset('/uploads/' ~ row.product.announcePic) }}"><img
+                            src="{{ asset('/uploads/' ~ row.product.announcePic) | imagine_filter('thumb_square_50') }}" /></a>
+            {% endif %}
+        </td>
+
+        <td>{{ row.product.summary }}</td>
+        <td>{{ row.price }}</td>
+        <td>{{ row.position }}</td>
+
+        <td><a class="btn btn-sm btn-danger removeElement" rel="product_{{ row.id }}"
+               href="{{ path('backend_event_product_delete', { id: row.id, event_id: row.event.id }) }}">delete</a> </td>
+
+    </tr>
+{% endfor %}

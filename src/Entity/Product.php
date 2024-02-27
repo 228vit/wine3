@@ -272,9 +272,10 @@ class Product implements TimestampableInterface
     private $isEdited;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Event::class, mappedBy="products")
+     * @ORM\OneToMany(targetEntity=EventProduct::class, mappedBy="product", orphanRemoval=true)
      */
     private $events;
+
 
     public function __construct()
     {
@@ -995,27 +996,30 @@ class Product implements TimestampableInterface
     }
 
     /**
-     * @return Collection<int, Event>
+     * @return Collection<int, EventProduct>
      */
     public function getEvents(): Collection
     {
         return $this->events;
     }
 
-    public function addEvent(Event $event): self
+    public function addEvent(EventProduct $event): self
     {
         if (!$this->events->contains($event)) {
             $this->events[] = $event;
-            $event->addProduct($this);
+            $event->setProduct($this);
         }
 
         return $this;
     }
 
-    public function removeEvent(Event $event): self
+    public function removeEvent(EventProduct $event): self
     {
         if ($this->events->removeElement($event)) {
-            $event->removeProduct($this);
+            // set the owning side to null (unless already changed)
+            if ($event->getProduct() === $this) {
+                $event->setProduct(null);
+            }
         }
 
         return $this;

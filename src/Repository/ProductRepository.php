@@ -42,11 +42,8 @@ class ProductRepository extends ServiceEntityRepository
     public function ajaxSearch(string $value)
     {
         return $this->createQueryBuilder('e')
-            ->leftJoin('e.aliases', 'alias')
             ->where('e.name LIKE :val')
             ->setParameter('val', "%$value%")
-            ->orWhere('alias.name LIKE :alias')
-            ->setParameter('alias', "%$value%")
             ->orderBy('e.name', 'ASC')
             ->setMaxResults(10)
             ->getQuery()

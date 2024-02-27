@@ -16,26 +16,42 @@
     {% include 'admin/flashes.html.twig' %}
 
     {{ form_start(form) }}
-    <h3>Products</h3>
-    <table class="table">
-        <thead>
-        </thead>
-        <tbody></tbody>
-        <tfoot>
-            <tr style="background-color: lightyellow;">
-                <td>-</td>
-                <td>
-                    <select id="product_select2" name="event[product]"
-                            placeholder="Search..."
-                            class="select2-hidden-accessible" tabindex="-1"
-                            aria-hidden="true">
-                    </select>
-                </td>
-                <td><button class="btn btn-sm btn-warning" id="addProduct">ADD</button> </td>
-            </tr>
-        </tfoot>
-    </table>
+
     {{ form_rest(form) }}
+
+    <div class="row">
+        <div class="col-12">
+            <h3>Products</h3>
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>pic</th>
+                    <th>name</th>
+                    <th>price</th>
+                    <th>pos</th>
+                </tr>
+                </thead>
+                <tbody id="productsTable">
+                    {% include 'admin/event/products.html.twig' with { products: row.products } %}
+                </tbody>
+                <tfoot>
+                <tr style="background-color: lightyellow;">
+                    <td>-</td>
+                    <td>
+                        <select id="product_select2" name="event[product]"
+                                placeholder="Search..."
+                                class="select2-hidden-accessible" tabindex="-1"
+                                aria-hidden="true">
+                        </select>
+                    </td>
+                    <td><input id="newProductPrice" type="text" class="form-control"></td>
+                    <td><input id="newProductPosition" type="text" class="form-control"></td>
+                    <td><button class="btn btn-sm btn-warning" id="addProduct">ADD</button> </td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
 
     <div class="row">
         <div class="col-8">
@@ -56,6 +72,30 @@
 {% block extra_scripts %}
 <script>
     $(document).ready(function() {
+        $('#addProduct').on('click', function (e) {
+            e.preventDefault();
+
+            let product_id = $('#product_select2 option:selected').val();
+
+            $.ajax({
+                url: '{{ path('backend_event_ajax_add_product', {id: row.id}) }}',
+                data: {
+                    'product_id': product_id,
+                    'price': $('#newProductPrice').val(),
+                    'position': $('#newProductPosition').val(),
+                }
+            }).done(function(html) {
+                // console.log(html);
+                $("#product_select2").select2("val", "");
+                $('#productsTable').html(html);
+                $('#newProductPrice').val('')
+                $('#newProductPosition').val('')
+                bindRemoveElements();
+            });
+
+            return false;
+        });
+
         $('#product_select2').select2({
             ajax: {
                 url: '{{ path("backend_ajax_product_search") }}',
@@ -69,7 +109,32 @@
             }
         });
 
-        $('.select2-container').css({'min-width': '400px'});
+        $('.select2-container').css({'min-width': '600px'});
+
+        function bindRemoveElements() {
+            $('.removeElement').on('click', function (e) {
+                e.preventDefault();
+                if (!confirm("Вы уверены?")) {
+                    return false;
+                }
+
+                let tableRowId = $(this).attr('rel');
+
+                $.ajax({
+                    url: $(this).attr('href'),
+                    error: function () {
+                        alert('error!!!');
+                    },
+                }).done(function() {
+                    console.log('remove row: ' + tableRowId);
+                    $('#'+tableRowId).remove();
+                });
+
+                return false;
+            });
+        }
+
+        bindRemoveElements();
     });
 </script>
 {% endblock %}

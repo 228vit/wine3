@@ -2,6 +2,8 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Event;
+use App\Entity\EventProduct;
 use App\Entity\Offer;
 use App\Entity\Product;
 use App\Entity\WineColor;
@@ -11,6 +13,7 @@ use App\Entity\WineSugarAlias;
 use App\Filter\ProductFilter;
 use App\Form\ProductType;
 use App\Repository\AliasRepository;
+use App\Repository\EventRepository;
 use App\Repository\OfferRepository;
 use App\Repository\ProductRepository;
 use App\Repository\SupplierRepository;
@@ -23,6 +26,7 @@ use App\Service\WineColorService;
 use App\Service\WineSugarService;
 use App\Utils\Slugger;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -40,6 +44,41 @@ class AdminProductController extends AbstractController
     CONST ENTITY_NAME = 'Product';
     CONST NS_ENTITY_NAME = 'App:Product';
 
+
+    /**
+     * @Route("backend/event/{id}/add_product", name="backend_event_ajax_add_product", methods={"GET"})
+     */
+    public function ajaxAddProduct(Request $request,
+                                   Event $event,
+                                   EventRepository $eventRepository,
+                                   ProductRepository $productRepository)
+    {
+        $productId = $request->query->get('product_id', null);
+        $price = floatval($request->query->get('price', 0));
+        $position = intval($request->query->get('position', 100));
+
+        $product = $productRepository->find($productId);
+
+        if (null === $product) {
+            return new JsonResponse(null, 404);
+        }
+        $eventProduct = (new EventProduct())
+            ->setEvent($event)
+            ->setProduct($product)
+            ->setPrice($price)
+            ->setPosition($position)
+        ;
+        $this->em->persist($eventProduct);
+        // todo: products sortable?
+        $event->addProduct($eventProduct);
+        $this->em->persist($event);
+        $this->em->flush();
+
+        return $this->render('admin/event/products.html.twig', array(
+            'row' => $event,
+            'products' => $event->getProducts(),
+        ));
+    }
 
     /**
      * @Route("backend/product/toggle/field", name="ajax_product_toggle_field", methods={"GET"})
@@ -79,12 +118,35 @@ class AdminProductController extends AbstractController
         return new Response($response, 200);
     }
 
+    /**
+     * @Route("backend/event_product/{id}/delete", name="backend_event_product_delete", methods={"GET"})
+     */
+    public function ajaxDeleteEventProduct(EventProduct $eventProduct,
+                                           Request $request,
+                                           EventRepository $eventRepository)
+    {
+        // todo: check if ajax?
+        $eventId = $request->query->get('event_id', null);
+        $event = $eventRepository->find($eventId);
+
+        if (null === $event) {
+            throw new NotFoundHttpException();
+        }
+
+        $event->removeProduct($eventProduct);
+
+        $this->em->persist($event);
+        $this->em->remove($eventProduct);
+        $this->em->flush();
+
+        return new JsonResponse(['message' => 'success'], 200);
+    }
 
     /**
      * @Route("backend/ajax/product/search", name="backend_ajax_product_search", methods={"GET"})
      */
-    public function ajaxSearchElements(Request $request,
-                                       ProductRepository $repository)
+    public function ajaxSearchProduct(Request $request,
+                                      ProductRepository $repository)
     {
         $searchString = $request->query->get('q', null);
 
@@ -96,7 +158,7 @@ class AdminProductController extends AbstractController
 
         $res = [];
 
-        /** @var Element $element */
+        /** @var Product $element */
         foreach ($elements as $element) {
             $res[] = [
                 'id' => $element->getId(),

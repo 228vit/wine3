@@ -56,11 +56,13 @@ class Event
 
     /**
      * @ORM\ManyToMany(targetEntity=Supplier::class, inversedBy="events")
+     * @ORM\OrderBy({"name" = "ASC"})
      */
     private $suppliers;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Product::class, inversedBy="events")
+     * @ORM\OneToMany(targetEntity=EventProduct::class, mappedBy="event", orphanRemoval=true)
+     * @ORM\OrderBy({"position" = "ASC"})
      */
     private $products;
 
@@ -202,25 +204,31 @@ class Event
     }
 
     /**
-     * @return Collection<int, Product>
+     * @return Collection<int, EventProduct>
      */
     public function getProducts(): Collection
     {
         return $this->products;
     }
 
-    public function addProduct(Product $product): self
+    public function addProduct(EventProduct $product): self
     {
         if (!$this->products->contains($product)) {
             $this->products[] = $product;
+            $product->setEvent($this);
         }
 
         return $this;
     }
 
-    public function removeProduct(Product $product): self
+    public function removeProduct(EventProduct $product): self
     {
-        $this->products->removeElement($product);
+        if ($this->products->removeElement($product)) {
+            // set the owning side to null (unless already changed)
+            if ($product->getEvent() === $this) {
+                $product->setEvent(null);
+            }
+        }
 
         return $this;
     }
