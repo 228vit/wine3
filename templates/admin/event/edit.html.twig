@@ -20,6 +20,20 @@
     {{ form_rest(form) }}
 
     <div class="row">
+        <div class="col-8">
+            <a class="btn btn-primary" href="{{ path('backend_' ~ model ~ '_index') }}"><i class="fa fa-arrow-left"></i> Back to the list</a>
+            <button class="btn btn-success" type="submit"><i class="fa fa-check"></i> Update</button>
+            {{ form_end(form) }}
+        </div>
+        <div class="col-4 text-right">
+{#            {{ form_start(delete_form) }}#}
+{#            <button class="btn btn-danger delete-button" type="submit"><i class="fa fa-exclamation"></i> Delete</button>#}
+{#            {{ form_end(delete_form) }}#}
+        </div>
+    </div>
+
+    <br />
+    <div class="row">
         <div class="col-12">
             <h3>Products</h3>
             <table class="table table-striped">
@@ -32,7 +46,7 @@
                 </tr>
                 </thead>
                 <tbody id="productsTable">
-                    {% include 'admin/event/products.html.twig' with { products: row.products } %}
+                {% include 'admin/event/products.html.twig' with { products: row.products } %}
                 </tbody>
                 <tfoot>
                 <tr style="background-color: lightyellow;">
@@ -54,24 +68,55 @@
     </div>
 
     <div class="row">
-        <div class="col-8">
-            <a class="btn btn-primary" href="{{ path('backend_' ~ model ~ '_index') }}"><i class="fa fa-arrow-left"></i> Back to the list</a>
-            <button class="btn btn-success" type="submit"><i class="fa fa-check"></i> Update</button>
-            {{ form_end(form) }}
-        </div>
-        <div class="col-4 text-right">
-            {{ form_start(delete_form) }}
-            <button class="btn btn-danger delete-button" type="submit"><i class="fa fa-exclamation"></i> Delete</button>
-            {{ form_end(delete_form) }}
+        <div class="col-12">
+            <h3>Event Gallery</h3>
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Pic</th>
+                    <th>Pos</th>
+                </tr>
+                </thead>
+                <tbody id="picsTable">
+                {% include 'admin/event/pics.html.twig' with { pics: row.eventPics } %}
+                </tbody>
+                <tfoot>
+                <form id="newPicForm" action="" method="post" enctype="multipart/form-data">
+                <tr style="background-color: lightyellow;">
+                    <td>-<input type="hidden" name="event_id" value="{{ row.id }}"></td>
+                    <td><input id="newEventPic" name="newEventPic" type="file" class="form-control"></td>
+                    <td><input id="newEventPicPosition" name="newEventPicPosition" type="text" class="form-control"></td>
+                    <td><button type="submit" class="btn btn-sm btn-warning" id="addProduct">ADD</button> </td>
+                </tr>
+                </form>
+                </tfoot>
+            </table>
         </div>
     </div>
-
-    <br />
-
 {% endblock %}
 {% block extra_scripts %}
 <script>
-    $(document).ready(function() {
+    $(document).ready(function(e) {
+        $('#newPicForm').on('submit', function (e) {
+            e.preventDefault();
+            let form = document.getElementById('newPicForm');
+            let formData = new FormData(form);
+            $.ajax({
+                url: '{{ path('backend_event_ajax_add_pic', { id: row.id }) }}',
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    alert('Your form has been sent successfully.');
+                },
+                error: function (xhr, status, error) {
+                    alert('Your form was not sent successfully.');
+                    console.error(error);
+                }
+            });
+        });
+
         $('#addProduct').on('click', function (e) {
             e.preventDefault();
 

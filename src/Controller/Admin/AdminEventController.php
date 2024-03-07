@@ -3,9 +3,12 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Event;
+use App\Entity\EventPic;
+use App\Entity\EventProduct;
 use App\Filter\EventFilter;
 use App\Form\EventType;
 use App\Repository\EventRepository;
+use App\Repository\ProductRepository;
 use App\Service\FileUploader;
 use App\Utils\Slugger;
 use Doctrine\ORM\EntityManagerInterface;
@@ -14,6 +17,7 @@ use Knp\Component\Pager\Paginator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,11 +35,78 @@ class AdminEventController extends AbstractController
     CONST NS_ENTITY_NAME = 'App:Event';
 
     /**
+     * @Route("backend/event/{id}/add_pic", name="backend_event_ajax_add_pic", methods={"POST"})
+     */
+    public function ajaxAddPic(Request $request,
+                               Event $event,
+                               FileUploader $fileUploader)
+    {
+        $pos = $request->request->getInt('position', 1);
+        $file = $request->files->get('newEventPic', null);// $event->getPicFile();
+
+        if (null === $file) {
+            return new JsonResponse([
+                'message' => 'Empty file'
+            ], 400);
+        }
+
+        $fileName = $fileUploader->uploadEventPic($file, 'event_pic');
+
+        $eventPic = (new EventPic())
+            ->setEvent($event)
+            ->setPosition($pos)
+            ->setPic($fileName)
+        ;
+        $this->em->persist($eventPic);
+
+        $event->addEventPic($eventPic);
+        $this->em->persist($event);
+        $this->em->flush();
+
+        return new JsonResponse(null);
+    }
+
+    /**
+     * @Route("backend/event/{id}/add_product", name="backend_event_ajax_add_product", methods={"GET"})
+     */
+    public function ajaxAddProduct(Request $request,
+                                   Event $event,
+                                   EventRepository $eventRepository,
+                                   ProductRepository $productRepository)
+    {
+        $productId = $request->query->get('product_id', null);
+        $price = floatval($request->query->get('price', 0));
+        $position = intval($request->query->get('position', 100));
+
+        $product = $productRepository->find($productId);
+
+        if (null === $product) {
+            return new JsonResponse(null, 404);
+        }
+        $eventProduct = (new EventProduct())
+            ->setEvent($event)
+            ->setProduct($product)
+            ->setPrice($price)
+            ->setPosition($position)
+        ;
+        $this->em->persist($eventProduct);
+        // todo: products sortable?
+        $event->addProduct($eventProduct);
+        $this->em->persist($event);
+        $this->em->flush();
+
+        return $this->render('admin/event/products.html.twig', array(
+            'row' => $event,
+            'products' => $event->getProducts(),
+        ));
+    }
+
+    /**
      * Lists all event entities.
      *
      * @Route("backend/event/index", name="backend_event_index", methods={"GET"})
      */
-    public function indexAction(Request $request, SessionInterface $session)
+    public function index(Request $request, SessionInterface $session)
     {
         $pagination = $this->getPagination($request, $session, EventFilter::class);
 
@@ -68,13 +139,12 @@ class AdminEventController extends AbstractController
         ));
     }
 
-
     /**
      * Creates a new event entity.
      *
      * @Route("backend/event/new", name="backend_event_new", methods={"GET", "POST"})
      */
-    public function newAction(Request $request, EventRepository $repository, EntityManagerInterface $em)
+    public function new(Request $request, EventRepository $repository, EntityManagerInterface $em)
     {
         $event = new Event();
         $form = $this->createForm('App\Form\EventType', $event);
@@ -133,7 +203,7 @@ class AdminEventController extends AbstractController
      *
      * @Route("backend/event/{id}/edit", name="backend_event_edit", methods={"GET", "POST"})
      */
-    public function editAction(Request $request, Event $event, FileUploader $fileUploader, EntityManagerInterface $em)
+    public function edit(Request $request, Event $event, FileUploader $fileUploader, EntityManagerInterface $em)
     {
         $deleteForm = $this->createDeleteForm($event);
         $editForm = $this->createForm(EventType::class, $event);
@@ -171,7 +241,7 @@ class AdminEventController extends AbstractController
      *
      * @Route("backend/event/{id}", name="backend_event_delete", methods={"DELETE"})
      */
-    public function deleteAction(Request $request, Event $event)
+    public function delete(Request $request, Event $event)
     {
         $filter_form = $this->createDeleteForm($event);
         $filter_form->handleRequest($request);

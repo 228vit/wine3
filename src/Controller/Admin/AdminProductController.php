@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Event;
+use App\Entity\EventPic;
 use App\Entity\EventProduct;
 use App\Entity\Offer;
 use App\Entity\Product;
@@ -43,42 +44,6 @@ class AdminProductController extends AbstractController
     CONST MODEL = 'product';
     CONST ENTITY_NAME = 'Product';
     CONST NS_ENTITY_NAME = 'App:Product';
-
-
-    /**
-     * @Route("backend/event/{id}/add_product", name="backend_event_ajax_add_product", methods={"GET"})
-     */
-    public function ajaxAddProduct(Request $request,
-                                   Event $event,
-                                   EventRepository $eventRepository,
-                                   ProductRepository $productRepository)
-    {
-        $productId = $request->query->get('product_id', null);
-        $price = floatval($request->query->get('price', 0));
-        $position = intval($request->query->get('position', 100));
-
-        $product = $productRepository->find($productId);
-
-        if (null === $product) {
-            return new JsonResponse(null, 404);
-        }
-        $eventProduct = (new EventProduct())
-            ->setEvent($event)
-            ->setProduct($product)
-            ->setPrice($price)
-            ->setPosition($position)
-        ;
-        $this->em->persist($eventProduct);
-        // todo: products sortable?
-        $event->addProduct($eventProduct);
-        $this->em->persist($event);
-        $this->em->flush();
-
-        return $this->render('admin/event/products.html.twig', array(
-            'row' => $event,
-            'products' => $event->getProducts(),
-        ));
-    }
 
     /**
      * @Route("backend/product/toggle/field", name="ajax_product_toggle_field", methods={"GET"})
@@ -137,6 +102,30 @@ class AdminProductController extends AbstractController
 
         $this->em->persist($event);
         $this->em->remove($eventProduct);
+        $this->em->flush();
+
+        return new JsonResponse(['message' => 'success'], 200);
+    }
+
+    /**
+     * @Route("backend/event_pic/{id}/delete", name="backend_event_pic_delete", methods={"GET"})
+     */
+    public function ajaxDeleteEventPic(EventPic $eventPic,
+                                       Request $request,
+                                       EventRepository $eventRepository)
+    {
+        // todo: check if ajax?
+        $eventId = $request->query->get('event_id', null);
+        $event = $eventRepository->find($eventId);
+
+        if (null === $event) {
+            throw new NotFoundHttpException();
+        }
+
+        $event->removeEventPic($eventPic);
+
+        $this->em->persist($event);
+        $this->em->remove($eventPic);
         $this->em->flush();
 
         return new JsonResponse(['message' => 'success'], 200);

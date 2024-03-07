@@ -2,21 +2,28 @@
 
 namespace App\Service;
 
+use App\Entity\EventPic;
 use App\Entity\ImportLog;
 use App\Entity\Product;
 use App\Utils\Slugger;
+//use App\Utils\Uuid;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Ramsey\Uuid\Uuid;
+
 
 class FileUploader
 {
+    private $eventsDirectory;
     private $uploadsDirectory;
     private $productPicsSubDirectory;
     private $importFilesDirectory;
     
-    public function __construct(string $uploadsDirectory,
+    public function __construct(string $eventsDirectory,
+                                string $uploadsDirectory,
                                 string $productPicsSubDirectory,
                                 string $importFilesDirectory)
     {
+        $this->eventsDirectory = $eventsDirectory;
         $this->uploadsDirectory = $uploadsDirectory;
         $this->productPicsSubDirectory = $productPicsSubDirectory;
         $this->importFilesDirectory = $importFilesDirectory;
@@ -29,6 +36,19 @@ class FileUploader
         $file->move($this->getUploadsDirectory(), $fileName);
 
         return $fileName;
+    }
+
+    public function uploadEventPic(UploadedFile $file, string $prefix)
+    {
+        $fileName = sprintf('%s_%s.%s',
+            $prefix,
+            Uuid::uuid4(),
+            $file->guessExtension()
+        );
+
+        $file->move($this->getUploadsDirectory() . DIRECTORY_SEPARATOR . $this->getProductPicsDirectory(), $fileName);
+
+        return $this->getProductPicsDirectory() . DIRECTORY_SEPARATOR . $fileName;
     }
 
     public function uploadProductPic(UploadedFile $file, Product $product, string $prefix)

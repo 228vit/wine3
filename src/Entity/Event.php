@@ -66,11 +66,17 @@ class Event
      */
     private $products;
 
+    /**
+     * @ORM\OneToMany(targetEntity=EventPic::class, mappedBy="event")
+     */
+    private $eventPics;
+
     public function __construct()
     {
         $this->vendors = new ArrayCollection();
         $this->suppliers = new ArrayCollection();
         $this->products = new ArrayCollection();
+        $this->eventPics = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -227,6 +233,36 @@ class Event
             // set the owning side to null (unless already changed)
             if ($product->getEvent() === $this) {
                 $product->setEvent(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, EventPic>
+     */
+    public function getEventPics(): Collection
+    {
+        return $this->eventPics;
+    }
+
+    public function addEventPic(EventPic $eventPic): self
+    {
+        if (!$this->eventPics->contains($eventPic)) {
+            $this->eventPics[] = $eventPic;
+            $eventPic->setEvent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEventPic(EventPic $eventPic): self
+    {
+        if ($this->eventPics->removeElement($eventPic)) {
+            // set the owning side to null (unless already changed)
+            if ($eventPic->getEvent() === $this) {
+                $eventPic->setEvent(null);
             }
         }
 

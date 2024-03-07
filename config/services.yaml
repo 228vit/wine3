@@ -7,6 +7,7 @@ parameters:
     locale: 'en'
     uploads_directory: '%kernel.project_dir%/public/uploads'
     import_files_directory: '%kernel.project_dir%/import'
+    event_pics_subdirectory: 'events'
     product_pics_subdirectory: 'products'
     mailer_sender_email: '%env(MAILER_SENDER_EMAIL)%'
     mailer_send_confirm_email: '%env(MAILER_SEND_CONFIRM_REGISTER)%'
@@ -32,6 +33,7 @@ services:
         tags: ['controller.service_arguments']
     App\Service\FileUploader:
         arguments:
+            $eventsDirectory: '%event_pics_subdirectory%'
             $uploadsDirectory: '%uploads_directory%'
             $productPicsSubDirectory: '%product_pics_subdirectory%'
             $importFilesDirectory: '%import_files_directory%'
