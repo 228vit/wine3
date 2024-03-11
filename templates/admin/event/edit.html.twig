@@ -89,7 +89,7 @@
                 </tr>
                 </thead>
 
-                <tbody id="tableGalleryPics">
+                <tbody id="tbodyGalleryPics">
                 {% include 'admin/event/pics.html.twig' with { pics: row.eventPics } %}
                 </tbody>
 
@@ -160,7 +160,7 @@
             stop: updateIndex
         }).disableSelection();
 
-        $("tbody#tableGalleryPics").sortable({
+        $("tbody#tbodyGalleryPics").sortable({
             distance: 5,
             delay: 100,
             opacity: 0.6,
@@ -195,8 +195,10 @@
                 data: formData,
                 processData: false,
                 contentType: false,
-                success: function (response) {
-                    $.get('{{ path('backend_event_ajax_render_pics', { id: row.id }) }}');
+                success: function () {
+                    $.get('{{ path('backend_event_ajax_render_pics', { id: row.id }) }}', function(html) {
+                        $("#tbodyGalleryPics").html(html);
+                    });
                 },
                 error: function (xhr, status, error) {
                     alert('Error! ' + error);

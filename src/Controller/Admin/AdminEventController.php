@@ -128,6 +128,18 @@ class AdminEventController extends AbstractController
     }
 
     /**
+     * @Route("backend/event/delete_pic/{id}", name="backend_event_ajax_delete_pic", methods={"GET"})
+     */
+    public function ajaxDeletePic(FileUploader $fileUploader,
+                                  EventPic $eventPic)
+    {
+
+        return $this->render('admin/event/pics.html.twig', [
+            'pics' => $event->getEventPics(),
+        ]);
+    }
+
+    /**
      * @Route("backend/event/{id}/add_product", name="backend_event_ajax_add_product", methods={"GET"})
      */
     public function ajaxAddProduct(Request $request,

@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\EventPic;
 use App\Entity\ImportLog;
 use App\Entity\Product;
+use App\Entity\User;
 use App\Utils\Slugger;
 //use App\Utils\Uuid;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -27,6 +28,22 @@ class FileUploader
         $this->uploadsDirectory = $uploadsDirectory;
         $this->productPicsSubDirectory = $productPicsSubDirectory;
         $this->importFilesDirectory = $importFilesDirectory;
+    }
+
+    // todo:
+    public function removeUserAvatar(User $user)
+    {
+        $fileName = sprintf('%s%s%s%s%s',
+            $this->getUploadsDirectory(),
+            DIRECTORY_SEPARATOR,
+            $this->getUserPicsSubDirectory(),
+            DIRECTORY_SEPARATOR,
+            $user->getPic()
+        );
+
+        if (is_file($fileName)) {
+            unlink($fileName);
+        }
     }
 
 
