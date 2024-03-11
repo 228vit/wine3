@@ -123,7 +123,7 @@ class AdminEventController extends AbstractController
                                    Event $event)
     {
         return $this->render('admin/event/pics.html.twig', [
-            $event->getEventPics(),
+            'pics' => $event->getEventPics(),
         ]);
     }
 
