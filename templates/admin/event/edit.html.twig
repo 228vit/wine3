@@ -196,7 +196,7 @@
                 processData: false,
                 contentType: false,
                 success: function (response) {
-                    $.get('{{ path('backend_event_ajax_add_pic', { id: row.id }) }}');
+                    $.get('{{ path('backend_event_ajax_render_pics', { id: row.id }) }}');
                 },
                 error: function (xhr, status, error) {
                     alert('Error! ' + error);
@@ -220,7 +220,7 @@
             }).done(function(html) {
                 // console.log(html);
                 $("#product_select2").select2("val", "");
-                $('#productsTable').html(html);
+                $('#tbodyProducts').html(html);
                 $('#newProductPrice').val('')
                 $('#newProductPosition').val('')
                 bindRemoveElements();
