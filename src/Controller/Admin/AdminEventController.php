@@ -7,6 +7,8 @@ use App\Entity\EventPic;
 use App\Entity\EventProduct;
 use App\Filter\EventFilter;
 use App\Form\EventType;
+use App\Repository\EventPicRepository;
+use App\Repository\EventProductRepository;
 use App\Repository\EventRepository;
 use App\Repository\ProductRepository;
 use App\Service\FileUploader;
@@ -35,12 +37,60 @@ class AdminEventController extends AbstractController
     CONST NS_ENTITY_NAME = 'App:Event';
 
     /**
+     * @Route("backend/event/{id}/sort_products", name="backend_event_ajax_sort_products", methods={"GET"})
+     */
+    public function ajaxSortEventProducts(Request $request,
+                                          Event $event,
+                                          EventProductRepository $repository)
+    {
+        $elements = $request->query->get('elements');
+
+        foreach ($elements as $i => $id) {
+            $item = $repository->find($id);
+
+            if (null === $item) continue;
+
+            $item->setPosition($i+1);
+            $this->em->persist($item);
+        }
+        $this->em->flush();
+
+        return new JsonResponse(null, 200);
+    }
+
+    /**
+     * @Route("backend/event/{id}/sort_pics", name="backend_event_ajax_sort_pics", methods={"GET"})
+     */
+    public function ajaxSortEventPics(Request $request,
+                                      Event $event,
+                                      EventPicRepository $repository)
+    {
+        $elements = $request->query->get('elements');
+
+        foreach ($elements as $i => $id) {
+            $item = $repository->find($id);
+
+            if (null === $item) continue;
+
+            $item->setPosition($i+1);
+            $this->em->persist($item);
+        }
+        $this->em->flush();
+
+        return new JsonResponse(null, 200);
+    }
+
+    /**
      * @Route("backend/event/{id}/add_pic", name="backend_event_ajax_add_pic", methods={"POST"})
      */
     public function ajaxAddPic(Request $request,
                                Event $event,
                                FileUploader $fileUploader)
     {
+//        return new JsonResponse([
+//            'message' => 'Empty file'
+//        ], 400);
+
         $pos = $request->request->getInt('position', 1);
         $file = $request->files->get('newEventPic', null);// $event->getPicFile();
 
@@ -63,7 +113,18 @@ class AdminEventController extends AbstractController
         $this->em->persist($event);
         $this->em->flush();
 
-        return new JsonResponse(null);
+        return new JsonResponse(['message' => 'success'], 200);
+    }
+
+    /**
+     * @Route("backend/event/{id}/render_pics", name="backend_event_ajax_render_pics", methods={"GET"})
+     */
+    public function ajaxRenderPics(Request $request,
+                                   Event $event)
+    {
+        return $this->render('admin/event/pics.html.twig', [
+            $event->getEventPics(),
+        ]);
     }
 
     /**

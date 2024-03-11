@@ -68,6 +68,7 @@ class Event
 
     /**
      * @ORM\OneToMany(targetEntity=EventPic::class, mappedBy="event")
+     * @ORM\OrderBy({"position" = "ASC"})
      */
     private $eventPics;
 
@@ -144,9 +145,6 @@ class Event
         return $this;
     }
 
-    /**
-     * @return Collection<int, Vendor>
-     */
     public function getVendors(): Collection
     {
         return $this->vendors;

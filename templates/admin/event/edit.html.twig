@@ -11,6 +11,12 @@
 {% endblock %}
 
 {% block body %}
+    <style>
+        .tableSortable td:hover{
+            cursor:move;
+        }
+    </style>
+
     <h1>{{ entity_name }} edit</h1>
 
     {% include 'admin/flashes.html.twig' %}
@@ -36,21 +42,24 @@
     <div class="row">
         <div class="col-12">
             <h3>Products</h3>
-            <table class="table table-striped">
-                <thead>
+            <table class="table table-striped tableSortable" id="tableProducts">
+                <thead class="thead-dark">
                 <tr>
+                    <th></th>
                     <th>Pic</th>
                     <th>Name</th>
                     <th>Price</th>
                     <th>Pos</th>
+                    <th></th>
                 </tr>
                 </thead>
-                <tbody id="productsTable">
+                <tbody id="tbodyProducts">
                 {% include 'admin/event/products.html.twig' with { products: row.products } %}
                 </tbody>
                 <tfoot>
                 <tr style="background-color: lightyellow;">
                     <td>-</td>
+                    <td></td>
                     <td>
                         <select id="product_select2" name="event[product]"
                                 placeholder="Search..."
@@ -70,23 +79,27 @@
     <div class="row">
         <div class="col-12">
             <h3>Event Gallery</h3>
-            <table class="table table-striped">
-                <thead>
+            <table class="table table-striped tableSortable" id="tableGallery">
+                <thead class="thead-dark">
                 <tr>
+                    <th></th>
                     <th>Pic</th>
                     <th>Pos</th>
+                    <th></th>
                 </tr>
                 </thead>
-                <tbody id="picsTable">
+
+                <tbody id="tableGalleryPics">
                 {% include 'admin/event/pics.html.twig' with { pics: row.eventPics } %}
                 </tbody>
+
                 <tfoot>
                 <form id="newPicForm" action="" method="post" enctype="multipart/form-data">
                 <tr style="background-color: lightyellow;">
-                    <td>-<input type="hidden" name="event_id" value="{{ row.id }}"></td>
-                    <td><input id="newEventPic" name="newEventPic" type="file" class="form-control"></td>
-                    <td><input id="newEventPicPosition" name="newEventPicPosition" type="text" class="form-control"></td>
-                    <td><button type="submit" class="btn btn-sm btn-warning" id="addProduct">ADD</button> </td>
+                    <th>-<input type="hidden" name="event_id" value="{{ row.id }}"></th>
+                    <th><input id="newEventPic" name="newEventPic" type="file" class="form-control"></th>
+                    <th><input id="newEventPicPosition" name="newEventPicPosition" type="text" class="form-control"></th>
+                    <th><button type="submit" class="btn btn-sm btn-warning" id="addProduct">ADD</button> </th>
                 </tr>
                 </form>
                 </tfoot>
@@ -95,8 +108,83 @@
     </div>
 {% endblock %}
 {% block extra_scripts %}
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js" integrity="sha256-T0Vest3yCU7pafRw9r+settMBX6JkKN06dqBnpQ8d30=" crossorigin="anonymous"></script>
+
 <script>
     $(document).ready(function(e) {
+        let fixHelperModified = function(e, tr) {
+                let $originals = tr.children();
+                let $helper = tr.clone();
+                $helper.children().each(function(index) {
+                    $(this).width($originals.eq(index).width())
+                });
+                return $helper;
+            },
+            updateIndex = function(e, ui) {
+                $('td.index', ui.item.parent()).each(function (i) {
+                    $(this).html(i+1);
+                });
+            };
+
+        $("#tableProducts").sortable({
+            helper: fixHelperModified,
+            stop: updateIndex
+        }).disableSelection();
+
+        $("tbody#tbodyProducts").sortable({
+            distance: 5,
+            delay: 100,
+            opacity: 0.6,
+            cursor: 'move',
+            update: function() {
+                let pos = [];
+                $('.sortableProducts').each(function () {
+                    pos.push($(this).attr('data-rel'));
+                });
+
+                let url = '{{ path('backend_event_ajax_sort_products', {id: row.id}) }}';
+
+                console.log(pos);
+                $.ajax({
+                    url: url,
+                    data: {'elements': pos}
+                }).done(function(html) {
+                    console.log(html);
+                });
+
+            }
+        }); // -- sortable rows!!!
+
+        $("#tableGallery").sortable({
+            helper: fixHelperModified,
+            stop: updateIndex
+        }).disableSelection();
+
+        $("tbody#tableGalleryPics").sortable({
+            distance: 5,
+            delay: 100,
+            opacity: 0.6,
+            cursor: 'move',
+            update: function() {
+                let pos = [];
+                $('.sortablePics').each(function () {
+                    pos.push($(this).attr('data-rel'));
+                });
+
+                let url = '{{ path('backend_event_ajax_sort_pics', {id: row.id}) }}';
+
+                console.log(pos);
+                $.ajax({
+                    url: url,
+                    data: {'elements': pos}
+                }).done(function(html) {
+                    console.log(html);
+                });
+
+            }
+        }); // -- sortable rows!!!
+
+
         $('#newPicForm').on('submit', function (e) {
             e.preventDefault();
             let form = document.getElementById('newPicForm');
@@ -108,10 +196,10 @@
                 processData: false,
                 contentType: false,
                 success: function (response) {
-                    alert('Your form has been sent successfully.');
+                    $.get('{{ path('backend_event_ajax_add_pic', { id: row.id }) }}');
                 },
                 error: function (xhr, status, error) {
-                    alert('Your form was not sent successfully.');
+                    alert('Error! ' + error);
                     console.error(error);
                 }
             });

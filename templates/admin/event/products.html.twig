@@ -1,5 +1,7 @@
 {% for row in products %}
-    <tr id="product_{{ row.id }}">
+    <tr class="sortableProducts" id="product_{{ row.id }}" data-rel="{{ row.id }}">
+        <td><i class="fa fa-arrows-v"></i></td>
+
         <td>
             {% if row.product.announcePic %}
                 <a data-lightbox="gallery" target="_blank" href="{{ asset('/uploads/' ~ row.product.announcePic) }}"><img

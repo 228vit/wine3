@@ -1,5 +1,6 @@
 {% for row in pics %}
-    <tr id="pic_{{ row.id }}">
+    <tr class="sortablePics" id="pic_{{ row.id }}" data-rel="{{ row.id }}">
+        <td><i class="fa fa-arrows-v"></i></td>
         <td>
             {% if row.pic %}
                 <a data-lightbox="gallery" target="_blank" href="{{ asset('/uploads/' ~ row.pic) }}"><img
