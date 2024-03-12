@@ -8,8 +8,8 @@
             {% endif %}
         </td>
         <td>{{ row.position }}</td>
-        <td><a class="btn btn-sm btn-danger removeElement" rel="product_{{ row.id }}"
-               href="{{ path('backend_event_product_delete', { id: row.id, event_id: row.event.id }) }}">delete</a> </td>
+        <td><a class="btn btn-sm btn-danger removeElement" rel="pic_{{ row.id }}"
+               href="{{ path('backend_event_pic_delete', { id: row.id, event_id: row.event.id }) }}">delete</a> </td>
 
     </tr>
 {% endfor %}

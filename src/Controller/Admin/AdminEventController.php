@@ -133,6 +133,13 @@ class AdminEventController extends AbstractController
     public function ajaxDeletePic(FileUploader $fileUploader,
                                   EventPic $eventPic)
     {
+        $event = $eventPic->getEvent();
+        $fileUploader->removeEventPic($eventPic);
+
+        $event->removeEventPic($eventPic);
+        $this->em->persist($event);
+        $this->em->remove($eventPic);
+        $this->em->flush();
 
         return $this->render('admin/event/pics.html.twig', [
             'pics' => $event->getEventPics(),

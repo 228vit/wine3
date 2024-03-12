@@ -180,10 +180,8 @@
                 }).done(function(html) {
                     console.log(html);
                 });
-
             }
         }); // -- sortable rows!!!
-
 
         $('#newPicForm').on('submit', function (e) {
             e.preventDefault();
@@ -198,6 +196,7 @@
                 success: function () {
                     $.get('{{ path('backend_event_ajax_render_pics', { id: row.id }) }}', function(html) {
                         $("#tbodyGalleryPics").html(html);
+                        bindRemoveElements();
                     });
                 },
                 error: function (xhr, status, error) {
@@ -221,8 +220,8 @@
                 }
             }).done(function(html) {
                 // console.log(html);
-                $("#product_select2").select2("val", "");
                 $('#tbodyProducts').html(html);
+                $("#product_select2").select2("val", "");
                 $('#newProductPrice').val('')
                 $('#newProductPosition').val('')
                 bindRemoveElements();
@@ -260,7 +259,7 @@
                     error: function () {
                         alert('error!!!');
                     },
-                }).done(function() {
+                }).done(function(html) {
                     console.log('remove row: ' + tableRowId);
                     $('#'+tableRowId).remove();
                 });

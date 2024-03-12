@@ -33,10 +33,10 @@ services:
         tags: ['controller.service_arguments']
     App\Service\FileUploader:
         arguments:
-            $eventsDirectory: '%event_pics_subdirectory%'
             $uploadsDirectory: '%uploads_directory%'
-            $productPicsSubDirectory: '%product_pics_subdirectory%'
             $importFilesDirectory: '%import_files_directory%'
+            $productPicsSubDirectory: '%product_pics_subdirectory%'
+            $eventPicsSubDirectory: '%event_pics_subdirectory%'
 
 sirian_suggest:
     form_options:

@@ -7,42 +7,43 @@ use App\Entity\ImportLog;
 use App\Entity\Product;
 use App\Entity\User;
 use App\Utils\Slugger;
-//use App\Utils\Uuid;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Ramsey\Uuid\Uuid;
 
 
 class FileUploader
 {
-    private $eventsDirectory;
     private $uploadsDirectory;
     private $productPicsSubDirectory;
+    private $eventPicsSubDirectory;
     private $importFilesDirectory;
     
-    public function __construct(string $eventsDirectory,
-                                string $uploadsDirectory,
+    public function __construct(string $uploadsDirectory,
+                                string $importFilesDirectory,
                                 string $productPicsSubDirectory,
-                                string $importFilesDirectory)
+                                string $eventPicsSubDirectory)
     {
-        $this->eventsDirectory = $eventsDirectory;
+        $this->eventPicsSubDirectory = $eventPicsSubDirectory;
         $this->uploadsDirectory = $uploadsDirectory;
         $this->productPicsSubDirectory = $productPicsSubDirectory;
         $this->importFilesDirectory = $importFilesDirectory;
     }
 
     // todo:
-    public function removeUserAvatar(User $user)
+    public function removeEventPic(EventPic $eventPic)
     {
         $fileName = sprintf('%s%s%s%s%s',
             $this->getUploadsDirectory(),
             DIRECTORY_SEPARATOR,
-            $this->getUserPicsSubDirectory(),
+            $this->eventPicsSubDirectory,
             DIRECTORY_SEPARATOR,
-            $user->getPic()
+            $eventPic->getPic()
         );
 
         if (is_file($fileName)) {
             unlink($fileName);
+        } else {
+            throw new \Exception($fileName);
         }
     }
 
@@ -63,9 +64,13 @@ class FileUploader
             $file->guessExtension()
         );
 
-        $file->move($this->getUploadsDirectory() . DIRECTORY_SEPARATOR . $this->getProductPicsDirectory(), $fileName);
+        $file->move(
+            $this->getUploadsDirectory() . 
+            DIRECTORY_SEPARATOR . 
+            $this->eventPicsSubDirectory, $fileName
+        );
 
-        return $this->getProductPicsDirectory() . DIRECTORY_SEPARATOR . $fileName;
+        return $this->eventPicsSubDirectory . DIRECTORY_SEPARATOR . $fileName;
     }
 
     public function uploadProductPic(UploadedFile $file, Product $product, string $prefix)
