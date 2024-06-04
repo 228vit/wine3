@@ -1,0 +1,14 @@
+{% extends 'layout_front.html.twig' %}
+
+{% block title %}Winedows!{% endblock %}
+
+{% block body %}
+    {% if is_granted('IS_AUTHENTICATED_FULLY') or is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+        {% set winecard_path = path('cabinet_wine_card_index') %}
+    {% else %}
+        {% set winecard_path = path('app_login') %}
+    {% endif %}
+
+
+
+{% endblock %}

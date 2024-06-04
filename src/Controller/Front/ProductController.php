@@ -16,7 +16,6 @@ use App\Repository\WineCardRepository;
 use App\Repository\WineColorRepository;
 use App\Repository\WineSugarRepository;
 use App\Service\ProductDataService;
-use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;

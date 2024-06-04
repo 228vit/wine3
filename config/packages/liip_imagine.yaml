@@ -47,6 +47,13 @@ liip_imagine:
             png_compression_level: 8
             filters:
                 thumbnail: { size: [228, 154], mode: inset }
+
+        thumb_event_pic:
+            jpeg_quality: 75
+            png_compression_level: 8
+            filters:
+                thumbnail: { size: [228, 154], mode: inset }
+
         thumb_client:
             jpeg_quality: 75
             png_compression_level: 8
