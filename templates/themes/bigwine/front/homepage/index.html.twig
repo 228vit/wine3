@@ -9,6 +9,17 @@
         {% set winecard_path = path('app_login') %}
     {% endif %}
 
+    <section class="sec-slider">
+        {% include 'front/common/slider.html.twig' %}
+    </section>
+
+    <div class="sec-info">
+        {% include 'front/homepage/section-info.html.twig' %}
+    </div>
+
+    <div class="sec-events">
+        {% include 'front/homepage/section-events.html.twig' %}
+    </div>
 
 
 {% endblock %}

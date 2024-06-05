@@ -13,6 +13,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class PageController extends AbstractController
 {
 
+    /**
+     * @Route("/page", name="page_view")
+     */
+    public function view(): Response
+    {
+        return $this->render('front/page/view.html.twig', [
+        ]);
+    }
+
     public function onlyContent(EntityManagerInterface $em,
                               PageRepository $repository, string $slug): Response
     {

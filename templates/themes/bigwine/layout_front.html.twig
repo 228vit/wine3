@@ -19,22 +19,14 @@
         {% include 'front/common/top_menu.html.twig' %}
     </header>
 
-    <section class="sec-slider">
-        {% include 'front/common/slider.html.twig' %}
-    </section>
-
-    <div class="sec-info">
-        {% include 'front/homepage/section-info.html.twig' %}
-    </div>
-
-    <div class="sec-events">
-        {% include 'front/homepage/section-events.html.twig' %}
-    </div>
+    {% block body %}
+    {% endblock %}
 
     <footer class="sec-footer">
         {% include 'front/common/footer.html.twig' %}
     </footer>
 </div>
+
 <div class="modal-def" id="modal-partner">
     <div class="modal-def__wrap">
         <div class="modal-def__content modal-content">

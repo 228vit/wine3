@@ -17,17 +17,14 @@ class HomepageController extends AbstractController
     /**
      * @Route("/", name="homepage")
      */
-    public function index(TranslatorInterface $translator,
-                          EntityManagerInterface $em,
-                          ProductRepository $repository,
-                          AuthenticationUtils $authenticationUtils): Response
+    public function index(AuthenticationUtils $authenticationUtils): Response
     {
         // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
         // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
 
-        return $this->render('front/common/index.html.twig', [
+        return $this->render('front/homepage/index.html.twig', [
             'last_username' => $lastUsername,
             'error' => $error,
         ]);
