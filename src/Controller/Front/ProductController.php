@@ -43,7 +43,7 @@ class ProductController extends AbstractController
                                 WineCardRepository $wineCardRepository,
                                 ProductDataService $productDataService)
     {
-        $wineCards = $wineCardRepository->getAllByUser($this->getUser());
+//        $wineCards = $wineCardRepository->getAllByUser($this->getUser());
         $currentWineCard = $wineCardRepository->find($session->get('currentWineCard', 0));
         $session_order_field = $session->get('order_field', 'name');
         $orderMapping = [
@@ -52,32 +52,32 @@ class ProductController extends AbstractController
             'country' => 'По стране',
         ];
 
-        if (null === $currentWineCard AND 0 !== count($wineCards)) {
-            $currentWineCard = $wineCards[0];
-            $session->set('currentWineCard', $currentWineCard->getId());
-        }
+//        if (null === $currentWineCard AND 0 !== count($wineCards)) {
+//            $currentWineCard = $wineCards[0];
+//            $session->set('currentWineCard', $currentWineCard->getId());
+//        }
 
         $pagination = $this->getPagination($request, $session, $productDataService, FrontProductFilter::class);
 
         $isAjax = $request->isXmlHttpRequest();
 
-        if ($isAjax) {
-            return $this->render('front/product/onlyProducts.html.twig', array(
-                'pagination' => $pagination,
-                'currentWineCard' => $currentWineCard,
-                'wineCards' => $wineCards,
-                'totalRows' => $pagination->getTotalItemCount(),
-                'current_filters' => $this->current_filters,
-                'currentFilters' => $this->currentFilters,
-                'orderField' => $session_order_field,
-                'orderMapping' => $orderMapping,
-            ));
-        }
+//        if ($isAjax) {
+//            return $this->render('front/product/onlyProducts.html.twig', array(
+//                'pagination' => $pagination,
+//                'currentWineCard' => $currentWineCard,
+//                'wineCards' => $wineCards,
+//                'totalRows' => $pagination->getTotalItemCount(),
+//                'current_filters' => $this->current_filters,
+//                'currentFilters' => $this->currentFilters,
+//                'orderField' => $session_order_field,
+//                'orderMapping' => $orderMapping,
+//            ));
+//        }
 
-        return $this->render('front/product/main.html.twig', array(
+        return $this->render('front/catalog/index.html.twig', array(
             'pagination' => $pagination,
             'currentWineCard' => $currentWineCard,
-            'wineCards' => $wineCards,
+//            'wineCards' => $wineCards,
             'isAjax' => $request->isXmlHttpRequest(),
             'totalRows' => $pagination->getTotalItemCount(),
             'current_filters' => $this->current_filters,

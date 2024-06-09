@@ -7,8 +7,14 @@
                 <div class="top-menu__lang lang-choose"><a class="lang-choose__el" href="#"><img
                                 src="{{ asset('/bigwine/img/ru.svg') }}" alt=""></a></div>
                 <ul class="links-def top-menu__links">
-                    <li class="links-def__el"><a class="links-def__link active" href="#">Главная</a></li>
-                    <li class="links-def__el"><a class="links-def__link" href="#">Каталог</a></li>
+                    <li class="links-def__el"><a
+                        class="links-def__link {{ app.request.get('_route') == 'homepage' ? 'active' : '' }}"
+                            href="{{ path('homepage') }}">Главная</a>
+                    </li>
+                    <li class="links-def__el"><a
+                        class="links-def__link {{ app.request.get('_route') == 'cabinet_product_index' ? 'active' : '' }}"
+                            href="{{ path('cabinet_product_index') }}">Каталог</a>
+                    </li>
                     <li class="links-def__el"><a class="links-def__link" href="#">Мероприятия</a></li>
                     <li class="links-def__el"><a class="links-def__link" href="#">Поставщики</a></li>
                     <li class="links-def__el"><a class="links-def__link" href="#">Сотрудничество</a></li>
