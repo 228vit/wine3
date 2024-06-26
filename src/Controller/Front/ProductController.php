@@ -61,18 +61,6 @@ class ProductController extends AbstractController
 
         $isAjax = $request->isXmlHttpRequest();
 
-//        if ($isAjax) {
-//            return $this->render('front/product/onlyProducts.html.twig', array(
-//                'pagination' => $pagination,
-//                'currentWineCard' => $currentWineCard,
-//                'wineCards' => $wineCards,
-//                'totalRows' => $pagination->getTotalItemCount(),
-//                'current_filters' => $this->current_filters,
-//                'currentFilters' => $this->currentFilters,
-//                'orderField' => $session_order_field,
-//                'orderMapping' => $orderMapping,
-//            ));
-//        }
 
         return $this->render('front/catalog/index.html.twig', array(
             'pagination' => $pagination,
@@ -107,8 +95,8 @@ class ProductController extends AbstractController
      * @Route("/cabinet/product/change_wine_card", name="cabinet_product_change_wine_card")
      */
     public function changeWineCardAction(Request $request,
-                                SessionInterface $session,
-                                WineCardRepository $wineCardRepository)
+                                         SessionInterface $session,
+                                         WineCardRepository $wineCardRepository)
     {
         $wineCardId = $request->query->get('id', null);
         $wineCard = $wineCardRepository->find($wineCardId);
@@ -119,6 +107,32 @@ class ProductController extends AbstractController
         $session->set('currentWineCard', $wineCard->getId());
 
         return $this->redirectToRoute('cabinet_product_index');
+    }
+
+    /**
+     * Save filter values in session.
+     *
+     * @Route("/apply/filter/product", name="ajax_apply_filter_product", methods={"POST"})
+     */
+    public function ajaxApplyFilter(Request $request,
+                                    SessionInterface $session,
+                                    ProductDataService $productDataService)
+    {
+
+        $filters = $request->request->get('product_filter');
+        // unset empty values
+        if (is_array($filters)) {
+            $filters = array_filter($filters, function($value) { return $value !== ''; });
+            unset($filters['_token']);
+        }
+
+        $session->set('filters', array(
+            self::MODEL => $filters,
+        ));
+
+        $pagination = $this->getPagination($request, $session, $productDataService, FrontProductFilter::class);
+
+        return new JsonResponse(['totalFilteredProducts' => $pagination->getTotalItemCount()]);
     }
 
     /**

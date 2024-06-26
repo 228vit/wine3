@@ -29,6 +29,17 @@ class CountryRepository extends ServiceEntityRepository
         ;
     }
 
+    public function findWithWines()
+    {
+        return $this->createQueryBuilder('c')
+            ->innerJoin('c.products', 'product')
+//            ->andWhere('c.id IN (:ids)')
+//            ->setParameter('ids', $ids)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
     // /**
     //  * @return Country[] Returns an array of Country objects
     //  */
