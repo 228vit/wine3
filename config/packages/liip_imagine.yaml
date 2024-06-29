@@ -8,6 +8,12 @@ liip_imagine:
             web_path: ~
 
     filter_sets:
+        thumb_h_184:
+            jpeg_quality: 75
+            png_compression_level: 8
+            filters:
+                thumbnail: { size: [50, 50], mode: inset, allow_upscale: true }
+#                background: { size: [50, 50], position: center, color: '#ffffff' }
         thumb_square_50:
             jpeg_quality: 75
             png_compression_level: 8

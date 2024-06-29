@@ -18,6 +18,7 @@
                 </div>
 
                 <div class="sec-catalog__sidebar filter">
+
                     <form id="filtersForm" action="{{ path('cabinet_save_filter_product') }}">
 
                     <div class="filter__mob">
@@ -53,7 +54,7 @@
                                 class="filter__btn btn-def btn-def_3"
                                 href="#"><span>Поиск</span></a><a
                                 class="filter__btn btn-def_text btn-def btn-def_3"
-                                href="#"><span>Сбросить</span></a>
+                                href="{{ path('catalog_reset_product_filter') }}"><span>Сбросить</span></a>
                     </div>
                     </form>
                 </div>
@@ -62,27 +63,8 @@
                 <!-- div class="sec-catalog__sidebar filter" -->
 
                 <div class="sec-catalog__body">
-                    <div class="catalog row">
-                        <div class="catalog__el col-6 col-lg-4 col-xl-3">
-                            <div class="product-def">
-                                <div class="product-def__top"><a class="product-def__fav" href="#">
-                                        <svg width="28" height="25" viewBox="0 0 28 25" fill="none"
-                                             xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M3.76834 3.80151C1.41055 6.20352 1.41055 10.098 3.76834 12.5L14.0751 23L24.3817 12.5C26.7395 10.098 26.7394 6.20352 24.3817 3.80151C22.0239 1.3995 18.2011 1.3995 15.8433 3.80151L14.0751 5.60309L12.3067 3.80151C9.94887 1.3995 6.12613 1.3995 3.76834 3.80151Z"
-                                                  stroke="#C8D4FF" stroke-width="2.5" stroke-linecap="round"
-                                                  stroke-linejoin="round"/>
-                                        </svg>
-                                    </a><img class="product-def__country" src="{{ asset('/bigwine/img/country/ru.svg') }}" alt=""></div>
-                                <a class="product-def__body" href="#"><img class="product-def__img"
-                                                                           src="{{ asset('/bigwine/img/product.png') }}" alt="">
-                                    <div class="product-def__title">Chateau<br> Domi-Cours 2012</div>
-                                    <div class="product-def__info">Красное, сухое</div>
-                                    <div class="product-def__cost">от 160 £</div>
-                                    <div class="product-def__bottom"><img class="product-def__brand"
-                                                                          src="{{ asset('/bigwine/img/1.png') }}" alt=""></div>
-                                </a>
-                            </div>
-                        </div>
+                    <div id="productsList" data-rel="{{ path('catalog_product_index') }}" class="catalog row">
+                        {{ render(controller('App\\Controller\\Front\\CatalogController::filteredProducts')) }}
                     </div>
                 </div>
                 <!-- div class="sec-catalog__body"-->
@@ -93,55 +75,11 @@
 
 {% block extra_scripts %}
 <script>
-    function submitFilterForm() {
-        var options = {
-            url:    '{{ path("cabinet_save_filter_product") }}',
-            type:   'post',
-            success: function(data) {
-                if (typeof data.totalFilteredProducts !== 'undefined') {
-                    $('#productTotalRows').html(data.totalFilteredProducts);
-                }
 
-                $('#productsList').load('{{ path('cabinet_product_index') }}' , function() {
-                    bindRemoveFilters();
-                    bindWineCardStar();
-                });
-
-            },
-            error: function () {
-                alert('Error!');
-            }
-        };
-
-        $("#productFiltersForm").ajaxSubmit(options);
-    } // submit filter form
 
     $(document).ready(function() {
 
-        $(".filterCheckBox, .filterSubmit").on('click', function () {
-            submitFilterForm();
-        });
 
-        {#$('.filterCheckBox').on('change', function (e) {#}
-        {#    e.preventDefault();#}
-        {#    $('.addToWineCard').click(function () {#}
-        {#        // $('#filtersForm').submit();#}
-        {#        // ajax: get list of my wine cards#}
-        {#        var url = '{{ path("ajax_user_winecards") }}';#}
-        {#        var data = {#}
-        {#            'product_id': product_id#}
-        {#        };#}
-
-        {#        $.ajax({#}
-        {#            url: url,#}
-        {#            data: data#}
-        {#        }).done(function(html) {#}
-        {#            $('#productWineCardsModal').html(html);#}
-        {#            bindClickLinkWineCards();#}
-        {#            myModal.show();#}
-        {#        });#}
-        {#    });#}
-        {#})#}
     })
 </script>
 {% endblock %}

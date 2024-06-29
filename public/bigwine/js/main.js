@@ -151,10 +151,33 @@ class App {
 				$wrap.find('.select-def__dropdown').stop().fadeIn(300);
 			}
 		});
+
 		$('.select-def .checkbox-el__inp').on('change', function () {
 			let $wrap = $(this).closest('.select-def');
 			$wrap.find('.select-def__els').empty();
-			console.log($wrap.find('.checkbox-el__inp:checked'));
+			//console.log($wrap.find('.checkbox-el__inp:checked'));
+
+			let form = $('#filtersForm');
+			let actionUrl = form.attr('action');
+			let loadProductUrl = $('#productsList').attr('data-rel');
+
+			$.ajax({
+				type: "POST",
+				url: actionUrl,
+				data: form.serialize(), // serializes the form's elements.
+				success: function(data)
+				{
+					console.log('filter ' + loadProductUrl);
+					$('#productsList').load(loadProductUrl , function() {
+						// 	bindRemoveFilters();
+						// 	bindWineCardStar();
+					});
+				},
+				error: function () {
+					alert('Error!');
+				}
+			});
+
 			if ($wrap.find('.checkbox-el__inp:checked').length) {
 				$wrap.find('.checkbox-el__inp:checked').each(function () {
 					let val = $(this).closest('.checkbox-el').find('.checkbox-el__text').text();
