@@ -1,3 +1,52 @@
+<style>
+    div.pagination a {
+        display: -ms-inline-flexbox;
+        display: inline-flex;
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        align-items: center;
+        -webkit-box-pack: center;
+        -ms-flex-pack: center;
+        justify-content: center;
+        text-align: center;
+        line-height: 1;
+        font-family: "Myriad Pro", sans-serif;
+        font-weight: 600;
+        font-size: 14px;
+        border-radius: 57px;
+        -webkit-transition: 0.3s;
+        -o-transition: 0.3s;
+        transition: 0.3s;
+        height: 100%;
+        padding: 10px 34px;
+        background: #0842b4;
+        color: #fff;
+    }
+    div.pagination span.current {
+        display: -ms-inline-flexbox;
+        display: inline-flex;
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        align-items: center;
+        -webkit-box-pack: center;
+        -ms-flex-pack: center;
+        justify-content: center;
+        text-align: center;
+        line-height: 1;
+        font-family: "Myriad Pro", sans-serif;
+        font-weight: 600;
+        font-size: 14px;
+        border-radius: 57px;
+        -webkit-transition: 0.3s;
+        -o-transition: 0.3s;
+        transition: 0.3s;
+        height: 100%;
+        padding: 10px 34px;
+        background: rgba(31, 29, 27, 0.93);
+        color: #fff;
+    }
+
+</style>
 {% for row in pagination %}
     <div class="catalog__el col-6 col-lg-4 col-xl-3">
         <div class="product-def">
@@ -13,7 +62,7 @@
                 <img class="product-def__country" src="{{ asset('svg/flags/' ~ row.country.codeAlpha2 ~ '.svg') }}">
             </div>
             <a class="product-def__body" href="#">
-                <img class="product-def__img" style="max-height: 184px;"
+                <img class="product-def__img" style="height: 164px;"
                      src="{{ asset('/uploads/' ~ row.announcePic) }}" >
                 <div class="product-def__title">{{ row.name }}<br> {{ row.vendor }} {{ row.year }}</div>
                 <div class="product-def__info">{{ row.wineColor }}, {{ row.wineSugar }}</div>
@@ -24,3 +73,6 @@
         </div>
     </div>
 {% endfor %}
+<div class="catalog__el col-12 col-lg-12 col-xl-12">
+    pagination: {{ knp_pagination_render(pagination) }}
+</div>

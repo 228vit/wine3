@@ -39,7 +39,7 @@ class CatalogController extends AbstractController
     /**
      * @Route("/catalog", name="front_catalog")
      */
-    public function indexAction(Request $request,
+    public function index(Request $request,
                                 SessionInterface $session,
                                 WineCardRepository $wineCardRepository,
                                 ProductDataService $productDataService)
