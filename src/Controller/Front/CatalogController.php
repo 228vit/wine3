@@ -44,8 +44,30 @@ class CatalogController extends AbstractController
                                 WineCardRepository $wineCardRepository,
                                 ProductDataService $productDataService)
     {
+        $session_order_field = $session->get('order_field', 'name');
+        $orderMapping = [
+            'name' => 'По названию',
+            'price' => 'По цене',
+            'country' => 'По стране',
+        ];
+
+        $pagination = $this->getPagination($request, $session, $productDataService, FrontProductFilter::class);
+
         return $this->render('front/catalog/index.html.twig', array(
+            'pagination' => $pagination,
+            'totalRows' => $pagination->getTotalItemCount(),
+            'current_filters' => $this->current_filters,
+            'currentFilters' => $this->currentFilters,
+            'current_filters_string' => $this->current_filters_string,
+            'filter_form' => $this->filter_form->createView(),
+            'model' => self::MODEL,
+            'entity_name' => self::ENTITY_NAME,
+            'orderField' => $session_order_field,
+            'orderMapping' => $orderMapping,
         ));
+
+//        return $this->render('front/catalog/index.html.twig', array(
+//        ));
     }
 
 
