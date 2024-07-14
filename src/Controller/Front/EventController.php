@@ -84,7 +84,7 @@ class EventController extends AbstractController
     /**
      * @Route("/event/{slug}", name="front_event_show")
      */
-    public function showAction(Request $request, Event $event, EventRepository $repository)
+    public function show(Request $request, Event $event, EventRepository $repository)
     {
         $isAjax = $request->isXmlHttpRequest();
         $template = $isAjax ? 'front/event/show_ajax.html.twig' : 'front/event/show.html.twig';
