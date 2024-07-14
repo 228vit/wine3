@@ -7,6 +7,7 @@ use App\Entity\Supplier;
 use App\Repository\SupplierRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -20,6 +21,12 @@ class EventType extends AbstractType
             ->add('address')
             ->add('coordinates')
             ->add('description')
+            ->add('collagePicFile', FileType::class, array(
+                'label' => 'Collage PIC',
+                'data_class' => null,
+                'required' => false
+            ))
+
             ->add('suppliers', EntityType::class, array(
                 'class' => Supplier::class,
                 'query_builder' => function (SupplierRepository $er) {

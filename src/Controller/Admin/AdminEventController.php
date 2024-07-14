@@ -87,10 +87,6 @@ class AdminEventController extends AbstractController
                                Event $event,
                                FileUploader $fileUploader)
     {
-//        return new JsonResponse([
-//            'message' => 'Empty file'
-//        ], 400);
-
         $pos = $request->request->getInt('position', 1);
         $file = $request->files->get('newEventPic', null);// $event->getPicFile();
 
@@ -291,14 +287,13 @@ class AdminEventController extends AbstractController
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             /** @var \Symfony\Component\HttpFoundation\File\UploadedFile $file */
-//            $file = $event->getPicFile();
-//
-//            if (null !== $file) {
-//                $fileName = $fileUploader->upload($file);
-//                $event->setPic($fileName);
-//            }
+            if (null !== $file = $event->getCollagePicFile()) {
+                $fileName = $fileUploader->uploadEventPic($file,'collage');
+                $event->setCollage($fileName);
+//                $this->cacheManager->remove('uploads/' . $fileName, 'thumb_square_50');
+            }
 
-            $this->getDoctrine()->getManager()->flush();
+            $this->em->flush();
             $this->addFlash('success', 'Your changes were saved!');
 
             return $this->redirectToRoute('backend_event_edit', array('id' => $event->getId()));

@@ -6,6 +6,8 @@ use App\Repository\EventRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=EventRepository::class)
@@ -71,6 +73,18 @@ class Event
      * @ORM\OrderBy({"position" = "ASC"})
      */
     private $eventPics;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $collage;
+
+    /**
+     * @var File
+     *
+     * @Assert\File(mimeTypes={ "image/jpg", "image/jpeg", "image/png", "image/webp" })
+     */
+    private $collagePicFile;
 
     public function __construct()
     {
@@ -266,4 +280,29 @@ class Event
 
         return $this;
     }
+
+    public function getCollage(): ?string
+    {
+        return $this->collage;
+    }
+
+    public function setCollage(?string $collage): self
+    {
+        $this->collage = $collage;
+
+        return $this;
+    }
+
+    public function getCollagePicFile(): ?File
+    {
+        return $this->collagePicFile;
+    }
+
+    public function setCollagePicFile(?File $collagePicFile): Event
+    {
+        $this->collagePicFile = $collagePicFile;
+        return $this;
+    }
+
+
 }

@@ -23,6 +23,22 @@
 
     {{ form_start(form) }}
 
+    {{ form_row(form.name) }}
+    {{ form_row(form.dateTime) }}
+
+    <div class="form-group row">
+        {{ form_label(form.collagePicFile) }}
+        <div class="col-8">
+            {{ form_widget(form.collagePicFile) }}
+        </div>
+        <div class="col-2">
+            {% if row.collage %}
+                <a data-fancybox="gallery" target="_blank" href="{{ asset('uploads/' ~ row.collage) }}"><img
+                            src="{{ asset('uploads/' ~ row.collage) | imagine_filter('thumb_square_50') }}" /></a>
+            {% endif %}
+        </div>
+    </div>
+
     {{ form_rest(form) }}
 
     <div class="row">

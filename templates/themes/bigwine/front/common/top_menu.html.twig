@@ -8,14 +8,17 @@
                                 src="{{ asset('/bigwine/img/ru.svg') }}" alt=""></a></div>
                 <ul class="links-def top-menu__links">
                     <li class="links-def__el"><a
-                        class="links-def__link {{ app.request.get('_route') == 'homepage' ? 'active' : '' }}"
+                            class="links-def__link {{ app.request.get('_route') == 'homepage' ? 'active' : '' }}"
                             href="{{ path('homepage') }}">Главная</a>
                     </li>
                     <li class="links-def__el"><a
-                        class="links-def__link {{ app.request.get('_route') == 'front_catalog' ? 'active' : '' }}"
+                            class="links-def__link {{ app.request.get('_route') == 'front_catalog' ? 'active' : '' }}"
                             href="{{ path('front_catalog') }}">Каталог</a>
                     </li>
-                    <li class="links-def__el"><a class="links-def__link" href="#">Мероприятия</a></li>
+                    <li class="links-def__el"><a
+                            class="links-def__link {{ app.request.get('_route') == 'front_events_calendar' ? 'active' : '' }}"
+                            href="{{ path('front_events_calendar') }}">Мероприятия</a>
+                    </li>
                     <li class="links-def__el"><a class="links-def__link" href="#">Поставщики</a></li>
                     <li class="links-def__el"><a class="links-def__link" href="#">Сотрудничество</a></li>
                 </ul>

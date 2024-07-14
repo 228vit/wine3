@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}BigWine{% endblock %}</title>
+
+    <link rel="stylesheet" href="{{ asset('/bigwine/css/style.css?ver=750') }}">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="robots" content="noindex, nofollow"/>
+</head>
+<body>
+<div class="wrapper-def">
+    <div class="mob-menu">
+        {% include 'front/common/mob_menu.html.twig' %}
+    </div>
+
+    <header class="top-menu">
+        {% include 'front/common/top_menu.html.twig' %}
+    </header>
+
+    {% block body %}
+    {% endblock %}
+
+    <footer class="sec-footer">
+        {% include 'front/common/footer.html.twig' %}
+    </footer>
+</div>
+
+<script src="{{ asset('/bigwine/js/main.js?ver=750') }}" ></script>
+</body>
+</html>

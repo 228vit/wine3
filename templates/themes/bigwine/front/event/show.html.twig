@@ -1,0 +1,203 @@
+{% extends 'layout_front_event.html.twig' %}
+
+{% block title %}Event :: {{ row.name }}{% endblock %}
+
+{% block body %}
+    <section class="sec-page sec-event">
+        <div class="container-def">
+            <div class="sec-page__wrap sec-event__wrap">
+                <div class="sec-page__top sec-top"><a class="sec-top__prev link-prev" href="#">
+                        <span>←</span>Назад в календарь</a>
+                    <div class="sec-top__line"></div>
+                </div>
+                <div class="sec-event__top">
+                    <div class="sec-event__top-left">
+                        <div class="sec-event__title title-def title-def_sec">{{ ruShortDate }} <span>/ {{ row.name }}</span>
+                        </div>
+                        <div class="sec-event__info">
+                            <div class="sec-event__date date">28.03.2021 / 16:30</div>
+                            <div class="icon-text">
+                                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9.1 4.9C9.1 3.71 8.19 2.8 7 2.8C5.81 2.8 4.9 3.71 4.9 4.9C4.9 6.09 5.81 7 7 7C8.19 7 9.1 6.09 9.1 4.9ZM6.3 4.9C6.3 4.48 6.58 4.2 7 4.2C7.42 4.2 7.7 4.48 7.7 4.9C7.7 5.32 7.42 5.6 7 5.6C6.58 5.6 6.3 5.32 6.3 4.9Z"
+                                          fill="#454F56"/>
+                                    <path d="M6.23 11.41L7 12.11L7.77 11.41C10.5 8.96 11.9 6.86 11.9 4.9C11.9 2.1 9.73 0 7 0C4.27 0 2.1 2.1 2.1 4.9C2.1 6.86 3.5 8.96 6.23 11.41ZM7 1.4C8.96 1.4 10.5 2.87 10.5 4.9C10.5 6.3 9.38 8.12 7 10.22C4.62 8.12 3.5 6.3 3.5 4.9C3.5 2.87 5.04 1.4 7 1.4Z"
+                                          fill="#454F56"/>
+                                    <path d="M11.41 8.96C11.13 9.38 10.78 9.73 10.43 10.15C11.76 10.43 12.6 10.85 12.6 11.2C12.6 11.76 10.08 12.6 7 12.6C3.92 12.6 1.4 11.76 1.4 11.2C1.4 10.85 2.24 10.43 3.57 10.15C3.22 9.73 2.87 9.31 2.59 8.96C0.98 9.45 0 10.22 0 11.2C0 12.95 3.15 14 7 14C10.85 14 14 12.95 14 11.2C14 10.22 13.02 9.45 11.41 8.96Z"
+                                          fill="#454F56"/>
+                                </svg>
+                                <span>{{ row.address }}</span></div>
+                        </div>
+                    </div>
+                    <div class="sec-event__top-right"><img class="sec-event__imgBrand" src="../img/1.png" alt=""><a
+                                class="sec-event__btn btn-def btn-def_border btn-modal" href="#"
+                                data-modal="#modal-partner"><span>Стать партнером</span></a><a
+                                class="sec-event__btn btn-def" href="#"><span>Участвовать</span></a></div>
+                </div>
+                <div class="sec-event__img"><img class="sec-event__img-img" src="../img/row.jpg" alt=""></div>
+                <div class="sec-event__content">
+                    <div class="sec-event__tabs tabs"><a class="tabs__el" href="#">О событий</a><a
+                                class="tabs__el active" href="#">Отчет события</a></div>
+                    <div class="sec-event__text wrap-article text-info">
+                        <p>Исследование инвестиционного агенства Knight Frank показало, что во время пандемии вина Бордо
+                            приносили большую доходность, чем часы Rolex и Cartier или сумки Hermès Birkin. С мая 2020
+                            по июнь 2021 инвестиционная стоимость вин в среднем выросла на 13%, тогда как стоимость
+                            люксовых сумок в среднем упала на 3%. Люксовые часы и машины прибавили в стоимости на 5% и
+                            4%, но эти показатели все равно ниже, чем те, которые получили вина Бордо винтажей 1996 и
+                            2000.</p>
+                        <p>По словам управляющего директора Liv-ex Руперта Мияра (Rupert Millar), цены растут не только
+                            на премиальные вина из Бордо: «Вина, которые выигрывают в цене больше всего, помимо
+                            классических французских регионов как Бордо, Бургундия и Шампань, – это известные бренды из
+                            Италии и США».</p>
+                    </div>
+                    <div class="sec-event__gal gal-def row">
+                        <div class="col-4 col-md-3 col-lg-2 col-xl-1 gal-def__el"><a class="gal-def-el"
+                                                                                     href="../img/gal/big/1.jpg"
+                                                                                     data-fancybox="gal"><img
+                                        class="gal-def-el__img" src="../img/gal/1.jpg" alt=""></a></div>
+                        <div class="col-4 col-md-3 col-lg-2 col-xl-1 gal-def__el"><a class="gal-def-el"
+                                                                                     href="../img/gal/big/2.jpg"
+                                                                                     data-fancybox="gal"><img
+                                        class="gal-def-el__img" src="../img/gal/2.jpg" alt=""></a></div>
+                        <div class="col-4 col-md-3 col-lg-2 col-xl-1 gal-def__el"><a class="gal-def-el"
+                                                                                     href="../img/gal/big/3.jpg"
+                                                                                     data-fancybox="gal"><img
+                                        class="gal-def-el__img" src="../img/gal/3.jpg" alt=""></a></div>
+                        <div class="col-4 col-md-3 col-lg-2 col-xl-1 gal-def__el"><a class="gal-def-el"
+                                                                                     href="../img/gal/big/4.jpg"
+                                                                                     data-fancybox="gal"><img
+                                        class="gal-def-el__img" src="../img/gal/4.jpg" alt=""></a></div>
+                        <div class="col-4 col-md-3 col-lg-2 col-xl-1 gal-def__el"><a class="gal-def-el"
+                                                                                     href="../img/gal/big/5.jpg"
+                                                                                     data-fancybox="gal"><img
+                                        class="gal-def-el__img" src="../img/gal/5.jpg" alt=""></a></div>
+                        <div class="col-4 col-md-3 col-lg-2 col-xl-1 gal-def__el"><a class="gal-def-el"
+                                                                                     href="../img/gal/big/6.jpg"
+                                                                                     data-fancybox="gal"><img
+                                        class="gal-def-el__img" src="../img/gal/6.jpg" alt=""></a></div>
+                        <div class="col-4 col-md-3 col-lg-2 col-xl-1 gal-def__el"><a class="gal-def-el"
+                                                                                     href="../img/gal/big/7.jpg"
+                                                                                     data-fancybox="gal"><img
+                                        class="gal-def-el__img" src="../img/gal/7.jpg" alt=""></a></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="sec-products">
+        <div class="container-def">
+            <div class="sec-products__wrap">
+                <div class="sec-products__tabs tabs tabs_2"><a class="tabs__el" href="#">Поставщики</a><a
+                            class="tabs__el active" href="#">Продукция</a><a class="tabs__el" href="#">Партнеры</a></div>
+                <div class="sec-products__content">
+                    <div class="products-min swiper">
+                        <div class="swiper-wrapper">
+                            <div class="products-min__el swiper-slide"><a class="products-min-el" href="#"><img
+                                            class="products-min-el__img" src="../img/pr1.png" alt="">
+                                    <div class="products-min-el__title">Cabernet Sauvignon 1987</div>
+                                    <div class="products-min-el__info">Красное, сухое</div>
+                                    <div class="products-min-el__cost">от 230 £</div>
+                                </a></div>
+                            <div class="products-min__el swiper-slide"><a class="products-min-el" href="#"><img
+                                            class="products-min-el__img" src="../img/pr2.png" alt="">
+                                    <div class="products-min-el__title">Domaine de la Romanee-Conti</div>
+                                    <div class="products-min-el__info">Красное, сухое</div>
+                                    <div class="products-min-el__cost">от 360 £</div>
+                                </a></div>
+                            <div class="products-min__el swiper-slide"><a class="products-min-el" href="#"><img
+                                            class="products-min-el__img" src="../img/pr3.png" alt="">
+                                    <div class="products-min-el__title">Cabernet Sauvignon</div>
+                                    <div class="products-min-el__info">Красное, сухое</div>
+                                    <div class="products-min-el__cost">от 130 £</div>
+                                </a></div>
+                            <div class="products-min__el swiper-slide"><a class="products-min-el" href="#"><img
+                                            class="products-min-el__img" src="../img/pr4.png" alt="">
+                                    <div class="products-min-el__title">Chateau Domi-Cours 2012 0,75</div>
+                                    <div class="products-min-el__info">Красное, сухое</div>
+                                    <div class="products-min-el__cost">от 170 £</div>
+                                </a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<main class="body-main">
+    <section class="start-screen">
+        <div class="h1">Winedows</div>
+
+            <div class="row">
+            <div class="col-8">
+                <strong>{{ short_date }}</strong> / {{ row.name }} <br>
+                {{ row.dateTime | date }} {{ row.address }}
+            </div>
+            <div class="col-4">
+                Партнёры
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                Коллаж
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <p>О событии / Отчёт события</p>
+                <p>
+                    {{ row.description }}
+                </p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="gallery-wrap col-12">
+
+                <div class="thumbs-wrap">
+                    {% for eventPic in row.eventPics %}
+                        <a data-fancybox="gallery" target="_blank"
+                           href="{{ asset('/uploads/' ~ eventPic.pic) }}"><img
+                                    class="img-thumbnail"
+                                    src="{{ asset('/uploads/' ~ eventPic.pic) | imagine_filter('thumb_event_pic') }}" /></a>
+                    {% endfor %}
+                </div> <!-- thumbs-wrap.// -->
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <p>Поставщики / Продукция / Парнёры</p>
+                <div class="thumbs-wrap">
+                    {% for eventProduct in row.products %}
+                        <div class="col-2 text-center">
+                            <a data-fancybox="gallery" target="_blank"
+                               href="{{ asset('/uploads/' ~ eventProduct.product.contentPic) }}"><img
+                                        class="img-thumbnail"
+                                        src="{{ asset('/uploads/' ~ eventProduct.product.contentPic) | imagine_filter('thumb_square_160') }}" /></a>
+                            <br>
+                            <strong>{{ eventProduct.product.name }}</strong>
+                            <br>
+                            <strong>{{ eventProduct.price }}</strong>
+
+                        </div>
+                    {% endfor %}
+                </div> <!-- thumbs-wrap.// -->
+            </div>
+        </div>
+
+    <br />
+    </section>
+</main>
+{% endblock %}
+
+{% block extra_scripts %}
+    <script>
+        $(document).ready(function() {
+
+        })
+    </script>
+{% endblock %}
