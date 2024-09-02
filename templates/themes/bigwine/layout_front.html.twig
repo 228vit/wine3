@@ -29,15 +29,50 @@
 
 {% include 'front/modals/modalPartner.html.twig' %}
 {% include 'front/modals/modalRegister.html.twig' %}
+{% include 'front/modals/modalAuth.html.twig' %}
 
 
 <script src="{{ asset('/bigwine/js/main.js?ver=750') }}" ></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" ></script>
 <script>
     $( document ).ready(function() {
+        $('#loginForm').on('submit', function (e) {
+            e.preventDefault();
+            let form = $(this);
+            let actionUrl = form.attr('action');
+            $.ajax({
+                url: actionUrl,
+                cache: false,
+                type: "POST",
+                data: form.serialize(),
+                success: function(html) {
+                    window.location = '{{ path('cabinet') }}';
+                    // $('#contentDivXls').html(html);
+                },
+                error: function(xhr) {
+                    alert('Wrong login ' + xhr.status);
+                    if (xhr.status == 500) {
+                        alert('Server error');
+                    }
+                }
+            });
+        });
+
         $('#cabinetLink').on('click', function (e) {
             e.preventDefault();
+            $('#modal-auth').toggle();
+        });
+
+        $('#switchToRegister').on('click', function (e) {
+            e.preventDefault();
+            $('#modal-auth').hide();
             $('#modal-reg').toggle();
+        });
+
+        $('#switchToLogin').on('click', function (e) {
+            e.preventDefault();
+            $('#modal-reg').hide();
+            $('#modal-auth').toggle();
         });
 
         $('#registerPasswordRepeat').on('blur', function (e) {
