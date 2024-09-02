@@ -39,25 +39,35 @@
         $('#loginForm').on('submit', function (e) {
             e.preventDefault();
             let form = $(this);
-            let actionUrl = form.attr('action');
-            $.ajax({
-                url: actionUrl,
-                cache: false,
-                type: "POST",
-                data: form.serialize(),
-                success: function(html) {
-                    window.location = '{{ path('cabinet') }}';
-                    // $('#contentDivXls').html(html);
-                },
-                error: function(xhr) {
-                    alert('Wrong login ' + xhr.status);
-                    if (xhr.status == 500) {
-                        alert('Server error');
-                    }
-                }
-            });
-        });
+            let url = form.attr('action');
+            // let phone = $('#username').val().replace(/[^0-9]/g, '');
 
+            let data = {
+                'username': $('#username').val(),
+                'password': $('#password').val()
+            };
+            let jsonData = JSON.stringify(data);
+            console.log(jsonData);
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: jsonData,
+                dataType: 'json',
+                contentType: "application/json"
+            }).done(function (data) {
+                console.log(data);
+                if (typeof data.redirect !== 'undefined') {
+                    window.location = data.redirect;
+                }
+            }).fail(function (response) {
+                alert('Wrong login or password!');
+                console.log(response);
+            });
+
+            return false;
+        });
+        
         $('#cabinetLink').on('click', function (e) {
             e.preventDefault();
             $('#modal-auth').toggle();

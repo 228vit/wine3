@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class SecurityController extends AbstractController
 {
     /**
-     * @Route("/new_login", name="new_login")
+     * @Route("/ajax_login", name="ajax_login")
      */
     public function login(): Response
     {
@@ -23,7 +23,7 @@ class SecurityController extends AbstractController
 
         return new JsonResponse([
             'success' => true,
-            'redirect' => $this->generateUrl('user_dashboard'),
+            'redirect' => $this->generateUrl('cabinet_product_index'),
         ]);
     }
 }

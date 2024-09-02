@@ -5,6 +5,7 @@ namespace App\Controller\Front;
 use App\Entity\User;
 use App\Form\ForgetPasswordType;
 use App\Form\RegistrationFormType;
+use App\Form\RegistrationShortFormType;
 use App\Repository\UserRepository;
 use App\Security\EmailVerifier;
 use App\Service\FormErrorService;
@@ -55,7 +56,7 @@ class RegistrationController extends AbstractController
     {
         $isAjax = $request->isXmlHttpRequest();
         $user = new User();
-        $form = $this->createForm(RegistrationFormType::class, $user);
+        $form = $this->createForm(RegistrationShortFormType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && !$form->isValid()) {

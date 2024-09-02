@@ -7,7 +7,7 @@
 {% block body %}
     <h4>Авторизация</h4>
 
-    <form method="post" action="{{ path('login_check') }}">
+    <form method="post" action="{{ path('app_login') }}">
         {% if error %}
             <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
         {% endif %}

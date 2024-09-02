@@ -4,12 +4,27 @@ namespace App\Controller;
 
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class UserAuthSecurityController extends AbstractController
 {
+    /**
+     * @Route("/front/auth", name="app_front_auth")
+     */
+    public function frontAuth(AuthenticationUtils $authenticationUtils, Request $request): Response
+    {
+        $lastUsername = $authenticationUtils->getLastUsername();
+
+//        $form =
+        return $this->render('front/security/login.html.twig', [
+            'last_username' => $lastUsername,
+            'error' => false,
+        ]);
+    }
+
     /**
      * @Route("/login", name="app_login")
      */
@@ -40,8 +55,10 @@ class UserAuthSecurityController extends AbstractController
     /**
      * @Route("/login/ajax", name="ajax_login")
      */
-    public function ajaxLogin(?User $user): Response
+    public function ajaxLogin(): Response
     {
+        $user = $this->getUser();
+
         if (null === $user) {
              return $this->json([
                  'message' => 'missing credentials wtf',
@@ -49,7 +66,8 @@ class UserAuthSecurityController extends AbstractController
         }
 
         return $this->json([
-            'user' => $user->getId(),
+            'user' => $user->getEmail(),
+            'redirect' => $this->generateUrl('user_dashboard'),
         ]);
     }
 }

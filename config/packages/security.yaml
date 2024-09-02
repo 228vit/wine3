@@ -11,6 +11,7 @@ security:
             entity:
                 class: App\Entity\Admin
                 property: email
+
     password_hashers:
         App\Entity\User:
             algorithm: auto #bcrypt
@@ -51,9 +52,12 @@ security:
                 login_path: app_login
                 check_path: app_login
                 #                default_target_path: cabinet_after_login
-                default_target_path: app_cabinet
+                default_target_path: cabinet_product_index
                 username_parameter: email
                 password_parameter: password
+            json_login:
+                check_path: ajax_login
+
             logout:
                 invalidate_session: true
                 path: app_logout
