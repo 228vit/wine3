@@ -12,16 +12,16 @@
             <div class="sec-product__content product-card">
                 <div class="product-card__top">
                     <div class="product-card__top-left">
-                        <h1 class="product-card__title title-def title-def_sec">Domaine de la Romanee-Conti,
-                            1996</h1>
-                        <div class="product-card__art">Артикул: 00076888</div>
+                        <h1 class="product-card__title title-def title-def_sec">{{ row.name }},
+                            {{ row.year }}</h1>
+                        <div class="product-card__art">Артикул: {{ row.id }}</div>
                     </div>
                     <div class="product-card__top-right">
                         <div class="product-card__info">
-                            <div class="product-card__cost">от 160 £</div>
-                            <a class="product-card__provider" href="#">26 поставщиков</a>
+                            <div class="product-card__cost">от {{ row.price }} £</div>
+                            <a class="product-card__provider" href="#">{{ row.offers | length }} поставщиков</a>
                         </div>
-                        <img class="product-card__country" src="../img/country/it.svg" alt="">
+                        <img class="product-card__country" src="{{ asset('svg/flags/' ~ row.country.codeAlpha2 ~ '.svg') }}" alt="">
                         <div class="product-card__fav">
                             <svg width="43" height="37" viewBox="0 0 43 37" fill="none"
                                  xmlns="http://www.w3.org/2000/svg">
@@ -43,7 +43,7 @@
                                           stroke-linejoin="round"/>
                                 </svg>
                             </div>
-                            <img class="product-card__country" src="../img/country/it.svg" alt="">
+                            <img class="product-card__country" src="{{ asset('svg/flags/' ~ row.country.codeAlpha2 ~ '.svg') }}" alt="">
                         </div>
                         <div class="swiper-arr swiper-arr_prev">
                             <svg width="37" height="63" viewBox="0 0 37 63" fill="none"
@@ -62,37 +62,34 @@
                             </svg>
                         </div>
                         <div class="product-card__swiper-swiper swiper">
-                            <div class="swiper-wrapper"><a class="swiper-slide product-card__swiper-el"
-                                                           href="../img/productCard.png" data-fancybox="card"><img
-                                            class="product-card__swiper-img" src="../img/productCard.png" alt=""></a><a
-                                        class="swiper-slide product-card__swiper-el" href="../img/productCard.png"
-                                        data-fancybox="card"><img class="product-card__swiper-img"
-                                                                  src="../img/productCard.png" alt=""></a><a
-                                        class="swiper-slide product-card__swiper-el" href="../img/productCard.png"
-                                        data-fancybox="card"><img class="product-card__swiper-img"
-                                                                  src="../img/productCard.png" alt=""></a><a
-                                        class="swiper-slide product-card__swiper-el" href="../img/productCard.png"
-                                        data-fancybox="card"><img class="product-card__swiper-img"
-                                                                  src="../img/productCard.png" alt=""></a></div>
+                            <div class="swiper-wrapper">
+                                <a class="swiper-slide product-card__swiper-el"
+                                    href="{{ asset('/uploads/' ~ row.contentPic) }}" data-fancybox="card"><img
+                                    class="product-card__swiper-img" src="{{ asset('/uploads/' ~ row.contentPic) }}" alt=""></a>
+                                <a class="swiper-slide product-card__swiper-el"
+                                   href="{{ asset('/uploads/' ~ row.contentPic) }}" data-fancybox="card"><img
+                                    class="product-card__swiper-img" src="{{ asset('/uploads/' ~ row.contentPic) }}" alt=""></a>
+
+                            </div>
                         </div>
                         <div class="product-card__dots dots"></div>
                     </div>
                     <div class="product-card__body">
                         <ul class="product-card__descrp product-card-descrp">
-                            <li class="product-card-descrp__el"><strong>Тип:</strong> Красное вино</li>
-                            <li class="product-card-descrp__el"><strong>Страна:</strong> Италия</li>
-                            <li class="product-card-descrp__el"><strong>Регион:</strong> Венето, Просекко</li>
-                            <li class="product-card-descrp__el"><strong>Производитель:</strong> Cantina Montelliana
+                            <li class="product-card-descrp__el"><strong>Тип:</strong> {{ row.wineColor }}</li>
+                            <li class="product-card-descrp__el"><strong>Страна:</strong> {{ row.country }}</li>
+                            <li class="product-card-descrp__el"><strong>Регион:</strong> {{ row.region }}</li>
+                            <li class="product-card-descrp__el"><strong>Производитель:</strong> {{ row.vendor }}
                             </li>
-                            <li class="product-card-descrp__el"><strong>Импортер:</strong> Carnaro</li>
-                            <li class="product-card-descrp__el"><strong>Сорт винограда:</strong> Глера (Просекко)
+                            <li class="product-card-descrp__el"><strong>Импортер:</strong> ???</li>
+                            <li class="product-card-descrp__el"><strong>Сорт винограда:</strong> {{ row.grapeSortsAsString }}
                             </li>
-                            <li class="product-card-descrp__el"><strong>Год урожая:</strong> 1987</li>
+                            <li class="product-card-descrp__el"><strong>Год урожая:</strong> {{ row.year }}</li>
                             <li class="product-card-descrp__el"><strong>Объем:</strong> 0,75 л</li>
-                            <li class="product-card-descrp__el"><strong>Крепость:</strong> Градусы</li>
-                            <li class="product-card-descrp__el"><strong>Аппелясьон:</strong> Винтаж</li>
-                            <li class="product-card-descrp__el"><strong>Выдержка в емкости:</strong> Нет</li>
-                            <li class="product-card-descrp__el"><strong>Сахар:</strong> Полусладкое</li>
+                            <li class="product-card-descrp__el"><strong>Крепость:</strong> {{ row.alcohol }}</li>
+                            <li class="product-card-descrp__el"><strong>Аппелясьон:</strong> {{ row.appellation }}</li>
+                            <li class="product-card-descrp__el"><strong>Выдержка в емкости:</strong> {{ row.aging }}</li>
+                            <li class="product-card-descrp__el"><strong>Сахар:</strong> {{ row.wineSugar }}</li>
                         </ul>
                         <div class="product-card__media media-audio">
                             <audio id="player" controls>
