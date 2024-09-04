@@ -65,7 +65,6 @@
                 <div class="sec-catalog__body">
                     <div id="productsList" data-rel="{{ path('catalog_product_index') }}" class="catalog row">
                         {{ include('themes/bigwine/front/catalog/products.html.twig') }}
-{#                        {{ render(controller('App\\Controller\\Front\\CatalogController::filteredProducts')) }}#}
                     </div>
                 </div>
                 <!-- div class="sec-catalog__body"-->
@@ -76,11 +75,7 @@
 
 {% block extra_scripts %}
 <script>
-
-
     $(document).ready(function() {
-
-
     })
 </script>
 {% endblock %}

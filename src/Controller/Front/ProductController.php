@@ -59,9 +59,6 @@ class ProductController extends AbstractController
 
         $pagination = $this->getPagination($request, $session, $productDataService, FrontProductFilter::class);
 
-        $isAjax = $request->isXmlHttpRequest();
-
-
         return $this->render('front/catalog/index.html.twig', array(
             'pagination' => $pagination,
             'currentWineCard' => $currentWineCard,
@@ -212,7 +209,7 @@ class ProductController extends AbstractController
     /**
      * @Route("/cabinet/product/{id}/show", name="cabinet_product_show")
      */
-    public function showAction(Request $request, Product $product, WineCardRepository $repository)
+    public function show(Request $request, Product $product, WineCardRepository $repository)
     {
         $wineCards = $repository->getAllByUser($this->getUser());
 
