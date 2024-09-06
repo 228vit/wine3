@@ -65,9 +65,6 @@ class CatalogController extends AbstractController
             'orderField' => $session_order_field,
             'orderMapping' => $orderMapping,
         ));
-
-//        return $this->render('front/catalog/index.html.twig', array(
-//        ));
     }
 
 
@@ -98,6 +95,20 @@ class CatalogController extends AbstractController
             'entity_name' => self::ENTITY_NAME,
             'orderField' => $session_order_field,
             'orderMapping' => $orderMapping,
+        ));
+    }
+
+    /**
+     * @Route("/catalog/product/{id}/show", name="catalog_product_show")
+     */
+    public function show(Request $request, Product $product)
+    {
+
+        $isAjax = $request->isXmlHttpRequest();
+        $template = $isAjax ? 'front/catalog/ajax_product.html.twig' : 'front/catalog/product.html.twig';
+
+        return $this->render($template, array(
+            'row' => $product,
         ));
     }
 

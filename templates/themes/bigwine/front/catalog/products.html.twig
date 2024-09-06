@@ -15,7 +15,7 @@
                      title="{{ row.country.name }}"
                      src="{{ asset('svg/flags/' ~ row.country.codeAlpha2 ~ '.svg') }}">
             </div>
-            <a class="product-def__body" href="{{ path('cabinet_product_show', {id: row.id}) }}">
+            <a class="product-def__body" href="{{ path('catalog_product_show', {id: row.id}) }}">
                 <img class="product-def__img" style="height: 164px;"
                      src="{{ asset('/uploads/' ~ row.announcePic) }}" >
                 <div class="product-def__title">{{ row.name }}<br> {{ row.vendor }} {{ row.year }}</div>

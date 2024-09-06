@@ -1,0 +1,164 @@
+{% extends 'layout_catalog.html.twig' %}
+
+{% block title %}Product - BigWine Catalog{% endblock %}
+
+{% block body %}
+    <div class="container-def">
+        <div class="sec-page__wrap sec-product__wrap">
+            <div class="sec-page__top sec-top"><a class="sec-top__prev link-prev" href="#">
+                    <span>←</span>Назад в каталог</a>
+                <div class="sec-top__line"></div>
+            </div>
+            <div class="sec-product__content product-card">
+                <div class="product-card__top">
+                    <div class="product-card__top-left">
+                        <h1 class="product-card__title title-def title-def_sec">{{ row.name }},
+                            {{ row.year }}</h1>
+                        <div class="product-card__art">Артикул: {{ row.id }}</div>
+                    </div>
+                    <div class="product-card__top-right">
+                        <div class="product-card__info">
+                            <div class="product-card__cost">от {{ row.price }} £</div>
+                            <a class="product-card__provider" href="#">{{ row.offers | length }} поставщиков</a>
+                        </div>
+                        <img class="product-card__country" src="{{ asset('svg/flags/' ~ row.country.codeAlpha2 ~ '.svg') }}" alt="">
+                        <div class="product-card__fav">
+                            <svg width="43" height="37" viewBox="0 0 43 37" fill="none"
+                                 xmlns="http://www.w3.org/2000/svg">
+                                <path d="M4.85571 4.83094C1.0481 8.60553 1.0481 14.7254 4.85571 18.4999L21.5001 35L38.1443 18.4999C41.9519 14.7254 41.9519 8.60553 38.1443 4.83094C34.3367 1.05635 28.1633 1.05635 24.3557 4.83094L21.5001 7.662L18.6443 4.83094C14.8367 1.05635 8.66332 1.05635 4.85571 4.83094Z"
+                                      stroke="#C8D4FF" stroke-width="2.5" stroke-linecap="round"
+                                      stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card__content">
+                    <div class="product-card__swiper">
+                        <div class="product-card__swiper-top">
+                            <div class="product-card__swiper-fav">
+                                <svg width="38" height="33" viewBox="0 0 38 33" fill="none"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4.48959 4.4878C1.17014 7.80486 1.17014 13.1829 4.48959 16.5L19.0001 31L33.5104 16.4999C36.8299 13.1829 36.8299 7.80486 33.5104 4.4878C30.1909 1.17073 24.809 1.17073 21.4896 4.4878L19.0001 6.9757L16.5104 4.4878C13.191 1.17073 7.80905 1.17073 4.48959 4.4878Z"
+                                          stroke="#C8D4FF" stroke-width="2.5" stroke-linecap="round"
+                                          stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <img class="product-card__country" src="{{ asset('svg/flags/' ~ row.country.codeAlpha2 ~ '.svg') }}" alt="">
+                        </div>
+                        <div class="swiper-arr swiper-arr_prev">
+                            <svg width="37" height="63" viewBox="0 0 37 63" fill="none"
+                                 xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                      d="M35.7466 61.848C36.5163 61.1102 36.9487 60.1096 36.9487 59.0663C36.9487 58.023 36.5163 57.0224 35.7466 56.2846L9.91005 31.5246L35.7466 6.7646C36.1387 6.40165 36.4515 5.96749 36.6667 5.48746C36.8819 5.00744 36.9951 4.49115 36.9998 3.96872C37.0046 3.4463 36.9007 2.92821 36.6943 2.44467C36.4878 1.96113 36.183 1.52183 35.7975 1.1524C35.412 0.782977 34.9536 0.490822 34.449 0.29299C33.9445 0.0951583 33.4039 -0.00439117 32.8587 0.000148557C32.3136 0.00468829 31.7748 0.113232 31.2739 0.319436C30.773 0.525641 30.32 0.825376 29.9413 1.20117L1.20206 28.7429C0.43238 29.4807 0 30.4813 0 31.5246C0 32.5679 0.43238 33.5685 1.20206 34.3063L29.9413 61.848C30.7112 62.5856 31.7553 63 32.8439 63C33.9326 63 34.9767 62.5856 35.7466 61.848Z"
+                                      fill="#CFDAFF"/>
+                            </svg>
+                        </div>
+                        <div class="swiper-arr swiper-arr_next">
+                            <svg width="37" height="63" viewBox="0 0 37 63" fill="none"
+                                 xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                      d="M1.2534 1.152C0.483695 1.8898 0.0512962 2.8904 0.0512962 3.9337C0.0512962 4.977 0.483695 5.9776 1.2534 6.7154L27.0899 31.4754L1.2534 56.2354C0.861295 56.5984 0.548498 57.0325 0.333298 57.5125C0.118098 57.9926 0.00489455 58.5089 0.00019455 59.0313C-0.00460545 59.5537 0.0992946 60.0718 0.305695 60.5553C0.512195 61.0389 0.816996 61.4782 1.2025 61.8476C1.588 62.217 2.04639 62.5092 2.55099 62.707C3.05549 62.9048 3.5961 63.0044 4.1413 62.9999C4.6864 62.9953 5.2252 62.8868 5.7261 62.6806C6.227 62.4744 6.68 62.1746 7.0587 61.7988L35.7979 34.2571C36.5676 33.5193 37 32.5187 37 31.4754C37 30.4321 36.5676 29.4315 35.7979 28.6937L7.0587 1.152C6.2888 0.414404 5.2447 3.8147e-06 4.1561 3.8147e-06C3.0674 3.8147e-06 2.0233 0.414404 1.2534 1.152Z"
+                                      fill="#CFDAFF"/>
+                            </svg>
+                        </div>
+                        <div class="product-card__swiper-swiper swiper">
+                            <div class="swiper-wrapper">
+                                <a class="swiper-slide product-card__swiper-el"
+                                    href="{{ asset('/uploads/' ~ row.contentPic) }}" data-fancybox="card"><img
+                                    class="product-card__swiper-img" src="{{ asset('/uploads/' ~ row.contentPic) }}" alt=""></a>
+                                <a class="swiper-slide product-card__swiper-el"
+                                   href="{{ asset('/uploads/' ~ row.contentPic) }}" data-fancybox="card"><img
+                                    class="product-card__swiper-img" src="{{ asset('/uploads/' ~ row.contentPic) }}" alt=""></a>
+
+                            </div>
+                        </div>
+                        <div class="product-card__dots dots"></div>
+                    </div>
+                    <div class="product-card__body">
+                        <ul class="product-card__descrp product-card-descrp">
+                            <li class="product-card-descrp__el"><strong>Тип:</strong> {{ row.wineColor }}</li>
+                            <li class="product-card-descrp__el"><strong>Страна:</strong> {{ row.country }}</li>
+                            <li class="product-card-descrp__el"><strong>Регион:</strong> {{ row.region }}</li>
+                            <li class="product-card-descrp__el"><strong>Производитель:</strong> {{ row.vendor }}
+                            </li>
+                            <li class="product-card-descrp__el"><strong>Импортер:</strong> ???</li>
+                            <li class="product-card-descrp__el"><strong>Сорт винограда:</strong> {{ row.grapeSortsAsString }}
+                            </li>
+                            <li class="product-card-descrp__el"><strong>Год урожая:</strong> {{ row.year }}</li>
+                            <li class="product-card-descrp__el"><strong>Объем:</strong> 0,75 л</li>
+                            <li class="product-card-descrp__el"><strong>Крепость:</strong> {{ row.alcohol }}</li>
+                            <li class="product-card-descrp__el"><strong>Аппелясьон:</strong> {{ row.appellation }}</li>
+                            <li class="product-card-descrp__el"><strong>Выдержка в емкости:</strong> {{ row.aging }}</li>
+                            <li class="product-card-descrp__el"><strong>Сахар:</strong> {{ row.wineSugar }}</li>
+                        </ul>
+                        <div class="product-card__media media-audio">
+                            <audio id="player" controls>
+                                <source src="../test.mp3" type="audio/mp3"/>
+                            </audio>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="sec-product__products">
+                <div class="provider-card row">
+                    <div class="provider-card__el col-6 col-md-4 col-lg-3 col-xl-1"><a class="provider-card-el"
+                                                                                       href="#">
+                            <div class="provider-card-el__top"><img class="provider-card-el__img"
+                                                                    src="../img/provider/1.png" alt=""></div>
+                            <div class="provider-card-el__title">Maguisan<br> wines</div>
+                            <div class="provider-card-el__info">168 позиций</div>
+                        </a></div>
+                    <div class="provider-card__el col-6 col-md-4 col-lg-3 col-xl-1"><a class="provider-card-el"
+                                                                                       href="#">
+                            <div class="provider-card-el__top"><img class="provider-card-el__img"
+                                                                    src="../img/provider/2.png" alt=""></div>
+                            <div class="provider-card-el__title">Agora<br> company</div>
+                            <div class="provider-card-el__info">1 368 позиций</div>
+                        </a></div>
+                    <div class="provider-card__el col-6 col-md-4 col-lg-3 col-xl-1"><a class="provider-card-el"
+                                                                                       href="#">
+                            <div class="provider-card-el__top"><img class="provider-card-el__img"
+                                                                    src="../img/provider/3.png" alt=""></div>
+                            <div class="provider-card-el__title">Montanelliana<br> inc.</div>
+                            <div class="provider-card-el__info">431 позиций</div>
+                        </a></div>
+                    <div class="provider-card__el col-6 col-md-4 col-lg-3 col-xl-1"><a class="provider-card-el"
+                                                                                       href="#">
+                            <div class="provider-card-el__top"><img class="provider-card-el__img"
+                                                                    src="../img/provider/4.png" alt=""></div>
+                            <div class="provider-card-el__title">Brewing<br> wines</div>
+                            <div class="provider-card-el__info">231 позиций</div>
+                        </a></div>
+                    <div class="provider-card__el col-6 col-md-4 col-lg-3 col-xl-1"><a class="provider-card-el"
+                                                                                       href="#">
+                            <div class="provider-card-el__top"><img class="provider-card-el__img"
+                                                                    src="../img/provider/5.png" alt=""></div>
+                            <div class="provider-card-el__title">Veuve<br> Clicquot Ponsardin</div>
+                            <div class="provider-card-el__info">1 368 позиций</div>
+                        </a></div>
+                    <div class="provider-card__el col-6 col-md-4 col-lg-3 col-xl-1"><a class="provider-card-el"
+                                                                                       href="#">
+                            <div class="provider-card-el__top"><img class="provider-card-el__img"
+                                                                    src="../img/provider/6.png" alt=""></div>
+                            <div class="provider-card-el__title">Santipadri<br> vineyards</div>
+                            <div class="provider-card-el__info">3 269 позиций</div>
+                        </a></div>
+                    <div class="provider-card__el col-6 col-md-4 col-lg-3 col-xl-1"><a class="provider-card-el"
+                                                                                       href="#">
+                            <div class="provider-card-el__top"><img class="provider-card-el__img"
+                                                                    src="../img/provider/7.png" alt=""></div>
+                            <div class="provider-card-el__title">Brewing wine<br> company</div>
+                            <div class="provider-card-el__info">168 позиций</div>
+                        </a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_scripts %}
+    <script>
+        $(document).ready(function() {
+        })
+    </script>
+{% endblock %}
