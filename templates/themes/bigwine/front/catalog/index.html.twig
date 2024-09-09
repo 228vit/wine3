@@ -19,7 +19,7 @@
 
                 <div class="sec-catalog__sidebar filter">
 
-                    <form id="filtersForm" action="{{ path('cabinet_save_filter_product') }}">
+                    <form method="post" id="filtersForm" action="{{ path('cabinet_save_filter_product') }}">
 
                     <div class="filter__mob">
                         <div class="filter__mob-title">Фильтр</div>
@@ -50,9 +50,9 @@
                         </div>
                     </div>
 
-                    <div class="filter__bottom"><a
+                    <div class="filter__bottom"><a id="submitFilterForm"
                                 class="filter__btn btn-def btn-def_3"
-                                href="#"><span>Поиск</span></a><a
+                                href="javascript: submitFilter();"><span>Поиск</span></a><a
                                 class="filter__btn btn-def_text btn-def btn-def_3"
                                 href="{{ path('catalog_reset_product_filter') }}"><span>Сбросить</span></a>
                     </div>
@@ -76,6 +76,13 @@
 {% block extra_scripts %}
 <script>
     $(document).ready(function() {
-    })
+        $('#submitFilterForm').on('click', function () {
+            $('#filtersForm').submit();
+        })
+    });
+
+    function submitFilter() {
+        console.log('puuuu');
+    }
 </script>
 {% endblock %}

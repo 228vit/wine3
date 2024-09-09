@@ -149,9 +149,10 @@ class ProductController extends AbstractController
             self::MODEL => $filters,
         ));
 
-        $pagination = $this->getPagination($request, $session, $productDataService, FrontProductFilter::class);
-
-        return new JsonResponse(['totalFilteredProducts' => $pagination->getTotalItemCount()]);
+        return $this->redirectToRoute('cabinet_product_index');
+//        $pagination = $this->getPagination($request, $session, $productDataService, FrontProductFilter::class);
+//
+//        return new JsonResponse(['totalFilteredProducts' => $pagination->getTotalItemCount()]);
     }
 
     /**
