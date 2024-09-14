@@ -131,7 +131,7 @@ class FrontProductFilter extends AbstractType
                     'placeholder' => 'Часть света',
                 ]
             ))
-            ->add('volume', Filters\ChoiceFilterType::class, array(
+            ->add('bottleVolumes', Filters\ChoiceFilterType::class, array(
                 'required' => false,
                 'choices' => $this->bottleVolumes,
                 'expanded' => true,

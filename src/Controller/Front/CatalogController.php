@@ -2,6 +2,7 @@
 namespace App\Controller\Front;
 
 use App\Entity\Country;
+use App\Entity\GrapeSort;
 use App\Entity\Product;
 use App\Entity\WineCard;
 use App\Entity\WineColor;
@@ -129,12 +130,14 @@ class CatalogController extends AbstractController
 
         $sessionFilters = $session->get('filters', []);
         $sessionFilters['product'] = $sessionFilters['product'] ?? [];
+        $sessionFilters['product']['grapeSort'] = $sessionFilters['product']['grapeSort'] ?? [];
         $sessionFilters['product']['wineColor'] = $sessionFilters['product']['wineColor'] ?? [];
         $sessionFilters['product']['wineSugar'] = $sessionFilters['product']['wineSugar'] ?? [];
         $sessionFilters['product']['supplier'] = $sessionFilters['product']['supplier'] ?? [];
         $sessionFilters['product']['country'] = $sessionFilters['product']['country'] ?? [];
         $sessionFilters['product']['vendor'] = $sessionFilters['product']['vendor'] ?? [];
         $sessionFilters['product']['volume'] = $sessionFilters['product']['volume'] ?? [];
+        $sessionFilters['product']['grapeSort'] = $sessionFilters['product']['grapeSort'] ?? [];
         $sessionFilters['product']['year'] = $sessionFilters['product']['year'] ?? '';
         $sessionFilters['product']['price_from'] = $sessionFilters['product']['price_from'] ?? '';
         $sessionFilters['product']['price_to'] = $sessionFilters['product']['price_to'] ?? '';
@@ -146,6 +149,7 @@ class CatalogController extends AbstractController
         $wineSugars = $wineSugarRepository->findAll();
         $countries = $countryRepository->findWithWines();
         $grapeSorts = $grapeSortRepository->findBy([], ['name' => 'ASC']);
+        $bottleVolumes = $productDataService->getBottleVolumes();
 
         return $this->render('front/catalog/filters.html.twig', array(
             'sessionFilters' => $sessionFilters,
@@ -155,6 +159,7 @@ class CatalogController extends AbstractController
             'wineSugars' => $wineSugars,
             'countries' => $countries,
             'grapeSorts' => $grapeSorts,
+            'bottleVolumes' => $bottleVolumes,
             'current_filters' => $this->current_filters,
             'currentFilters' => $this->currentFilters,
             'current_filters_string' => $this->current_filters_string,
@@ -195,6 +200,7 @@ class CatalogController extends AbstractController
         $session_order_field = $session->get('order_field', 'name');
         $session_order_direction = $session->get('order_direction', 'asc');
 
+//        dd($session_filters);
         if (false !== $session_filters && count($session_filters) && isset($session_filters[$model])) {
             $this->current_filters = $session_filters[$model];
             $filter_form->submit($this->current_filters);
@@ -222,6 +228,18 @@ class CatalogController extends AbstractController
                         }
 
                         $query->andWhere($model.'.country IN (:country)')->setParameter('country', $value);
+                        break;
+                    case 'grapeSort':
+                        $grapeSorts = $this->grapeSortRepository->findAllByIds($value);
+                        /** @var GrapeSort $grapeSort */
+                        foreach ($grapeSorts as $grapeSort) {
+                            $this->currentFilters[$filter][] = [
+                                'name' => $grapeSort->getName(),
+                                'value' => $grapeSort->getId(),
+                            ];
+                        }
+
+                        $query->andWhere($model.'.grapeSort IN (:grapeSort)')->setParameter('grapeSort', $value);
                         break;
                     case 'worldPart':
                         $country_ids = [];

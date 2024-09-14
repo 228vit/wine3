@@ -22,6 +22,16 @@ class GrapeSortRepository extends ServiceEntityRepository
         parent::__construct($registry, GrapeSort::class);
     }
 
+    public function findAllByIds(array $ids)
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
     public function getQueryAllExceptMe(GrapeSort $grapeSort)
     {
         return $this->createQueryBuilder('g')

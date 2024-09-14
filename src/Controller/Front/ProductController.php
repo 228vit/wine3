@@ -3,6 +3,7 @@
 namespace App\Controller\Front;
 
 use App\Entity\Country;
+use App\Entity\GrapeSort;
 use App\Entity\Product;
 use App\Entity\WineCard;
 use App\Entity\WineColor;
@@ -170,7 +171,9 @@ class ProductController extends AbstractController
         $pagination = $this->getPagination($request, $session, $productDataService, FrontProductFilter::class);
 
         $sessionFilters = $session->get('filters', []);
+//        dd($sessionFilters);
         $sessionFilters['product'] = $sessionFilters['product'] ?? [];
+        $sessionFilters['product']['grapeSort'] = $sessionFilters['product']['grapeSort'] ?? [];
         $sessionFilters['product']['wineColor'] = $sessionFilters['product']['wineColor'] ?? [];
         $sessionFilters['product']['wineSugar'] = $sessionFilters['product']['wineSugar'] ?? [];
         $sessionFilters['product']['supplier'] = $sessionFilters['product']['supplier'] ?? [];
@@ -286,6 +289,27 @@ class ProductController extends AbstractController
 
                         $query->andWhere($model.'.country IN (:country)')->setParameter('country', $value);
                         break;
+                    case 'grapeSort':
+                        $grapeSorts = $this->grapeSortRepository->findAllByIds($value);
+                        /** @var GrapeSort $grapeSort */
+                        foreach ($grapeSorts as $grapeSort) {
+                            $this->currentFilters[$filter][] = [
+                                'name' => $grapeSort->getName(),
+                                'value' => $grapeSort->getId(),
+                            ];
+                        }
+
+                        $productIds = [];
+                        /** @var Product $product */
+                        foreach ($this->productRepository->findByGrapeSorts($grapeSorts) as $product) {
+                            $productIds[] = $product->getId();
+                        }
+
+                        if (count($productIds)) {
+                            $query->andWhere($model.'.id IN (:productIds)')
+                                ->setParameter('productIds', $productIds);
+                        }
+                        break;
                     case 'worldPart':
                         $country_ids = [];
                         foreach ($value as $wp) {
@@ -388,6 +412,7 @@ class ProductController extends AbstractController
             ;
         }
 
+//        dd($this->currentFilters);
         return $query;
     }
 

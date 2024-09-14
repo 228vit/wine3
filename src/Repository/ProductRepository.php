@@ -51,6 +51,19 @@ class ProductRepository extends ServiceEntityRepository
         ;
     }
 
+    public function findByGrapeSorts(array $grapeSortIds)
+    {
+        return $this->createQueryBuilder('product')
+            ->select('product')
+            ->innerJoin('product.productGrapeSorts', 'productGrapeSorts')
+            ->innerJoin('productGrapeSorts.grapeSort', 'grapeSort')
+            ->where('grapeSort.id IN (:grapeSortIds)')
+            ->setParameter('grapeSortIds', $grapeSortIds)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
     public function getJoinedQuery($alias = 'product')
     {
         return $this->createQueryBuilder($alias)

@@ -5,6 +5,8 @@ namespace App\Controller\Front;
 use App\Repository\CategoryRepository;
 use App\Repository\CountryRegionRepository;
 use App\Repository\CountryRepository;
+use App\Repository\GrapeSortRepository;
+use App\Repository\ProductGrapeSortRepository;
 use App\Repository\ProductRepository;
 use App\Repository\VendorRepository;
 use App\Repository\WineColorRepository;
@@ -35,6 +37,8 @@ trait FrontTraitController
     private $vendorRepository;
     private $wineColorRepository;
     private $wineSugarRepository;
+    private $grapeSortRepository;
+    private $productGrapeSortRepository;
     private $cacheManager;
 
     public function __construct(EntityManagerInterface $em,
@@ -45,6 +49,8 @@ trait FrontTraitController
                                 WineSugarRepository $wineSugarRepository,
                                 CountryRepository $countryRepository,
                                 VendorRepository $vendorRepository,
+                                GrapeSortRepository $grapeSortRepository,
+                                ProductGrapeSortRepository $productGrapeSortRepository,
                                 CacheManager $cacheManager)
     {
         $this->em = $em;
@@ -55,6 +61,8 @@ trait FrontTraitController
         $this->vendorRepository = $vendorRepository;
         $this->wineColorRepository = $wineColorRepository;
         $this->wineSugarRepository = $wineSugarRepository;
+        $this->grapeSortRepository = $grapeSortRepository;
+        $this->productGrapeSortRepository = $productGrapeSortRepository;
         $this->cacheManager = $cacheManager;
     }
 

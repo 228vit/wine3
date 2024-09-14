@@ -19,6 +19,15 @@ class ProductGrapeSortRepository extends ServiceEntityRepository
         parent::__construct($registry, ProductGrapeSort::class);
     }
 
+    public function findAllByIds(array $ids)
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->getQuery()
+            ->getResult()
+            ;
+    }
     // /**
     //  * @return ProductGrapeSort[] Returns an array of ProductGrapeSort objects
     //  */
