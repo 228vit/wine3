@@ -1,8 +1,7 @@
 
 <div class="filter__el select-def">
     <div class="select-def__top">
-        <div class="select-def__val">Тип вина
-        </div>
+        <div class="select-def__val">Тип вина</div>
         <div class="select-def__els"></div>
         <svg class="select-def__arr" width="10" height="6" viewBox="0 0 10 6" fill="none"
              xmlns="http://www.w3.org/2000/svg">
@@ -46,8 +45,7 @@
 
 <div class="filter__el select-def">
     <div class="select-def__top">
-        <div class="select-def__val">Цвет вина
-        </div>
+        <div class="select-def__val">Цвет вина</div>
         <div class="select-def__els"></div>
         <svg class="select-def__arr" width="10" height="6" viewBox="0 0 10 6" fill="none"
              xmlns="http://www.w3.org/2000/svg">
@@ -69,8 +67,7 @@
 
 <div class="filter__el select-def">
     <div class="select-def__top">
-        <div class="select-def__val">Объём
-        </div>
+        <div class="select-def__val">Объём</div>
         <div class="select-def__els"></div>
         <svg class="select-def__arr" width="10" height="6" viewBox="0 0 10 6" fill="none"
              xmlns="http://www.w3.org/2000/svg">
@@ -92,8 +89,7 @@
 
 <div class="filter__el select-def">
     <div class="select-def__top">
-        <div class="select-def__val">Сорт винограда
-        </div>
+        <div class="select-def__val">Сорт винограда</div>
         <div class="select-def__els"></div>
         <svg class="select-def__arr" width="10" height="6" viewBox="0 0 10 6" fill="none"
              xmlns="http://www.w3.org/2000/svg">
@@ -102,6 +98,7 @@
         </svg>
     </div>
     <div class="select-def__dropdown" style="display: none;">
+        <div class="select-def__els"></div>
         {% for grapeSort in grapeSorts %}
             <label class="select-def__dropdown-el checkbox-el">
                 <input name="product_filter[grapeSort][]" value="{{ grapeSort.id }}"

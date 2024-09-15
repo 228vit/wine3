@@ -47,6 +47,7 @@ class App {
 		this.swiperCard();
 		this.menu();
 		this.select();
+		this.renderCheckedFilters();
 		this.filter();
 		this.product();
 		this.provider();
@@ -272,6 +273,25 @@ class App {
 		this.clickOutside($('.select-def'), function () {
 			$('.select-def').removeClass('active');
 			$('.select-def__dropdown').stop().hide();
+		});
+	}
+	renderCheckedFilters() {
+		$('.filter__el').each(function( index ) {
+			// console.log( index + ": " + $( this ).text() );
+			// console.log( index + " filter__el select-def " + $( this ).text() );
+			let $wrap = $(this);
+			$wrap.find('.select-def__els').empty();
+			console.log($wrap.find('.checkbox-el__inp:checked'));
+			if ($wrap.find('.checkbox-el__inp:checked').length) {
+				$wrap.find('.checkbox-el__inp:checked').each(function () {
+					let val = $(this).closest('.checkbox-el').find('.checkbox-el__text').text();
+					$wrap.find('.select-def__els').append('<div class="select-def__el">' + val + '</div>');
+				});
+				$wrap.addClass('selected');
+			} else {
+				$wrap.removeClass('selected');
+			}
+
 		});
 	}
 	menu() {
