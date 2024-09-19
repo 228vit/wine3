@@ -30,13 +30,11 @@ class EventController extends AbstractController
         $currentMonth = $firstDay->format('m');
         $currentYear = $firstDay->format('Y');
         $firstDayNum = (int)$firstDayNum - 1;
-        $firstWeekDay = $firstDay->modify('- ' . $firstDayNum . ' days');
-        //dd($firstWeekDay->format('Y-m-d'));
+        $firstWeekDay = $firstDay->modify('-' . $firstDayNum . ' days');
 
         $totalCalendarDays = (5*7) - 1;
         $calendar = [];
         $currentDay = clone $firstWeekDay;
-//        dd($currentMonth);
 
         $thisMonthEvents = $repository->currentMonthEvents($firstDay, $lastDay);
         $events = [];

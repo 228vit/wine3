@@ -23,13 +23,25 @@
                     <li class="links-def__el"><a class="links-def__link" href="#">Сотрудничество</a></li>
                 </ul>
             </nav>
-            <a id="cabinetLink" class="top-menu__link link-lk" href="#">
-                <svg class="link-lk__icon" width="17" height="17" viewBox="0 0 17 17" fill="none"
-                     xmlns="http://www.w3.org/2000/svg">
-                    <path d="M6.625 12.25L10.375 8.5M10.375 8.5L6.625 4.75M10.375 8.5H1M8.5 1H13C14.0501 1 14.5751 1 14.9762 1.20436C15.329 1.38413 15.6159 1.67096 15.7956 2.02377C16 2.42485 16 2.9499 16 4V13C16 14.0501 16 14.5751 15.7956 14.9762C15.6159 15.329 15.329 15.6159 14.9762 15.7956C14.5751 16 14.0501 16 13 16H8.5"
-                          stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                <span>Личный кабинет</span></a>
+            {% if app.user %}
+                <a id="cabinetLinkLogged" class="top-menu__link link-lk" href="{{ path('cabinet_product_index') }}">
+                    <svg class="link-lk__icon" width="17" height="17" viewBox="0 0 17 17" fill="none"
+                         xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6.625 12.25L10.375 8.5M10.375 8.5L6.625 4.75M10.375 8.5H1M8.5 1H13C14.0501 1 14.5751 1 14.9762 1.20436C15.329 1.38413 15.6159 1.67096 15.7956 2.02377C16 2.42485 16 2.9499 16 4V13C16 14.0501 16 14.5751 15.7956 14.9762C15.6159 15.329 15.329 15.6159 14.9762 15.7956C14.5751 16 14.0501 16 13 16H8.5"
+                              stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>Личный кабинет</span>
+                </a>
+            {% else %}
+                <a id="cabinetLink" class="top-menu__link link-lk" href="#">
+                    <svg class="link-lk__icon" width="17" height="17" viewBox="0 0 17 17" fill="none"
+                         xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6.625 12.25L10.375 8.5M10.375 8.5L6.625 4.75M10.375 8.5H1M8.5 1H13C14.0501 1 14.5751 1 14.9762 1.20436C15.329 1.38413 15.6159 1.67096 15.7956 2.02377C16 2.42485 16 2.9499 16 4V13C16 14.0501 16 14.5751 15.7956 14.9762C15.6159 15.329 15.329 15.6159 14.9762 15.7956C14.5751 16 14.0501 16 13 16H8.5"
+                              stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>Личный кабинет</span>
+                </a>
+            {% endif %}
             <div class="top-menu__burger btn-burger">
                 <svg width="33" height="25" viewBox="0 0 33 25" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <rect width="33" height="3" rx="1.5" fill="#0842B4"/>
