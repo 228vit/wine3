@@ -130,6 +130,7 @@ class CatalogController extends AbstractController
 
         $sessionFilters = $session->get('filters', []);
         $sessionFilters['product'] = $sessionFilters['product'] ?? [];
+        $sessionFilters['product']['supplier'] = $sessionFilters['product']['supplier'] ?? [];
         $sessionFilters['product']['grapeSort'] = $sessionFilters['product']['grapeSort'] ?? [];
         $sessionFilters['product']['wineColor'] = $sessionFilters['product']['wineColor'] ?? [];
         $sessionFilters['product']['wineSugar'] = $sessionFilters['product']['wineSugar'] ?? [];
@@ -139,6 +140,7 @@ class CatalogController extends AbstractController
         $sessionFilters['product']['volume'] = $sessionFilters['product']['volume'] ?? [];
         $sessionFilters['product']['grapeSort'] = $sessionFilters['product']['grapeSort'] ?? [];
         $sessionFilters['product']['year'] = $sessionFilters['product']['year'] ?? '';
+        $sessionFilters['product']['years'] = $sessionFilters['product']['years'] ?? '';
         $sessionFilters['product']['price_from'] = $sessionFilters['product']['price_from'] ?? '';
         $sessionFilters['product']['price_to'] = $sessionFilters['product']['price_to'] ?? '';
         $productFilters = null !== $sessionFilters AND isset($sessionFilters['product']) ?
@@ -150,6 +152,7 @@ class CatalogController extends AbstractController
         $countries = $countryRepository->findWithWines();
         $grapeSorts = $grapeSortRepository->findBy([], ['name' => 'ASC']);
         $bottleVolumes = $productDataService->getBottleVolumes();
+        $years = $productDataService->getYears();
 
         return $this->render('front/catalog/filters.html.twig', array(
             'sessionFilters' => $sessionFilters,
@@ -160,6 +163,7 @@ class CatalogController extends AbstractController
             'countries' => $countries,
             'grapeSorts' => $grapeSorts,
             'bottleVolumes' => $bottleVolumes,
+            'years' => $years,
             'current_filters' => $this->current_filters,
             'currentFilters' => $this->currentFilters,
             'current_filters_string' => $this->current_filters_string,
@@ -296,6 +300,17 @@ class CatalogController extends AbstractController
                             ];
                         }
                         $query->andWhere($model.'.wineColor IN (:wineColors)')->setParameter('wineColors', $value);
+                        break;
+                    case 'years':
+//                        $rows = $this->productRepository->findAllByYears($value);
+//                        /** @var Product $row */
+//                        foreach ($rows as $row) {
+//                            $this->currentFilters[$filter][] = [
+//                                'name' => $row->getName(),
+//                                'value' => $row->getId(),
+//                            ];
+//                        }
+                        $query->andWhere($model.'.year IN (:years)')->setParameter('years', $value);
                         break;
                     case 'year':
                         $value = intval($value);

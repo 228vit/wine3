@@ -173,9 +173,33 @@ class ProductRepository extends ServiceEntityRepository
             ->select('p.volume')
             ->where('p.volume > 0')
             ->groupBy('p.volume')
+//            ->distinct()
             ->addOrderBy('p.volume', 'ASC')
             ->getQuery()
             ->getResult(AbstractQuery::HYDRATE_SCALAR)
+        ;
+    }
+
+    public function getYears(): array
+    {
+        return $this->createQueryBuilder('p')
+            ->select('p.year')
+            ->where('p.year > 0')
+            ->distinct()
+            ->addOrderBy('p.year', 'ASC')
+            ->getQuery()
+            ->getResult(AbstractQuery::HYDRATE_SCALAR)
+        ;
+    }
+
+
+    public function findAllByYears(array $years)
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.year IN (:years)')
+            ->setParameter('years', $years)
+            ->getQuery()
+            ->getResult()
         ;
     }
 

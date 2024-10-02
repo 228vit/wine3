@@ -181,6 +181,7 @@ class ProductController extends AbstractController
         $sessionFilters['product']['vendor'] = $sessionFilters['product']['vendor'] ?? [];
         $sessionFilters['product']['volume'] = $sessionFilters['product']['volume'] ?? [];
         $sessionFilters['product']['year'] = $sessionFilters['product']['year'] ?? '';
+        $sessionFilters['product']['years'] = $sessionFilters['product']['years'] ?? '';
         $sessionFilters['product']['price_from'] = $sessionFilters['product']['price_from'] ?? '';
         $sessionFilters['product']['price_to'] = $sessionFilters['product']['price_to'] ?? '';
         $productFilters = null !== $sessionFilters AND isset($sessionFilters['product']) ?
@@ -366,6 +367,10 @@ class ProductController extends AbstractController
                         }
                         $query->andWhere($model.'.wineColor IN (:wineColors)')->setParameter('wineColors', $value);
                         break;
+                    case 'years':
+                        $query->andWhere($model.'.year IN (:years)')->setParameter('years', $value);
+                        break;
+
                     case 'year':
                         $value = intval($value);
                         $query->andWhere($model.'.year  = :year')->setParameter('year', $value);
