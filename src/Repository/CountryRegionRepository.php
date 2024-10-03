@@ -19,6 +19,16 @@ class CountryRegionRepository extends ServiceEntityRepository
         parent::__construct($registry, CountryRegion::class);
     }
 
+    public function findWithWines()
+    {
+        return $this->createQueryBuilder('c')
+            ->innerJoin('c.products', 'product')
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+
+
     // /**
     //  * @return CountryRegion[] Returns an array of CountryRegion objects
     //  */

@@ -2,12 +2,14 @@
 namespace App\Controller\Front;
 
 use App\Entity\Country;
+use App\Entity\CountryRegion;
 use App\Entity\GrapeSort;
 use App\Entity\Product;
 use App\Entity\WineCard;
 use App\Entity\WineColor;
 use App\Entity\WineSugar;
 use App\Filter\Front\FrontProductFilter;
+use App\Repository\CountryRegionRepository;
 use App\Repository\CountryRepository;
 use App\Repository\GrapeSortRepository;
 use App\Repository\ProductRepository;
@@ -123,10 +125,10 @@ class CatalogController extends AbstractController
                                   WineSugarRepository $wineSugarRepository,
                                   GrapeSortRepository $grapeSortRepository,
                                   CountryRepository $countryRepository,
+                                  CountryRegionRepository $regionRepository,
                                   ProductDataService $productDataService)
     {
         $pagination = $this->getPagination($request, $session, $productDataService, FrontProductFilter::class);
-
 
         $sessionFilters = $session->get('filters', []);
         $sessionFilters['product'] = $sessionFilters['product'] ?? [];
@@ -136,8 +138,10 @@ class CatalogController extends AbstractController
         $sessionFilters['product']['wineSugar'] = $sessionFilters['product']['wineSugar'] ?? [];
         $sessionFilters['product']['supplier'] = $sessionFilters['product']['supplier'] ?? [];
         $sessionFilters['product']['country'] = $sessionFilters['product']['country'] ?? [];
+        $sessionFilters['product']['region'] = $sessionFilters['product']['region'] ?? [];
         $sessionFilters['product']['vendor'] = $sessionFilters['product']['vendor'] ?? [];
         $sessionFilters['product']['volume'] = $sessionFilters['product']['volume'] ?? [];
+        $sessionFilters['product']['alcohol'] = $sessionFilters['product']['alcohol'] ?? [];
         $sessionFilters['product']['grapeSort'] = $sessionFilters['product']['grapeSort'] ?? [];
         $sessionFilters['product']['year'] = $sessionFilters['product']['year'] ?? '';
         $sessionFilters['product']['years'] = $sessionFilters['product']['years'] ?? '';
@@ -150,9 +154,11 @@ class CatalogController extends AbstractController
         $wineColors = $wineColorRepository->findAll();
         $wineSugars = $wineSugarRepository->findAll();
         $countries = $countryRepository->findWithWines();
+        $regions = $regionRepository->findWithWines();
         $grapeSorts = $grapeSortRepository->findBy([], ['name' => 'ASC']);
         $bottleVolumes = $productDataService->getBottleVolumes();
         $years = $productDataService->getYears();
+        $alcohol = $productDataService->getAlcohol();
 
         return $this->render('front/catalog/filters.html.twig', array(
             'sessionFilters' => $sessionFilters,
@@ -161,9 +167,11 @@ class CatalogController extends AbstractController
             'wineColors' => $wineColors,
             'wineSugars' => $wineSugars,
             'countries' => $countries,
+            'regions' => $regions,
             'grapeSorts' => $grapeSorts,
             'bottleVolumes' => $bottleVolumes,
             'years' => $years,
+            'alcoholValues' => $alcohol,
             'current_filters' => $this->current_filters,
             'currentFilters' => $this->currentFilters,
             'current_filters_string' => $this->current_filters_string,
@@ -263,8 +271,22 @@ class CatalogController extends AbstractController
                         $query->andWhere($model.'.country IN (:country_ids)')->setParameter('country_ids', $country_ids);
 
                         break;
+                    case 'region':
+                        $regions = $this->regionRepository->findWithWines();
+                        /** @var CountryRegion $region */
+                        foreach ($regions as $region) {
+                            $this->currentFilters[$filter][] = [
+                                'name' => $region->getName(),
+                                'value' => $region->getId(),
+                            ];
+                        }
+                        $query->andWhere($model.'.region IN (:region)')->setParameter('region', $value);
+                        break;
                     case 'vendor':
                         $query->andWhere($model.'.vendor IN (:vendor)')->setParameter('vendor', $value);
+                        break;
+                    case 'alcohol':
+                        $query->andWhere($model.'.alcohol IN (:alcohol)')->setParameter('alcohol', $value);
                         break;
                     case 'volume':
                         $bottleValues = $productDataService->getBottleVolumesReversed();

@@ -3,6 +3,7 @@
 namespace App\Controller\Front;
 
 use App\Entity\Country;
+use App\Entity\CountryRegion;
 use App\Entity\GrapeSort;
 use App\Entity\Product;
 use App\Entity\WineCard;
@@ -180,6 +181,7 @@ class ProductController extends AbstractController
         $sessionFilters['product']['country'] = $sessionFilters['product']['country'] ?? [];
         $sessionFilters['product']['vendor'] = $sessionFilters['product']['vendor'] ?? [];
         $sessionFilters['product']['volume'] = $sessionFilters['product']['volume'] ?? [];
+        $sessionFilters['product']['alcohol'] = $sessionFilters['product']['alcohol'] ?? [];
         $sessionFilters['product']['year'] = $sessionFilters['product']['year'] ?? '';
         $sessionFilters['product']['years'] = $sessionFilters['product']['years'] ?? '';
         $sessionFilters['product']['price_from'] = $sessionFilters['product']['price_from'] ?? '';
@@ -290,6 +292,17 @@ class ProductController extends AbstractController
 
                         $query->andWhere($model.'.country IN (:country)')->setParameter('country', $value);
                         break;
+                    case 'region':
+                        $regions = $this->regionRepository->findWithWines();
+                        /** @var CountryRegion $region */
+                        foreach ($regions as $region) {
+                            $this->currentFilters[$filter][] = [
+                                'name' => $region->getName(),
+                                'value' => $region->getId(),
+                            ];
+                        }
+                        $query->andWhere($model.'.region IN (:region)')->setParameter('region', $value);
+                        break;
                     case 'grapeSort':
                         $grapeSorts = $this->grapeSortRepository->findAllByIds($value);
                         /** @var GrapeSort $grapeSort */
@@ -310,6 +323,9 @@ class ProductController extends AbstractController
                             $query->andWhere($model.'.id IN (:productIds)')
                                 ->setParameter('productIds', $productIds);
                         }
+                        break;
+                    case 'alcohol':
+                        $query->andWhere($model.'.alcohol IN (:alcohol)')->setParameter('alcohol', $value);
                         break;
                     case 'worldPart':
                         $country_ids = [];

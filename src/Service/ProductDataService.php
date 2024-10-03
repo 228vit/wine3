@@ -46,4 +46,14 @@ class ProductDataService
         return $volumes;
     }
 
+    public function getAlcohol(): array
+    {
+        $volumes = [];
+        foreach ($this->repository->getAlcohol() as $item) {
+            $volumes[] = $item['alcohol'];
+        }
+
+        return $volumes;
+    }
+
 }

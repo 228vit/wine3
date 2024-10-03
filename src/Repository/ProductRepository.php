@@ -192,6 +192,18 @@ class ProductRepository extends ServiceEntityRepository
         ;
     }
 
+    public function getAlcohol(): array
+    {
+        return $this->createQueryBuilder('p')
+            ->select('p.alcohol')
+            ->where('p.alcohol > 0')
+            ->distinct()
+            ->addOrderBy('p.alcohol', 'ASC')
+            ->getQuery()
+            ->getResult(AbstractQuery::HYDRATE_SCALAR)
+        ;
+    }
+
 
     public function findAllByYears(array $years)
     {

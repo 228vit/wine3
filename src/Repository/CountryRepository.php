@@ -33,8 +33,6 @@ class CountryRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('c')
             ->innerJoin('c.products', 'product')
-//            ->andWhere('c.id IN (:ids)')
-//            ->setParameter('ids', $ids)
             ->getQuery()
             ->getResult()
         ;

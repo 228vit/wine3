@@ -34,6 +34,7 @@ trait FrontTraitController
     private $query_builder_updater;
     private $productRepository;
     private $countryRepository;
+    private $regionRepository;
     private $vendorRepository;
     private $wineColorRepository;
     private $wineSugarRepository;
@@ -48,6 +49,7 @@ trait FrontTraitController
                                 WineColorRepository $wineColorRepository,
                                 WineSugarRepository $wineSugarRepository,
                                 CountryRepository $countryRepository,
+                                CountryRegionRepository $regionRepository,
                                 VendorRepository $vendorRepository,
                                 GrapeSortRepository $grapeSortRepository,
                                 ProductGrapeSortRepository $productGrapeSortRepository,
@@ -58,6 +60,7 @@ trait FrontTraitController
         $this->query_builder_updater = $query_builder_updater;
         $this->productRepository = $productRepository;
         $this->countryRepository = $countryRepository;
+        $this->regionRepository = $regionRepository;
         $this->vendorRepository = $vendorRepository;
         $this->wineColorRepository = $wineColorRepository;
         $this->wineSugarRepository = $wineSugarRepository;
