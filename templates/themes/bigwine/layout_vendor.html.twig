@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}BigWine{% endblock %}</title>
+
+    <link rel="stylesheet" href="{{ asset('/bigwine/css/style.css?ver=750') }}">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="robots" content="noindex, nofollow"/>
+    <style>
+        .product-def__img {
+            width: 100%;
+            -o-object-fit: contain;
+            object-fit: contain;
+            height: 150px;
+            position: relative;
+            top: 10px;
+            padding-bottom: 5px;
+            margin-bottom: 5px;
+        }
+
+        div.pagination a {
+            display: -ms-inline-flexbox;
+            display: inline-flex;
+            -webkit-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            -webkit-box-pack: center;
+            -ms-flex-pack: center;
+            justify-content: center;
+            text-align: center;
+            line-height: 1;
+            font-family: "Myriad Pro", sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            border-radius: 57px;
+            -webkit-transition: 0.3s;
+            -o-transition: 0.3s;
+            transition: 0.3s;
+            height: 100%;
+            padding: 10px 34px;
+            background: #0842b4;
+            color: #fff;
+        }
+        div.pagination span.current {
+            display: -ms-inline-flexbox;
+            display: inline-flex;
+            -webkit-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            -webkit-box-pack: center;
+            -ms-flex-pack: center;
+            justify-content: center;
+            text-align: center;
+            line-height: 1;
+            font-family: "Myriad Pro", sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            border-radius: 57px;
+            -webkit-transition: 0.3s;
+            -o-transition: 0.3s;
+            transition: 0.3s;
+            height: 100%;
+            padding: 10px 34px;
+            background: darkgray;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper-def">
+    <div class="mob-menu">
+        {% include 'front/common/mob_menu.html.twig' %}
+    </div>
+
+    <header class="top-menu">
+        {% include 'front/common/top_menu.html.twig' %}
+    </header>
+
+    <section class="sec-catalog">
+        {% block body %}
+        {% endblock %}
+    </section>
+
+    <footer class="sec-footer">
+        {% include 'front/common/footer.html.twig' %}
+    </footer>
+</div>
+
+{% include 'front/modals/modalPartner.html.twig' %}
+{% include 'front/modals/modalRegister.html.twig' %}
+{% include 'front/modals/modalAuth.html.twig' %}
+
+<script src="{{ asset('/bigwine/js/main.js?ver=750') }}" ></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" ></script>
+<script src="{{ asset('/bigwine/js/login.js?ver=1') }}" ></script>
+
+{% block extra_scripts %}
+{% endblock %}
+
+</body>
+</html>

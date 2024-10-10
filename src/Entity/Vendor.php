@@ -6,6 +6,8 @@ use App\Repository\VendorRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=VendorRepository::class)
@@ -44,10 +46,43 @@ class Vendor
      */
     private $events;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Country::class, inversedBy="vendors")
+     */
+    private $country;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $description;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $address;
+
+    /**
+     * @ORM\OneToMany(targetEntity=VendorPic::class, mappedBy="vendor", orphanRemoval=true)
+     */
+    private $pics;
+
+    /**
+     * @var File
+     *
+     * @Assert\File(mimeTypes={ "image/jpg", "image/jpeg", "image/png", "image/webp" })
+     */
+    private $logoFile;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $logo;
+
     public function __construct()
     {
         $this->products = new ArrayCollection();
         $this->events = new ArrayCollection();
+        $this->pics = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -152,4 +187,95 @@ class Vendor
 
         return $this;
     }
+
+    public function getCountry(): ?Country
+    {
+        return $this->country;
+    }
+
+    public function setCountry(?Country $country): self
+    {
+        $this->country = $country;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): self
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    public function getAddress(): ?string
+    {
+        return $this->address;
+    }
+
+    public function setAddress(?string $address): self
+    {
+        $this->address = $address;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, VendorPic>
+     */
+    public function getPics(): Collection
+    {
+        return $this->pics;
+    }
+
+    public function addPic(VendorPic $pic): self
+    {
+        if (!$this->pics->contains($pic)) {
+            $this->pics[] = $pic;
+            $pic->setVendor($this);
+        }
+
+        return $this;
+    }
+
+    public function removePic(VendorPic $pic): self
+    {
+        if ($this->pics->removeElement($pic)) {
+            // set the owning side to null (unless already changed)
+            if ($pic->getVendor() === $this) {
+                $pic->setVendor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getLogo(): ?string
+    {
+        return $this->logo;
+    }
+
+    public function setLogo(?string $logo): self
+    {
+        $this->logo = $logo;
+
+        return $this;
+    }
+
+    public function getLogoFile(): ?File
+    {
+        return $this->logoFile;
+    }
+
+    public function setLogoFile(File $logoFile): Vendor
+    {
+        $this->logoFile = $logoFile;
+        return $this;
+    }
+
+
 }

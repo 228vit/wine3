@@ -141,18 +141,19 @@ class AdminVendorController extends AbstractController
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             /** @var \Symfony\Component\HttpFoundation\File\UploadedFile $file */
-//            $file = $vendor->getPicFile();
-//
-//            if (null !== $file) {
-//                $fileName = $fileUploader->upload($file);
-//                $vendor->setPic($fileName);
-//            }
+            $file = $vendor->getLogoFile();
+
+            if (null !== $file) {
+                $fileName = $fileUploader->upload($file);
+                $vendor->setLogo($fileName);
+            }
 
             $this->getDoctrine()->getManager()->flush();
             $this->addFlash('success', 'Your changes were saved!');
 
             return $this->redirectToRoute('backend_vendor_edit', array('id' => $vendor->getId()));
         }
+
         if ($editForm->isSubmitted() && !$editForm->isValid()) {
             $this->addFlash('danger', 'Errors due saving object!');
         }

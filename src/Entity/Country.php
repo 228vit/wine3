@@ -63,6 +63,11 @@ class Country
      */
     private $worldPart;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Vendor::class, mappedBy="country")
+     */
+    private $vendors;
+
     public const WORLD_PARTS = [
         'new_world' => 'Новый свет',
         'old_world' => 'Старый свет',
@@ -79,6 +84,7 @@ class Country
         $this->regions = new ArrayCollection();
         $this->products = new ArrayCollection();
         $this->aliases = new ArrayCollection();
+        $this->vendors = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -236,6 +242,36 @@ class Country
     public function setWorldPart(?string $worldPart): self
     {
         $this->worldPart = $worldPart;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Vendor>
+     */
+    public function getVendors(): Collection
+    {
+        return $this->vendors;
+    }
+
+    public function addVendor(Vendor $vendor): self
+    {
+        if (!$this->vendors->contains($vendor)) {
+            $this->vendors[] = $vendor;
+            $vendor->setCountry($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVendor(Vendor $vendor): self
+    {
+        if ($this->vendors->removeElement($vendor)) {
+            // set the owning side to null (unless already changed)
+            if ($vendor->getCountry() === $this) {
+                $vendor->setCountry(null);
+            }
+        }
 
         return $this;
     }

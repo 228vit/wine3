@@ -29,6 +29,19 @@
     {{ form_row(form.worldPart) }}
 
     <div class="row">
+        <div class="col-12">
+            <h4>Регионы</h4>
+            <table class="table table-bordered table-striped">
+                {% for region in row.regions %}
+                    <tr>
+                        <td>{{ region.name }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
         <div class="col-4">
             <h4>Алиасы</h4>
             <table class="table table-bordered table-striped">

@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Vendor;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -14,8 +15,17 @@ class VendorType extends AbstractType
     {
         $builder
             ->add('name')
+            ->add('description')
+            ->add('country')
+            ->add('address')
             ->add('slug', TextType::class, ['required' => false,])
             ->add('website')
+            ->add('logoFile', FileType::class, array(
+                'label' => 'Logo',
+                'data_class' => null,
+                'required' => false
+            ))
+
         ;
     }
 
