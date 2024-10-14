@@ -62,7 +62,7 @@ class Vendor
     private $address;
 
     /**
-     * @ORM\OneToMany(targetEntity=VendorPic::class, mappedBy="vendor", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=VendorPic::class, mappedBy="vendor", orphanRemoval=true, cascade={"persist"})
      */
     private $pics;
 

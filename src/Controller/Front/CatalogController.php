@@ -128,7 +128,7 @@ class CatalogController extends AbstractController
                                   CountryRegionRepository $regionRepository,
                                   ProductDataService $productDataService)
     {
-        $pagination = $this->getPagination($request, $session, $productDataService, FrontProductFilter::class);
+//        $pagination = $this->getPagination($request, $session, $productDataService, FrontProductFilter::class);
 
         $sessionFilters = $session->get('filters', []);
         $sessionFilters['product'] = $sessionFilters['product'] ?? [];

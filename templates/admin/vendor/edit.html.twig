@@ -24,27 +24,52 @@
             {{ form_row(form.country) }}
             {{ form_row(form.address) }}
             {{ form_row(form.website) }}
-            {{ form_row(form.logoFile) }}
+        </div>
+    </div>
+    <div class="form-group row">
+        {{ form_label(form.logoFile) }}
+        <div class="col-8">
+            {{ form_widget(form.logoFile) }}
+        </div>
+        <div class="col-2">
+            {% if row.logo %}
+                <a data-lightbox="gallery" target="_blank" href="{{ asset('uploads/' ~ row.logo) }}"><img
+                            src="{{ asset('uploads/' ~ row.logo) | imagine_filter('thumb_square_50') }}" /></a>
+            {% endif %}
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-12">
-            <h2>Vendor gallery</h2>
-        </div>
-    </div>
+    <h4>Gallery</h4>
 
-
-{#    <div class="form-group row">#}
-{#        {{ form_label(form.picFile) }}#}
-{#        <div class="col-sm-10">#}
-{#            {{ form_widget(form.picFile) }}#}
-{#            {% if row.pic %}#}
-{#                <a data-lightbox="gallery" target="_blank" href="{{ asset('uploads/pics/' ~ row.pic) }}"><img#}
-{#                            src="{{ asset('uploads/pics/' ~ row.pic) | imagine_filter('thumb_square_50') }}" /></a>#}
-{#            {% endif %}#}
-{#        </div>#}
-{#    </div>#}
+    <table class="table table-bordered table-striped">
+        <thead class="thead-light">
+        <tr>
+            <th>Pic</th>
+            <th>Title</th>
+            <th>Upload file</th>
+            <th>actions</th>
+        </tr>
+        </thead>
+        <tbody class="vendorGalleryItems" data-prototype="{{ include('admin/vendor/prototype.html.twig', { 'form': form.pics.vars.prototype })|e('html_attr') }}">
+        {% for id, image in form.pics %}
+            <tr class="itemRow" id="vendorGalleryItem-{{ id }}" rel="{{ id }}">
+                <td class="text-center">{% if image.vars.value.pic %}
+                        <a data-lightbox="gallery" target="_blank"
+                           href="{{ asset('uploads/' ~ image.vars.value.pic) }}"><img
+                                    src="{{ asset('uploads/' ~ image.vars.value.pic) | imagine_filter('thumb_square_50') }}" /></a>
+                    {% endif %}</td>
+                <td>
+                    {{ form_errors(image) }}
+                    {{ form_widget(image.title) }}
+                </td>
+                <td>{{ form_widget(image.picFile) }}</td>
+                <td><button type="button" class="btn btn-danger deleteRow" rel="vendorGalleryItem-{{ id }}">delete</button>
+                    {{ form_rest(image) }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot id="tableFooter"></tfoot>
+    </table>
 
     {{ form_rest(form) }}
 
@@ -63,4 +88,77 @@
         </div>
     </div>
 
+    <script>
+        function bindClickDeleteBtn() {
+            $('.deleteRow').on('click', function () {
+                if (confirm('Are you sure?')) {
+                    let rel = $(this).attr('rel');
+                    console.log(rel);
+                    $('#'+rel).slideUp('slow');
+                    $('#'+rel).remove();
+
+                    return false;
+                }
+            });
+        }
+
+        $( document ).ready(function() {
+            bindClickDeleteBtn();
+
+            let $collectionHolder;
+
+            // setup an "add a tag" link
+            let $addTagButton = $('<td colspan="2"><button type="button" class="btn btn-sm btn-success addRow add_tag_link"><i class="fa fa-plus"></i> add new row</button></td>');
+            let $newLink = $('<tr></tr>').append($addTagButton);
+
+            // Get the ul that holds the collection of tags
+            $collectionHolder = $('tbody.vendorGalleryItems');
+            let $collectionFooter = $('tfoot#tableFooter');
+
+            $collectionFooter.append($newLink);
+
+            // alert($collectionHolder.find(':input').length);
+            let lastId = parseInt($('.vendorGalleryItems > tr.itemRow').last().attr('rel')) + 1;
+            if (isNaN(lastId)) {
+                lastId = 0;
+            }
+            // count the current form inputs we have (e.g. 2), use that as the new
+            // index when inserting a new item (e.g. 2)
+            // $collectionHolder.data('index', $collectionHolder.find(':input').length);
+            $collectionHolder.data('index', lastId);
+
+            $addTagButton.on('click', function(e) {
+                // add a new tag form (see next code block)
+                addTagForm($collectionHolder, $newLink);
+            });
+
+        });
+
+        function addTagForm($collectionHolder, $newLinkLi) {
+            // Get the data-prototype explained earlier
+            let prototype = $collectionHolder.data('prototype');
+
+            // get the new index
+            let index = $collectionHolder.data('index');
+
+            let newForm = prototype;
+            // You need this only if you didn't set 'label' => false in your tags field in TaskType
+            // Replace '__name__label__' in the prototype's HTML to
+            // instead be a number based on how many items we have
+            // newForm = newForm.replace(/__name__label__/g, index);
+
+            // Replace '__name__' in the prototype's HTML to
+            // instead be a number based on how many items we have
+            newForm = newForm.replace(/__name__/g, index);
+
+            // increase the index with one for the next item
+            $collectionHolder.data('index', index + 1);
+
+            // Display the form in the page in an li, before the "Add a tag" link li
+            // let $newFormLi = $('<tr></tr>').append(newForm);
+            $('.vendorGalleryItems').append(newForm);
+
+            // $newLinkLi.before($newFormLi);
+        }
+    </script>
 {% endblock %}

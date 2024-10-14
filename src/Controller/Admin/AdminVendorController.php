@@ -3,11 +3,13 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Vendor;
+use App\Entity\VendorPic;
 use App\Filter\VendorFilter;
 use App\Form\VendorType;
 use App\Repository\VendorRepository;
 use App\Service\FileUploader;
 use App\Utils\Slugger;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Knp\Component\Pager\Paginator;
@@ -133,34 +135,60 @@ class AdminVendorController extends AbstractController
      *
      * @Route("backend/vendor/{id}/edit", name="backend_vendor_edit", methods={"GET", "POST"})
      */
-    public function editAction(Request $request, Vendor $vendor, FileUploader $fileUploader, EntityManagerInterface $em)
+    public function edit(Request $request, Vendor $vendor, FileUploader $fileUploader, EntityManagerInterface $em)
     {
         $deleteForm = $this->createDeleteForm($vendor);
-        $editForm = $this->createForm(VendorType::class, $vendor);
-        $editForm->handleRequest($request);
+        $form = $this->createForm(VendorType::class, $vendor);
+        $form->handleRequest($request);
+        $originalImages = new ArrayCollection();
 
-        if ($editForm->isSubmitted() && $editForm->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             /** @var \Symfony\Component\HttpFoundation\File\UploadedFile $file */
             $file = $vendor->getLogoFile();
 
             if (null !== $file) {
-                $fileName = $fileUploader->upload($file);
+                $fileName = $fileUploader->uploadVendorLogo($file, $vendor);
                 $vendor->setLogo($fileName);
             }
 
-            $this->getDoctrine()->getManager()->flush();
+            foreach ($originalImages as $image) {
+                if (false === $vendor->getPics()->contains($image)) {
+                    // remove the Task from the Tag
+                    $vendor->getPics()->removeElement($image);
+                    // todo: check if image deleted
+                    $em->persist($vendor);
+                    $em->remove($image);
+                }
+            }
+
+            // save and create new images
+            $images = $form['pics']->getData();
+
+            /** @var VendorPic $image */
+            foreach ($images as $i => $image) {
+                $picFile = $form['pics'][$i]['picFile']->getData();
+                if ($picFile) {
+                    $fileName = $fileUploader->uploadVendorPic($picFile, $vendor);
+                    $image->setPosition($i);
+                    $image->setPic($fileName);
+                    $image->setVendor($vendor);
+                    $originalImages->add($image);
+                }
+            }
+
+            $this->em->flush();
             $this->addFlash('success', 'Your changes were saved!');
 
             return $this->redirectToRoute('backend_vendor_edit', array('id' => $vendor->getId()));
         }
 
-        if ($editForm->isSubmitted() && !$editForm->isValid()) {
+        if ($form->isSubmitted() && !$form->isValid()) {
             $this->addFlash('danger', 'Errors due saving object!');
         }
 
         return $this->render('admin/vendor/edit.html.twig', array(
             'row' => $vendor,
-            'form' => $editForm->createView(),
+            'form' => $form->createView(),
             'delete_form' => $deleteForm->createView(),
             'model' => self::MODEL,
             'entity_name' => self::ENTITY_NAME,

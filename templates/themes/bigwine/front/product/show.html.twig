@@ -79,7 +79,8 @@
                             <li class="product-card-descrp__el"><strong>Тип:</strong> {{ row.wineColor }}</li>
                             <li class="product-card-descrp__el"><strong>Страна:</strong> {{ row.country }}</li>
                             <li class="product-card-descrp__el"><strong>Регион:</strong> {{ row.region }}</li>
-                            <li class="product-card-descrp__el"><strong>Производитель:</strong> {{ row.vendor }}
+                            <li class="product-card-descrp__el"><strong>Производитель:</strong>
+                                <a href="{{ path('vendor_view', { slug: row.vendor.slug }) }}">{{ row.vendor }}</a>
                             </li>
                             <li class="product-card-descrp__el"><strong>Импортер:</strong> ???</li>
                             <li class="product-card-descrp__el"><strong>Сорт винограда:</strong> {{ row.grapeSortsAsString }}

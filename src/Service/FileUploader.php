@@ -6,6 +6,7 @@ use App\Entity\EventPic;
 use App\Entity\ImportLog;
 use App\Entity\Product;
 use App\Entity\User;
+use App\Entity\Vendor;
 use App\Utils\Slugger;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Ramsey\Uuid\Uuid;
@@ -15,17 +16,23 @@ class FileUploader
 {
     private $uploadsDirectory;
     private $productPicsSubDirectory;
+    private $vendorLogoSubDirectory;
+    private $vendorPicsSubDirectory;
     private $eventPicsSubDirectory;
     private $importFilesDirectory;
     
     public function __construct(string $uploadsDirectory,
                                 string $importFilesDirectory,
                                 string $productPicsSubDirectory,
+                                string $vendorLogoSubDirectory,
+                                string $vendorPicsSubDirectory,
                                 string $eventPicsSubDirectory)
     {
         $this->eventPicsSubDirectory = $eventPicsSubDirectory;
         $this->uploadsDirectory = $uploadsDirectory;
         $this->productPicsSubDirectory = $productPicsSubDirectory;
+        $this->vendorLogoSubDirectory = $vendorLogoSubDirectory;
+        $this->vendorPicsSubDirectory = $vendorPicsSubDirectory;
         $this->importFilesDirectory = $importFilesDirectory;
     }
 
@@ -81,9 +88,38 @@ class FileUploader
             $file->guessExtension()
         );
 
-        $file->move($this->getUploadsDirectory() . DIRECTORY_SEPARATOR . $this->getProductPicsDirectory(), $fileName);
+        $file->move($this->getUploadsDirectory() . DIRECTORY_SEPARATOR .
+            $this->getProductPicsDirectory(), $fileName);
 
         return $this->getProductPicsDirectory() . DIRECTORY_SEPARATOR . $fileName;
+    }
+
+    public function uploadVendorLogo(UploadedFile $file, Vendor $vendor, string $prefix = 'logo')
+    {
+        $fileName = sprintf('%s_%s.%s',
+            $prefix,
+            $vendor->getSlug(),
+            $file->guessExtension()
+        );
+
+        $file->move($this->getUploadsDirectory() . DIRECTORY_SEPARATOR .
+            $this->vendorLogoSubDirectory, $fileName);
+
+        return $this->vendorLogoSubDirectory . DIRECTORY_SEPARATOR . $fileName;
+    }
+
+    public function uploadVendorPic(UploadedFile $file, Vendor $vendor)
+    {
+        $fileName = sprintf('%s_%s.%s',
+            $vendor->getSlug(),
+            Uuid::uuid4(),
+            $file->guessExtension()
+        );
+
+        $file->move($this->getUploadsDirectory() . DIRECTORY_SEPARATOR .
+            $this->vendorPicsSubDirectory, $fileName);
+
+        return $this->vendorPicsSubDirectory . DIRECTORY_SEPARATOR . $fileName;
     }
 
     public function uploadImportCsv(UploadedFile $file, ImportLog $importLog)

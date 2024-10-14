@@ -39,7 +39,7 @@ class VendorController extends AbstractController
     private $currentFilters = [];
 
     /**
-     * @Route("/vendor/{slug}", name="vendor_homepage")
+     * @Route("/vendor/{slug}", name="vendor_view")
      */
     public function view(Vendor $vendor,
                          Request $request,
@@ -55,9 +55,16 @@ class VendorController extends AbstractController
             'country' => 'По стране',
         ];
 
-        $pagination = $this->getPagination($request, $session, $productDataService, FrontProductFilter::class);
+        $pagination = $this->getPagination(
+            $vendor,
+            $request,
+            $session,
+            $productDataService,
+            FrontProductFilter::class
+        );
 
-        return $this->render('front/catalog/index.html.twig', array(
+        return $this->render('front/vendor/view.html.twig', array(
+            'row' => $vendor,
             'pagination' => $pagination,
             'currentWineCard' => $currentWineCard,
             'isAjax' => $request->isXmlHttpRequest(),
@@ -106,9 +113,10 @@ class VendorController extends AbstractController
     /**
      * Save filter values in session.
      *
-     * @Route("/apply/filter/product", name="ajax_apply_filter_product", methods={"POST"})
+     * @Route("/apply/filter/vendor/{id}", name="ajax_apply_filter_vendor", methods={"POST"})
      */
-    public function ajaxApplyFilter(Request $request,
+    public function ajaxApplyFilter(Vendor $vendor,
+                                    Request $request,
                                     SessionInterface $session,
                                     ProductDataService $productDataService)
     {
@@ -124,7 +132,7 @@ class VendorController extends AbstractController
             self::MODEL => $filters,
         ));
 
-        $pagination = $this->getPagination($request, $session, $productDataService, FrontProductFilter::class);
+        $pagination = $this->getPagination($vendor, $request, $session, $productDataService, FrontProductFilter::class);
 
         return new JsonResponse(['totalFilteredProducts' => $pagination->getTotalItemCount()]);
     }
@@ -152,10 +160,8 @@ class VendorController extends AbstractController
 //        return new JsonResponse(['totalFilteredProducts' => $pagination->getTotalItemCount()]);
     }
 
-    /**
-     * @Route("/cabinet/product/filters", name="cabinet_product_filters")
-     */
-    public function renderFilters(Request $request,
+    public function renderFilters(int $vendorId,
+                                  Request $request,
                                   SessionInterface $session,
                                   SupplierRepository $supplierRepository,
                                   WineColorRepository $wineColorRepository,
@@ -164,25 +170,23 @@ class VendorController extends AbstractController
                                   CountryRepository $countryRepository,
                                   ProductDataService $productDataService)
     {
-        $pagination = $this->getPagination($request, $session, $productDataService, FrontProductFilter::class);
 
         $sessionFilters = $session->get('filters', []);
-//        dd($sessionFilters);
-        $sessionFilters['product'] = $sessionFilters['product'] ?? [];
-        $sessionFilters['product']['grapeSort'] = $sessionFilters['product']['grapeSort'] ?? [];
-        $sessionFilters['product']['wineColor'] = $sessionFilters['product']['wineColor'] ?? [];
-        $sessionFilters['product']['wineSugar'] = $sessionFilters['product']['wineSugar'] ?? [];
-        $sessionFilters['product']['supplier'] = $sessionFilters['product']['supplier'] ?? [];
-        $sessionFilters['product']['country'] = $sessionFilters['product']['country'] ?? [];
-        $sessionFilters['product']['vendor'] = $sessionFilters['product']['vendor'] ?? [];
-        $sessionFilters['product']['volume'] = $sessionFilters['product']['volume'] ?? [];
-        $sessionFilters['product']['alcohol'] = $sessionFilters['product']['alcohol'] ?? [];
-        $sessionFilters['product']['year'] = $sessionFilters['product']['year'] ?? '';
-        $sessionFilters['product']['years'] = $sessionFilters['product']['years'] ?? '';
-        $sessionFilters['product']['price_from'] = $sessionFilters['product']['price_from'] ?? '';
-        $sessionFilters['product']['price_to'] = $sessionFilters['product']['price_to'] ?? '';
-        $productFilters = null !== $sessionFilters AND isset($sessionFilters['product']) ?
-            $sessionFilters['product'] : [];
+        $sessionFilters['vendor'][$vendorId] = $sessionFilters['vendor'][$vendorId] ?? [];
+        $sessionFilters['vendor'][$vendorId]['grapeSort'] = $sessionFilters['vendor'][$vendorId]['grapeSort'] ?? [];
+        $sessionFilters['vendor'][$vendorId]['wineColor'] = $sessionFilters['vendor'][$vendorId]['wineColor'] ?? [];
+        $sessionFilters['vendor'][$vendorId]['wineSugar'] = $sessionFilters['vendor'][$vendorId]['wineSugar'] ?? [];
+        $sessionFilters['vendor'][$vendorId]['supplier'] = $sessionFilters['vendor'][$vendorId]['supplier'] ?? [];
+        $sessionFilters['vendor'][$vendorId]['country'] = $sessionFilters['vendor'][$vendorId]['country'] ?? [];
+        $sessionFilters['vendor'][$vendorId]['volume'] = $sessionFilters['vendor'][$vendorId]['volume'] ?? [];
+        $sessionFilters['vendor'][$vendorId]['alcohol'] = $sessionFilters['vendor'][$vendorId]['alcohol'] ?? [];
+        $sessionFilters['vendor'][$vendorId]['year'] = $sessionFilters['vendor'][$vendorId]['year'] ?? '';
+        $sessionFilters['vendor'][$vendorId]['years'] = $sessionFilters['vendor'][$vendorId]['years'] ?? '';
+        $sessionFilters['vendor'][$vendorId]['price_from'] = $sessionFilters['vendor'][$vendorId]['price_from'] ?? '';
+        $sessionFilters['vendor'][$vendorId]['price_to'] = $sessionFilters['vendor'][$vendorId]['price_to'] ?? '';
+
+        $productFilters = null !== $sessionFilters AND isset($sessionFilters['vendor'][$vendorId]) ?
+            $sessionFilters['vendor'][$vendorId] : [];
 
         $suppliers = $supplierRepository->findBy([], ['name' => 'ASC']);
         $wineColors = $wineColorRepository->findAll();
@@ -190,15 +194,23 @@ class VendorController extends AbstractController
         $countries = $countryRepository->findBy([], ['name' => 'ASC']);
         $grapeSorts = $grapeSortRepository->findBy([], ['name' => 'ASC']);
 
-        return $this->render('front/product/filters.html.twig', array(
-            'totalRows' => $pagination->getTotalItemCount(),
+        $alcohol = $productDataService->getAlcohol();
+        $bottleVolumes = $productDataService->getBottleVolumes();
+        $years = $productDataService->getYears();
+
+        $sessionFilters['product'] = $sessionFilters['vendor'][$vendorId];
+
+        return $this->render('front/vendor/filters.html.twig', array(
             'sessionFilters' => $sessionFilters,
-            'productFilters' => $productFilters,
-            'suppliers' => $suppliers,
+            'bottleVolumes' => $bottleVolumes,
+            'years' => $years,
+            'alcoholValues' => $alcohol,
+            'vendorId' => $vendorId,
             'wineColors' => $wineColors,
             'wineSugars' => $wineSugars,
             'countries' => $countries,
             'grapeSorts' => $grapeSorts,
+            'suppliers' => $suppliers,
             'current_filters' => $this->current_filters,
             'currentFilters' => $this->currentFilters,
             'current_filters_string' => $this->current_filters_string,
@@ -208,25 +220,8 @@ class VendorController extends AbstractController
         ));
     }
 
-    /**
-     * @Route("/cabinet/product/{id}/show", name="cabinet_product_show")
-     */
-    public function show(Request $request, Product $product, WineCardRepository $repository)
-    {
-        $wineCards = $repository->getAllByUser($this->getUser());
-
-        $isAjax = $request->isXmlHttpRequest();
-        $template = $isAjax ? 'front/product/show_ajax.html.twig' : 'front/product/show.html.twig';
-
-        return $this->render($template, array(
-            'row' => $product,
-            'wineCards' => $wineCards,
-            'model' => self::MODEL,
-            'entity_name' => self::ENTITY_NAME,
-        ));
-    }
-
-    private function getPagination(Request $request,
+    private function getPagination(Vendor $vendor,
+                                   Request $request,
                                    SessionInterface $session,
                                    ProductDataService $productDataService,
                                    string $filter_form_class)
@@ -237,7 +232,7 @@ class VendorController extends AbstractController
         ));
 
         /** @var Query $query */
-        $query = $this->buildQuery($session, $productDataService, $this->filter_form, self::MODEL);
+        $query = $this->buildQuery($vendor, $session, $productDataService, $this->filter_form, self::MODEL);
 
         $pagination = $this->paginator->paginate(
             $query, /* query NOT result */
@@ -248,13 +243,12 @@ class VendorController extends AbstractController
         return $pagination;
     }
 
-    private function buildQuery(SessionInterface $session,
+    private function buildQuery(Vendor $vendor,
+                                SessionInterface $session,
                                 ProductDataService $productDataService,
                                 FormInterface $filter_form,
                                 string $model)
     {
-//        $sort_by = $request->query->get('sort_by', 'id');
-//        $order_direction = $request->query->get('order', 'asc');
         $session_filters = $session->get('filters', false);
         $session_order_field = $session->get('order_field', 'name');
         $session_order_direction = $session->get('order_direction', 'asc');
@@ -424,12 +418,15 @@ class VendorController extends AbstractController
             // default query w/sorting
             $query = $this->productRepository->getJoinedQuery($model)
                 ->orderBy($model.'.'.$session_order_field, $session_order_direction)
-                ->getQuery()
+
             ;
         }
 
-//        dd($this->currentFilters);
-        return $query;
+        $query->andWhere($model.'.vendor = :vendor')
+            ->setParameter('vendor', $vendor)
+        ;
+
+        return $query->getQuery();
     }
 
     /**

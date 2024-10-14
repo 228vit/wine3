@@ -79,7 +79,8 @@
                             <li class="product-card-descrp__el"><strong>Тип:</strong> {{ row.wineColor }}</li>
                             <li class="product-card-descrp__el"><strong>Страна:</strong> {{ row.country }}</li>
                             <li class="product-card-descrp__el"><strong>Регион:</strong> {{ row.region }}</li>
-                            <li class="product-card-descrp__el"><strong>Производитель:</strong> {{ row.vendor }}
+                            <li class="product-card-descrp__el"><strong>Производитель:</strong>
+                                <a href="{{ path('vendor_view', { slug: row.vendor.slug }) }}">{{ row.vendor }}</a>
                             </li>
                             <li class="product-card-descrp__el"><strong>Импортер:</strong> ???</li>
                             <li class="product-card-descrp__el"><strong>Сорт винограда:</strong> {{ row.grapeSortsAsString }}
@@ -104,49 +105,49 @@
                     <div class="provider-card__el col-6 col-md-4 col-lg-3 col-xl-1"><a class="provider-card-el"
                                                                                        href="#">
                             <div class="provider-card-el__top"><img class="provider-card-el__img"
-                                                                    src="../img/provider/1.png" alt=""></div>
+                                                                    src="/bigwine/img/provider/1.png" alt=""></div>
                             <div class="provider-card-el__title">Maguisan<br> wines</div>
                             <div class="provider-card-el__info">168 позиций</div>
                         </a></div>
                     <div class="provider-card__el col-6 col-md-4 col-lg-3 col-xl-1"><a class="provider-card-el"
                                                                                        href="#">
                             <div class="provider-card-el__top"><img class="provider-card-el__img"
-                                                                    src="../img/provider/2.png" alt=""></div>
+                                                                    src="/bigwine/img/provider/2.png" alt=""></div>
                             <div class="provider-card-el__title">Agora<br> company</div>
                             <div class="provider-card-el__info">1 368 позиций</div>
                         </a></div>
                     <div class="provider-card__el col-6 col-md-4 col-lg-3 col-xl-1"><a class="provider-card-el"
                                                                                        href="#">
                             <div class="provider-card-el__top"><img class="provider-card-el__img"
-                                                                    src="../img/provider/3.png" alt=""></div>
+                                                                    src="/bigwine/img/provider/3.png" alt=""></div>
                             <div class="provider-card-el__title">Montanelliana<br> inc.</div>
                             <div class="provider-card-el__info">431 позиций</div>
                         </a></div>
                     <div class="provider-card__el col-6 col-md-4 col-lg-3 col-xl-1"><a class="provider-card-el"
                                                                                        href="#">
                             <div class="provider-card-el__top"><img class="provider-card-el__img"
-                                                                    src="../img/provider/4.png" alt=""></div>
+                                                                    src="/bigwine/img/provider/4.png" alt=""></div>
                             <div class="provider-card-el__title">Brewing<br> wines</div>
                             <div class="provider-card-el__info">231 позиций</div>
                         </a></div>
                     <div class="provider-card__el col-6 col-md-4 col-lg-3 col-xl-1"><a class="provider-card-el"
                                                                                        href="#">
                             <div class="provider-card-el__top"><img class="provider-card-el__img"
-                                                                    src="../img/provider/5.png" alt=""></div>
+                                                                    src="/bigwine/img/provider/5.png" alt=""></div>
                             <div class="provider-card-el__title">Veuve<br> Clicquot Ponsardin</div>
                             <div class="provider-card-el__info">1 368 позиций</div>
                         </a></div>
                     <div class="provider-card__el col-6 col-md-4 col-lg-3 col-xl-1"><a class="provider-card-el"
                                                                                        href="#">
                             <div class="provider-card-el__top"><img class="provider-card-el__img"
-                                                                    src="../img/provider/6.png" alt=""></div>
+                                                                    src="/bigwine/img/provider/6.png" alt=""></div>
                             <div class="provider-card-el__title">Santipadri<br> vineyards</div>
                             <div class="provider-card-el__info">3 269 позиций</div>
                         </a></div>
                     <div class="provider-card__el col-6 col-md-4 col-lg-3 col-xl-1"><a class="provider-card-el"
                                                                                        href="#">
                             <div class="provider-card-el__top"><img class="provider-card-el__img"
-                                                                    src="../img/provider/7.png" alt=""></div>
+                                                                    src="/bigwine/img/provider/7.png" alt=""></div>
                             <div class="provider-card-el__title">Brewing wine<br> company</div>
                             <div class="provider-card-el__info">168 позиций</div>
                         </a></div>

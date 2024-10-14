@@ -1,0 +1,169 @@
+
+<div class="filter__el select-def">
+    <div class="select-def__top">
+        <div class="select-def__val">Тип вина</div>
+        <div class="select-def__els"></div>
+        <svg class="select-def__arr" width="10" height="6" viewBox="0 0 10 6" fill="none"
+             xmlns="http://www.w3.org/2000/svg">
+            <path d="M0.182854 0.203253C0.29997 0.0784397 0.458793 0.00832337 0.624395 0.00832337C0.789998 0.00832337 0.94882 0.0784397 1.06594 0.203253L4.9961 4.39297L8.92625 0.203253C8.98386 0.139665 9.05278 0.0889443 9.12897 0.0540517C9.20517 0.0191592 9.28712 0.000793318 9.37004 2.51372e-05C9.45297 -0.000743043 9.53521 0.0161023 9.61196 0.049578C9.68871 0.0830537 9.75844 0.132489 9.81708 0.195001C9.87572 0.257512 9.92209 0.331847 9.95349 0.413668C9.98489 0.495489 10.0007 0.583157 9.99998 0.671558C9.99926 0.759959 9.98203 0.847322 9.9493 0.928549C9.91656 1.00978 9.86899 1.08324 9.80934 1.14466L5.43764 5.80507C5.32052 5.92988 5.1617 6 4.9961 6C4.83049 6 4.67167 5.92988 4.55455 5.80507L0.182854 1.14466C0.0657726 1.01981 0 0.850494 0 0.673955C0 0.497415 0.0657726 0.328104 0.182854 0.203253Z"
+                  fill="#9FA2A5"/>
+        </svg>
+    </div>
+    <div class="select-def__dropdown" style="display: none;">
+        {% for wineSugar in wineSugars %}
+            <label class="select-def__dropdown-el checkbox-el">
+                <input name="vendor_filter[{{ vendorId }}][wineSugar][]" value="{{ wineSugar.id }}"
+                       {{ wineSugar.id in sessionFilters.product.wineSugar ? 'checked' : '' }}
+                       class="checkbox-def checkbox-el__inp filterCheckBox" type="checkbox">
+                <span class="checkbox-el__text">{{ wineSugar.name }}</span>
+            </label>
+        {% endfor %}
+    </div>
+
+</div>
+
+<div class="filter__el select-def">
+    <div class="select-def__top">
+        <div class="select-def__val">Цвет вина</div>
+        <div class="select-def__els"></div>
+        <svg class="select-def__arr" width="10" height="6" viewBox="0 0 10 6" fill="none"
+             xmlns="http://www.w3.org/2000/svg">
+            <path d="M0.182854 0.203253C0.29997 0.0784397 0.458793 0.00832337 0.624395 0.00832337C0.789998 0.00832337 0.94882 0.0784397 1.06594 0.203253L4.9961 4.39297L8.92625 0.203253C8.98386 0.139665 9.05278 0.0889443 9.12897 0.0540517C9.20517 0.0191592 9.28712 0.000793318 9.37004 2.51372e-05C9.45297 -0.000743043 9.53521 0.0161023 9.61196 0.049578C9.68871 0.0830537 9.75844 0.132489 9.81708 0.195001C9.87572 0.257512 9.92209 0.331847 9.95349 0.413668C9.98489 0.495489 10.0007 0.583157 9.99998 0.671558C9.99926 0.759959 9.98203 0.847322 9.9493 0.928549C9.91656 1.00978 9.86899 1.08324 9.80934 1.14466L5.43764 5.80507C5.32052 5.92988 5.1617 6 4.9961 6C4.83049 6 4.67167 5.92988 4.55455 5.80507L0.182854 1.14466C0.0657726 1.01981 0 0.850494 0 0.673955C0 0.497415 0.0657726 0.328104 0.182854 0.203253Z"
+                  fill="#9FA2A5"/>
+        </svg>
+    </div>
+    <div class="select-def__dropdown" style="display: none;">
+        {% for wineColor in wineColors %}
+            <label class="select-def__dropdown-el checkbox-el">
+                <input name="vendor_filter[{{ vendorId }}][wineColor][]" value="{{ wineColor.id }}"
+                        {{ wineColor.id in sessionFilters.product.wineColor ? 'checked' : '' }}
+                       class="checkbox-def checkbox-el__inp filterCheckBox" type="checkbox">
+                <span class="checkbox-el__text">{{ wineColor.name }}</span>
+            </label>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="filter__el select-def">
+    <div class="select-def__top">
+        <div class="select-def__val">Алкоголь (гр)</div>
+        <div class="select-def__els"></div>
+        <svg class="select-def__arr" width="10" height="6" viewBox="0 0 10 6" fill="none"
+             xmlns="http://www.w3.org/2000/svg">
+            <path d="M0.182854 0.203253C0.29997 0.0784397 0.458793 0.00832337 0.624395 0.00832337C0.789998 0.00832337 0.94882 0.0784397 1.06594 0.203253L4.9961 4.39297L8.92625 0.203253C8.98386 0.139665 9.05278 0.0889443 9.12897 0.0540517C9.20517 0.0191592 9.28712 0.000793318 9.37004 2.51372e-05C9.45297 -0.000743043 9.53521 0.0161023 9.61196 0.049578C9.68871 0.0830537 9.75844 0.132489 9.81708 0.195001C9.87572 0.257512 9.92209 0.331847 9.95349 0.413668C9.98489 0.495489 10.0007 0.583157 9.99998 0.671558C9.99926 0.759959 9.98203 0.847322 9.9493 0.928549C9.91656 1.00978 9.86899 1.08324 9.80934 1.14466L5.43764 5.80507C5.32052 5.92988 5.1617 6 4.9961 6C4.83049 6 4.67167 5.92988 4.55455 5.80507L0.182854 1.14466C0.0657726 1.01981 0 0.850494 0 0.673955C0 0.497415 0.0657726 0.328104 0.182854 0.203253Z"
+                  fill="#9FA2A5"/>
+        </svg>
+    </div>
+    <div class="select-def__dropdown" style="display: none;">
+        {% for alcohol in alcoholValues %}
+            <label class="select-def__dropdown-el checkbox-el">
+                <input name="vendor_filter[{{ vendorId }}][alcohol][]" value="{{ alcohol }}"
+                        {{ alcohol in sessionFilters.product.alcohol ? 'checked' : '' }}
+                       class="checkbox-def checkbox-el__inp filterCheckBox" type="checkbox">
+                <span class="checkbox-el__text">{{ alcohol }}</span>
+            </label>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="filter__el select-def">
+    <div class="select-def__top">
+        <div class="select-def__val">Объём</div>
+        <div class="select-def__els"></div>
+        <svg class="select-def__arr" width="10" height="6" viewBox="0 0 10 6" fill="none"
+             xmlns="http://www.w3.org/2000/svg">
+            <path d="M0.182854 0.203253C0.29997 0.0784397 0.458793 0.00832337 0.624395 0.00832337C0.789998 0.00832337 0.94882 0.0784397 1.06594 0.203253L4.9961 4.39297L8.92625 0.203253C8.98386 0.139665 9.05278 0.0889443 9.12897 0.0540517C9.20517 0.0191592 9.28712 0.000793318 9.37004 2.51372e-05C9.45297 -0.000743043 9.53521 0.0161023 9.61196 0.049578C9.68871 0.0830537 9.75844 0.132489 9.81708 0.195001C9.87572 0.257512 9.92209 0.331847 9.95349 0.413668C9.98489 0.495489 10.0007 0.583157 9.99998 0.671558C9.99926 0.759959 9.98203 0.847322 9.9493 0.928549C9.91656 1.00978 9.86899 1.08324 9.80934 1.14466L5.43764 5.80507C5.32052 5.92988 5.1617 6 4.9961 6C4.83049 6 4.67167 5.92988 4.55455 5.80507L0.182854 1.14466C0.0657726 1.01981 0 0.850494 0 0.673955C0 0.497415 0.0657726 0.328104 0.182854 0.203253Z"
+                  fill="#9FA2A5"/>
+        </svg>
+    </div>
+    <div class="select-def__dropdown" style="display: none;">
+        {% for volume in bottleVolumes %}
+            <label class="select-def__dropdown-el checkbox-el">
+                <input name="vendor_filter[{{ vendorId }}][volume][]" value="{{ volume }}"
+                        {{ volume in sessionFilters.product.volume ? 'checked' : '' }}
+                       class="checkbox-def checkbox-el__inp filterCheckBox" type="checkbox">
+                <span class="checkbox-el__text">{{ volume }}</span>
+            </label>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="filter__el select-def">
+    <div class="select-def__top">
+        <div class="select-def__val">Сорт винограда</div>
+        <div class="select-def__els"></div>
+        <svg class="select-def__arr" width="10" height="6" viewBox="0 0 10 6" fill="none"
+             xmlns="http://www.w3.org/2000/svg">
+            <path d="M0.182854 0.203253C0.29997 0.0784397 0.458793 0.00832337 0.624395 0.00832337C0.789998 0.00832337 0.94882 0.0784397 1.06594 0.203253L4.9961 4.39297L8.92625 0.203253C8.98386 0.139665 9.05278 0.0889443 9.12897 0.0540517C9.20517 0.0191592 9.28712 0.000793318 9.37004 2.51372e-05C9.45297 -0.000743043 9.53521 0.0161023 9.61196 0.049578C9.68871 0.0830537 9.75844 0.132489 9.81708 0.195001C9.87572 0.257512 9.92209 0.331847 9.95349 0.413668C9.98489 0.495489 10.0007 0.583157 9.99998 0.671558C9.99926 0.759959 9.98203 0.847322 9.9493 0.928549C9.91656 1.00978 9.86899 1.08324 9.80934 1.14466L5.43764 5.80507C5.32052 5.92988 5.1617 6 4.9961 6C4.83049 6 4.67167 5.92988 4.55455 5.80507L0.182854 1.14466C0.0657726 1.01981 0 0.850494 0 0.673955C0 0.497415 0.0657726 0.328104 0.182854 0.203253Z"
+                  fill="#9FA2A5"/>
+        </svg>
+    </div>
+    <div class="select-def__dropdown" style="display: none;">
+        <div class="select-def__els"></div>
+        {% for grapeSort in grapeSorts %}
+            <label class="select-def__dropdown-el checkbox-el">
+                <input name="vendor_filter[{{ vendorId }}][grapeSort][]" value="{{ grapeSort.id }}"
+                        {{ grapeSort.id in sessionFilters.product.grapeSort ? 'checked' : '' }}
+                       class="checkbox-def checkbox-el__inp filterCheckBox" type="checkbox">
+                <span class="checkbox-el__text">{{ grapeSort.name }}</span>
+            </label>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="filter__el select-def">
+    <div class="select-def__top">
+        <div class="select-def__val">Импортёр</div>
+        <div class="select-def__els"></div>
+        <svg class="select-def__arr" width="10" height="6" viewBox="0 0 10 6" fill="none"
+             xmlns="http://www.w3.org/2000/svg">
+            <path d="M0.182854 0.203253C0.29997 0.0784397 0.458793 0.00832337 0.624395 0.00832337C0.789998 0.00832337 0.94882 0.0784397 1.06594 0.203253L4.9961 4.39297L8.92625 0.203253C8.98386 0.139665 9.05278 0.0889443 9.12897 0.0540517C9.20517 0.0191592 9.28712 0.000793318 9.37004 2.51372e-05C9.45297 -0.000743043 9.53521 0.0161023 9.61196 0.049578C9.68871 0.0830537 9.75844 0.132489 9.81708 0.195001C9.87572 0.257512 9.92209 0.331847 9.95349 0.413668C9.98489 0.495489 10.0007 0.583157 9.99998 0.671558C9.99926 0.759959 9.98203 0.847322 9.9493 0.928549C9.91656 1.00978 9.86899 1.08324 9.80934 1.14466L5.43764 5.80507C5.32052 5.92988 5.1617 6 4.9961 6C4.83049 6 4.67167 5.92988 4.55455 5.80507L0.182854 1.14466C0.0657726 1.01981 0 0.850494 0 0.673955C0 0.497415 0.0657726 0.328104 0.182854 0.203253Z"
+                  fill="#9FA2A5"/>
+        </svg>
+    </div>
+    <div class="select-def__dropdown" style="display: none;">
+        {% for supplier in suppliers %}
+            <label class="select-def__dropdown-el checkbox-el">
+                <input name="vendor_filter[{{ vendorId }}][supplier][]" value="{{ supplier.id }}"
+                        {{ supplier.id in sessionFilters.product.supplier ? 'checked' : '' }}
+                       class="checkbox-def checkbox-el__inp filterCheckBox" type="checkbox">
+                <span class="checkbox-el__text">{{ supplier.name }}</span>
+            </label>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="filter__el select-def">
+    <div class="select-def__top">
+        <div class="select-def__val">Год производства</div>
+        <div class="select-def__els"></div>
+        <svg class="select-def__arr" width="10" height="6" viewBox="0 0 10 6" fill="none"
+             xmlns="http://www.w3.org/2000/svg">
+            <path d="M0.182854 0.203253C0.29997 0.0784397 0.458793 0.00832337 0.624395 0.00832337C0.789998 0.00832337 0.94882 0.0784397 1.06594 0.203253L4.9961 4.39297L8.92625 0.203253C8.98386 0.139665 9.05278 0.0889443 9.12897 0.0540517C9.20517 0.0191592 9.28712 0.000793318 9.37004 2.51372e-05C9.45297 -0.000743043 9.53521 0.0161023 9.61196 0.049578C9.68871 0.0830537 9.75844 0.132489 9.81708 0.195001C9.87572 0.257512 9.92209 0.331847 9.95349 0.413668C9.98489 0.495489 10.0007 0.583157 9.99998 0.671558C9.99926 0.759959 9.98203 0.847322 9.9493 0.928549C9.91656 1.00978 9.86899 1.08324 9.80934 1.14466L5.43764 5.80507C5.32052 5.92988 5.1617 6 4.9961 6C4.83049 6 4.67167 5.92988 4.55455 5.80507L0.182854 1.14466C0.0657726 1.01981 0 0.850494 0 0.673955C0 0.497415 0.0657726 0.328104 0.182854 0.203253Z"
+                  fill="#9FA2A5"/>
+        </svg>
+    </div>
+    <div class="select-def__dropdown" style="display: none;">
+        {% for year in years %}
+            <label class="select-def__dropdown-el checkbox-el">
+                <input name="vendor_filter[{{ vendorId }}][years][]" value="{{ year }}"
+                        {{ year in sessionFilters.product.years ? 'checked' : '' }}
+                       class="checkbox-def checkbox-el__inp filterCheckBox" type="checkbox">
+                <span class="checkbox-el__text">{{ year }}</span>
+            </label>
+        {% endfor %}
+    </div>
+</div>
+
+
+{#отображаем все фильтры из базы#}
+
+{#в должны быть:#}
+
+{#- емкость (объем)#}
+{#- тип (красное, белое#}
+{#- урожай#}
+{#- сахар#}
+{#- сорт (тут есть разные варианты)#}
+{#- регион#}
+{#- крепость#}

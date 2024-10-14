@@ -20,7 +20,7 @@ class VendorPic
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Vendor::class, inversedBy="pics")
+     * @ORM\ManyToOne(targetEntity=Vendor::class, inversedBy="pics", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $vendor;
