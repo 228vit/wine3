@@ -140,7 +140,7 @@ class VendorController extends AbstractController
     /**
      * Save filter values in session.
      *
-     * @Route("/cabinet/save/filter/product", name="cabinet_save_filter_product", methods={"GET", "POST"})
+     * @Route("/cabinet/vendor/save/filter/product", name="cabinet/vendor_save_filter_product", methods={"GET", "POST"})
      */
     public function saveProductFilter(Request $request, SessionInterface $session, ProductDataService $productDataService)
     {
@@ -161,7 +161,6 @@ class VendorController extends AbstractController
     }
 
     public function renderFilters(int $vendorId,
-                                  Request $request,
                                   SessionInterface $session,
                                   SupplierRepository $supplierRepository,
                                   WineColorRepository $wineColorRepository,
@@ -170,7 +169,10 @@ class VendorController extends AbstractController
                                   CountryRepository $countryRepository,
                                   ProductDataService $productDataService)
     {
-
+        $vendor = $this->vendorRepository->find($vendorId);
+        if (!$vendor) {
+            throw new NotFoundHttpException();
+        }
         $sessionFilters = $session->get('filters', []);
         $sessionFilters['vendor'][$vendorId] = $sessionFilters['vendor'][$vendorId] ?? [];
         $sessionFilters['vendor'][$vendorId]['grapeSort'] = $sessionFilters['vendor'][$vendorId]['grapeSort'] ?? [];

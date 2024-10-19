@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Vendor;
 use App\Entity\WineColor;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -34,6 +35,17 @@ class WineColorRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('c')
             ->andWhere('c.id IN (:ids)')
             ->setParameter('ids', $ids)
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+
+    public function VendorWineColors(Vendor $vendor)
+    {
+        return $this->createQueryBuilder('wc')
+            ->innerJoin('wc.products','product')
+            ->where('product.vendor = :vendor')
+            ->setParameter('vendor', $vendor)
             ->getQuery()
             ->getResult()
             ;

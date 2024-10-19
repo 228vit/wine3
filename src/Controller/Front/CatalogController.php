@@ -147,6 +147,8 @@ class CatalogController extends AbstractController
         $sessionFilters['product']['years'] = $sessionFilters['product']['years'] ?? '';
         $sessionFilters['product']['price_from'] = $sessionFilters['product']['price_from'] ?? '';
         $sessionFilters['product']['price_to'] = $sessionFilters['product']['price_to'] ?? '';
+        $sessionFilters['product']['alcohol_from'] = $sessionFilters['product']['alcohol_from'] ?? '';
+        $sessionFilters['product']['alcohol_to'] = $sessionFilters['product']['alcohol_to'] ?? '';
         $productFilters = null !== $sessionFilters AND isset($sessionFilters['product']) ?
             $sessionFilters['product'] : [];
 
@@ -212,7 +214,6 @@ class CatalogController extends AbstractController
         $session_order_field = $session->get('order_field', 'name');
         $session_order_direction = $session->get('order_direction', 'asc');
 
-//        dd($session_filters);
         if (false !== $session_filters && count($session_filters) && isset($session_filters[$model])) {
             $this->current_filters = $session_filters[$model];
             $filter_form->submit($this->current_filters);
@@ -358,6 +359,24 @@ class CatalogController extends AbstractController
                         $this->currentFilters[$filter][] = [
                             'name' => 'цена до: ' . $value,
                             'value' => 'name',
+                        ];
+                        break;
+
+                    case 'alcohol_from':
+                        $value = intval($value);
+                        $query->andWhere($model.'.alcohol >= :alcohol_from')->setParameter('alcohol_from', $value);
+                        $this->currentFilters[$filter][] = [
+                            'name' => 'алкоголь от: ' . $value,
+                            'value' => 'alcohol',
+                        ];
+                        break;
+
+                    case 'alcohol_to':
+                        $value = intval($value);
+                        $query->andWhere($model.'.alcohol <= :alcohol_to')->setParameter('alcohol_to', $value);
+                        $this->currentFilters[$filter][] = [
+                            'name' => 'алкоголь до: ' . $value,
+                            'value' => 'alcohol',
                         ];
                         break;
 

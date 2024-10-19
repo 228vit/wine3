@@ -151,7 +151,7 @@ class ProductController extends AbstractController
             self::MODEL => $filters,
         ));
 
-        return $this->redirectToRoute('cabinet_product_index');
+        return $this->redirectToRoute('front_catalog');
 //        $pagination = $this->getPagination($request, $session, $productDataService, FrontProductFilter::class);
 //
 //        return new JsonResponse(['totalFilteredProducts' => $pagination->getTotalItemCount()]);

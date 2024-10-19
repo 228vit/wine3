@@ -204,12 +204,47 @@ class App {
 
 			return km + kw + kd;
 		}
-		if ($('.filter-cost__slider').length) {
-			let slider = document.querySelector('.filter-cost__slider');
+		if ($('#filter-cost__slider').length) {
+			let slider = document.querySelector('#filter-cost__slider');
 			let min = 0;
-			let max = 23000;
+			let max = 5000;
 			noUiSlider.create(slider, {
-				start: [4000, 16000],
+				start: [10, 2000],
+				tooltips: true,
+				connect: true,
+				step: 10,
+				range: {
+					'min': min,
+					'max': max
+				},
+				format: {
+					to: function (value) {
+						// let val = number_format(parseInt(value), 0);
+						return parseInt(value);
+					},
+					from: function (value) {
+						// let val = parseInt(value);
+						return parseInt(value);
+					}
+				},
+			});
+			let nodes = [
+				document.getElementById('price_from'),
+				document.getElementById('price_to')
+			];
+			slider.noUiSlider.on('update', function (values, handle, unencoded, isTap, positions) {
+				nodes[0].value = values[0];
+				nodes[1].value = values[1];
+			});
+
+		} // if cost slider
+
+		if ($('#filter-alcohol__slider').length) {
+			let slider = document.querySelector('#filter-alcohol__slider');
+			let min = 0;
+			let max = 25;
+			noUiSlider.create(slider, {
+				start: [0, 25],
 				tooltips: true,
 				connect: true,
 				step: 1,
@@ -219,16 +254,25 @@ class App {
 				},
 				format: {
 					to: function (value) {
-						let val = number_format(parseInt(value), 0);
-						return val;
+						// let val = number_format(parseInt(value), 0);
+						return parseInt(value);
 					},
 					from: function (value) {
-						let val = parseInt(value);
-						return val;
+						// let val = parseInt(value);
+						return parseInt(value);
 					}
 				},
 			});
-		}
+			let nodesAlco = [
+				document.getElementById('alcohol_from'),
+				document.getElementById('alcohol_to')
+			];
+			slider.noUiSlider.on('update', function (values, handle, unencoded, isTap, positions) {
+				nodesAlco[0].value = values[0];
+				nodesAlco[1].value = values[1];
+			});
+
+		} // if alcohol slider
 
 		$('.sec-catalog__mob-filt, .filter__mob-btn, .filter__btn').on('click', function () {
 			let $filter = $('.sec-catalog__sidebar');
