@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Product;
 use App\Entity\Supplier;
+use App\Entity\Vendor;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\Persistence\ManagerRegistry;
@@ -173,7 +174,20 @@ class ProductRepository extends ServiceEntityRepository
             ->select('p.volume')
             ->where('p.volume > 0')
             ->groupBy('p.volume')
-//            ->distinct()
+            ->addOrderBy('p.volume', 'ASC')
+            ->getQuery()
+            ->getResult(AbstractQuery::HYDRATE_SCALAR)
+        ;
+    }
+
+    public function getVendorBottleVolumes(Vendor $vendor): array
+    {
+        return $this->createQueryBuilder('p')
+            ->select('p.volume')
+            ->where('p.volume > 0')
+            ->andWhere('p.vendor = :vendor')
+            ->setParameter('vendor', $vendor)
+            ->groupBy('p.volume')
             ->addOrderBy('p.volume', 'ASC')
             ->getQuery()
             ->getResult(AbstractQuery::HYDRATE_SCALAR)
@@ -185,6 +199,20 @@ class ProductRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('p')
             ->select('p.year')
             ->where('p.year > 0')
+            ->distinct()
+            ->addOrderBy('p.year', 'ASC')
+            ->getQuery()
+            ->getResult(AbstractQuery::HYDRATE_SCALAR)
+        ;
+    }
+
+    public function getVendorYears(Vendor $vendor): array
+    {
+        return $this->createQueryBuilder('p')
+            ->select('p.year')
+            ->where('p.year > 0')
+            ->andWhere('p.vendor = :vendor')
+            ->setParameter('vendor', $vendor)
             ->distinct()
             ->addOrderBy('p.year', 'ASC')
             ->getQuery()

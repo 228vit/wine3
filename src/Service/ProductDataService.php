@@ -4,6 +4,7 @@
 namespace App\Service;
 
 
+use App\Entity\Vendor;
 use App\Repository\ProductRepository;
 
 class ProductDataService
@@ -23,7 +24,16 @@ class ProductDataService
         }
 
         return $volumes;
-//        return array_combine(array_values($volumes), array_values($volumes));
+    }
+
+    public function getVendorBottleVolumes(Vendor $vendor): array
+    {
+        $volumes = [];
+        foreach ($this->repository->getVendorBottleVolumes($vendor) as $item) {
+            $volumes[] = $item['volume'];
+        }
+
+        return $volumes;
     }
 
     public function getBottleVolumesReversed(): array
@@ -40,6 +50,16 @@ class ProductDataService
     {
         $volumes = [];
         foreach ($this->repository->getYears() as $item) {
+            $volumes[] = $item['year'];
+        }
+
+        return $volumes;
+    }
+
+    public function getVendorYears(Vendor $vendor): array
+    {
+        $volumes = [];
+        foreach ($this->repository->getVendorYears($vendor) as $item) {
             $volumes[] = $item['year'];
         }
 

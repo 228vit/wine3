@@ -6,8 +6,9 @@
     <section class="sec-page sec-event">
         <div class="container-def">
             <div class="sec-page__wrap sec-event__wrap">
-                <div class="sec-page__top sec-top"><a class="sec-top__prev link-prev" href="#">
-                        <span>←</span>Назад в календарь</a>
+                <div class="sec-page__top sec-top"><a class="sec-top__prev link-prev"
+                    href="{{ path('front_events_calendar') }}">
+                    <span>←</span>Назад в календарь</a>
                     <div class="sec-top__line"></div>
                 </div>
                 <div class="sec-event__top">
@@ -15,7 +16,7 @@
                         <div class="sec-event__title title-def title-def_sec">{{ ruShortDate }} <span>/ {{ row.name }}</span>
                         </div>
                         <div class="sec-event__info">
-                            <div class="sec-event__date date">28.03.2021 / 16:30</div>
+                            <div class="sec-event__date date">{{ row.dateTime | date }}</div>
                             <div class="icon-text">
                                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
                                      xmlns="http://www.w3.org/2000/svg">
@@ -39,47 +40,38 @@
                     <div class="sec-event__tabs tabs"><a class="tabs__el" href="#">О событий</a><a
                                 class="tabs__el active" href="#">Отчет события</a></div>
                     <div class="sec-event__text wrap-article text-info">
-                        <p>Исследование инвестиционного агенства Knight Frank показало, что во время пандемии вина Бордо
-                            приносили большую доходность, чем часы Rolex и Cartier или сумки Hermès Birkin. С мая 2020
-                            по июнь 2021 инвестиционная стоимость вин в среднем выросла на 13%, тогда как стоимость
-                            люксовых сумок в среднем упала на 3%. Люксовые часы и машины прибавили в стоимости на 5% и
-                            4%, но эти показатели все равно ниже, чем те, которые получили вина Бордо винтажей 1996 и
-                            2000.</p>
-                        <p>По словам управляющего директора Liv-ex Руперта Мияра (Rupert Millar), цены растут не только
-                            на премиальные вина из Бордо: «Вина, которые выигрывают в цене больше всего, помимо
-                            классических французских регионов как Бордо, Бургундия и Шампань, – это известные бренды из
-                            Италии и США».</p>
+
+                        {{ row.description }}
+
+{#                        <p>Исследование инвестиционного агенства Knight Frank показало, что во время пандемии вина Бордо#}
+{#                            приносили большую доходность, чем часы Rolex и Cartier или сумки Hermès Birkin. С мая 2020#}
+{#                            по июнь 2021 инвестиционная стоимость вин в среднем выросла на 13%, тогда как стоимость#}
+{#                            люксовых сумок в среднем упала на 3%. Люксовые часы и машины прибавили в стоимости на 5% и#}
+{#                            4%, но эти показатели все равно ниже, чем те, которые получили вина Бордо винтажей 1996 и#}
+{#                            2000.</p>#}
+{#                        <p>По словам управляющего директора Liv-ex Руперта Мияра (Rupert Millar), цены растут не только#}
+{#                            на премиальные вина из Бордо: «Вина, которые выигрывают в цене больше всего, помимо#}
+{#                            классических французских регионов как Бордо, Бургундия и Шампань, – это известные бренды из#}
+{#                            Италии и США».</p>#}
                     </div>
                     <div class="sec-event__gal gal-def row">
-                        <div class="col-4 col-md-3 col-lg-2 col-xl-1 gal-def__el"><a class="gal-def-el"
-                                                                                     href="../img/gal/big/1.jpg"
-                                                                                     data-fancybox="gal"><img
-                                        class="gal-def-el__img" src="../img/gal/1.jpg" alt=""></a></div>
-                        <div class="col-4 col-md-3 col-lg-2 col-xl-1 gal-def__el"><a class="gal-def-el"
-                                                                                     href="../img/gal/big/2.jpg"
-                                                                                     data-fancybox="gal"><img
-                                        class="gal-def-el__img" src="../img/gal/2.jpg" alt=""></a></div>
-                        <div class="col-4 col-md-3 col-lg-2 col-xl-1 gal-def__el"><a class="gal-def-el"
-                                                                                     href="../img/gal/big/3.jpg"
-                                                                                     data-fancybox="gal"><img
-                                        class="gal-def-el__img" src="../img/gal/3.jpg" alt=""></a></div>
-                        <div class="col-4 col-md-3 col-lg-2 col-xl-1 gal-def__el"><a class="gal-def-el"
-                                                                                     href="../img/gal/big/4.jpg"
-                                                                                     data-fancybox="gal"><img
-                                        class="gal-def-el__img" src="../img/gal/4.jpg" alt=""></a></div>
-                        <div class="col-4 col-md-3 col-lg-2 col-xl-1 gal-def__el"><a class="gal-def-el"
-                                                                                     href="../img/gal/big/5.jpg"
-                                                                                     data-fancybox="gal"><img
-                                        class="gal-def-el__img" src="../img/gal/5.jpg" alt=""></a></div>
-                        <div class="col-4 col-md-3 col-lg-2 col-xl-1 gal-def__el"><a class="gal-def-el"
-                                                                                     href="../img/gal/big/6.jpg"
-                                                                                     data-fancybox="gal"><img
-                                        class="gal-def-el__img" src="../img/gal/6.jpg" alt=""></a></div>
-                        <div class="col-4 col-md-3 col-lg-2 col-xl-1 gal-def__el"><a class="gal-def-el"
-                                                                                     href="../img/gal/big/7.jpg"
-                                                                                     data-fancybox="gal"><img
-                                        class="gal-def-el__img" src="../img/gal/7.jpg" alt=""></a></div>
-                    </div>
+
+                        {% for eventPic in row.eventPics %}
+                            <div class="col-4 col-md-3 col-lg-2 col-xl-1 gal-def__el"><a
+                                class="gal-def-el"
+                                href="{{ asset('/uploads/' ~ eventPic.pic) }}"
+                                data-fancybox="gal"><img
+                                    class="gal-def-el__img"
+                                    src="{{ asset('/uploads/' ~ eventPic.pic) | imagine_filter('thumb_event_pic') }}" alt=""></a>
+                            </div>
+                        {% endfor %}
+
+{#                        <div class="col-4 col-md-3 col-lg-2 col-xl-1 gal-def__el"><a class="gal-def-el"#}
+{#                                                                                     href="../img/gal/big/2.jpg"#}
+{#                                                                                     data-fancybox="gal"><img#}
+{#                                        class="gal-def-el__img" src="../img/gal/2.jpg" alt=""></a></div>#}
+
+                        </div>
                 </div>
             </div>
         </div>
@@ -93,30 +85,18 @@
                 <div class="sec-products__content">
                     <div class="products-min swiper">
                         <div class="swiper-wrapper">
-                            <div class="products-min__el swiper-slide"><a class="products-min-el" href="#"><img
-                                            class="products-min-el__img" src="../img/pr1.png" alt="">
-                                    <div class="products-min-el__title">Cabernet Sauvignon 1987</div>
-                                    <div class="products-min-el__info">Красное, сухое</div>
-                                    <div class="products-min-el__cost">от 230 £</div>
-                                </a></div>
-                            <div class="products-min__el swiper-slide"><a class="products-min-el" href="#"><img
-                                            class="products-min-el__img" src="../img/pr2.png" alt="">
-                                    <div class="products-min-el__title">Domaine de la Romanee-Conti</div>
-                                    <div class="products-min-el__info">Красное, сухое</div>
-                                    <div class="products-min-el__cost">от 360 £</div>
-                                </a></div>
-                            <div class="products-min__el swiper-slide"><a class="products-min-el" href="#"><img
-                                            class="products-min-el__img" src="../img/pr3.png" alt="">
-                                    <div class="products-min-el__title">Cabernet Sauvignon</div>
-                                    <div class="products-min-el__info">Красное, сухое</div>
-                                    <div class="products-min-el__cost">от 130 £</div>
-                                </a></div>
-                            <div class="products-min__el swiper-slide"><a class="products-min-el" href="#"><img
-                                            class="products-min-el__img" src="../img/pr4.png" alt="">
-                                    <div class="products-min-el__title">Chateau Domi-Cours 2012 0,75</div>
-                                    <div class="products-min-el__info">Красное, сухое</div>
-                                    <div class="products-min-el__cost">от 170 £</div>
-                                </a></div>
+                            {% for eventProduct in row.products %}
+                                <div class="products-min__el swiper-slide"><a
+                                            class="products-min-el"
+                                            href="{{ asset('/uploads/' ~ eventProduct.product.contentPic) }}"><img
+                                            class="products-min-el__img"
+                                            src="{{ asset('/uploads/' ~ eventProduct.product.contentPic) | imagine_filter('thumb_square_160') }}" alt="">
+                                        <div class="products-min-el__title">{{ eventProduct.product.name }}</div>
+                                        <div class="products-min-el__info">{{ eventProduct.product.shortSUmmary }}</div>
+                                        <div class="products-min-el__cost">от {{ eventProduct.price }} £?</div>
+                                    </a>
+                                </div>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
@@ -124,74 +104,6 @@
         </div>
     </section>
 
-<main class="body-main">
-    <section class="start-screen">
-        <div class="h1">Winedows</div>
-
-            <div class="row">
-            <div class="col-8">
-                <strong>{{ short_date }}</strong> / {{ row.name }} <br>
-                {{ row.dateTime | date }} {{ row.address }}
-            </div>
-            <div class="col-4">
-                Партнёры
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-12">
-                Коллаж
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-12">
-                <p>О событии / Отчёт события</p>
-                <p>
-                    {{ row.description }}
-                </p>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="gallery-wrap col-12">
-
-                <div class="thumbs-wrap">
-                    {% for eventPic in row.eventPics %}
-                        <a data-fancybox="gallery" target="_blank"
-                           href="{{ asset('/uploads/' ~ eventPic.pic) }}"><img
-                                    class="img-thumbnail"
-                                    src="{{ asset('/uploads/' ~ eventPic.pic) | imagine_filter('thumb_event_pic') }}" /></a>
-                    {% endfor %}
-                </div> <!-- thumbs-wrap.// -->
-
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-12">
-                <p>Поставщики / Продукция / Парнёры</p>
-                <div class="thumbs-wrap">
-                    {% for eventProduct in row.products %}
-                        <div class="col-2 text-center">
-                            <a data-fancybox="gallery" target="_blank"
-                               href="{{ asset('/uploads/' ~ eventProduct.product.contentPic) }}"><img
-                                        class="img-thumbnail"
-                                        src="{{ asset('/uploads/' ~ eventProduct.product.contentPic) | imagine_filter('thumb_square_160') }}" /></a>
-                            <br>
-                            <strong>{{ eventProduct.product.name }}</strong>
-                            <br>
-                            <strong>{{ eventProduct.price }}</strong>
-
-                        </div>
-                    {% endfor %}
-                </div> <!-- thumbs-wrap.// -->
-            </div>
-        </div>
-
-    <br />
-    </section>
-</main>
 {% endblock %}
 
 {% block extra_scripts %}

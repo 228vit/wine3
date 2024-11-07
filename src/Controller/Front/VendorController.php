@@ -11,13 +11,8 @@ use App\Entity\WineCard;
 use App\Entity\WineColor;
 use App\Entity\WineSugar;
 use App\Filter\Front\FrontProductFilter;
-use App\Repository\CountryRepository;
-use App\Repository\GrapeSortRepository;
 use App\Repository\ProductRepository;
-use App\Repository\SupplierRepository;
 use App\Repository\WineCardRepository;
-use App\Repository\WineColorRepository;
-use App\Repository\WineSugarRepository;
 use App\Service\ProductDataService;
 use Doctrine\ORM\Query;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -43,11 +38,8 @@ class VendorController extends AbstractController
      */
     public function view(Vendor $vendor,
                          Request $request,
-                         SessionInterface $session,
-                         WineCardRepository $wineCardRepository,
-                         ProductDataService $productDataService)
+                         SessionInterface $session)
     {
-        $currentWineCard = $wineCardRepository->find($session->get('currentWineCard', 0));
         $session_order_field = $session->get('order_field', 'name');
         $orderMapping = [
             'name' => 'По названию',
@@ -59,14 +51,12 @@ class VendorController extends AbstractController
             $vendor,
             $request,
             $session,
-            $productDataService,
             FrontProductFilter::class
         );
 
         return $this->render('front/vendor/view.html.twig', array(
             'row' => $vendor,
             'pagination' => $pagination,
-            'currentWineCard' => $currentWineCard,
             'isAjax' => $request->isXmlHttpRequest(),
             'totalRows' => $pagination->getTotalItemCount(),
             'current_filters' => $this->current_filters,
@@ -76,38 +66,8 @@ class VendorController extends AbstractController
             'model' => self::MODEL,
             'entity_name' => self::ENTITY_NAME,
             'orderField' => $session_order_field,
-            'orderMapping' => $orderMapping,
+//            'orderMapping' => $orderMapping,
         ));
-    }
-
-    /**
-     * @Route("/cabinet/product/set_order", name="cabinet_product_set_order")
-     */
-    public function setOrderAction(Request $request,
-                                SessionInterface $session)
-    {
-        $session_order_field = $request->get('field', 'name');
-        $session->set('order_field', $session_order_field);
-
-        return $this->redirectToRoute('cabinet_product_index');
-    }
-
-    /**
-     * @Route("/cabinet/product/change_wine_card", name="cabinet_product_change_wine_card")
-     */
-    public function changeWineCardAction(Request $request,
-                                         SessionInterface $session,
-                                         WineCardRepository $wineCardRepository)
-    {
-        $wineCardId = $request->query->get('id', null);
-        $wineCard = $wineCardRepository->find($wineCardId);
-        if (null === $wineCard) {
-            return new JsonResponse([], 404);
-        }
-
-        $session->set('currentWineCard', $wineCard->getId());
-
-        return $this->redirectToRoute('cabinet_product_index');
     }
 
     /**
@@ -132,7 +92,7 @@ class VendorController extends AbstractController
             self::MODEL => $filters,
         ));
 
-        $pagination = $this->getPagination($vendor, $request, $session, $productDataService, FrontProductFilter::class);
+        $pagination = $this->getPagination($vendor, $request, $session, FrontProductFilter::class);
 
         return new JsonResponse(['totalFilteredProducts' => $pagination->getTotalItemCount()]);
     }
@@ -142,7 +102,7 @@ class VendorController extends AbstractController
      *
      * @Route("/cabinet/vendor/save/filter/product", name="cabinet/vendor_save_filter_product", methods={"GET", "POST"})
      */
-    public function saveProductFilter(Request $request, SessionInterface $session, ProductDataService $productDataService)
+    public function saveProductFilter(Request $request, SessionInterface $session)
     {
         $filters = $request->request->get('product_filter');
         // unset empty values
@@ -155,19 +115,10 @@ class VendorController extends AbstractController
         ));
 
         return $this->redirectToRoute('cabinet_product_index');
-//        $pagination = $this->getPagination($request, $session, $productDataService, FrontProductFilter::class);
-//
-//        return new JsonResponse(['totalFilteredProducts' => $pagination->getTotalItemCount()]);
     }
 
     public function renderFilters(int $vendorId,
-                                  SessionInterface $session,
-                                  SupplierRepository $supplierRepository,
-                                  WineColorRepository $wineColorRepository,
-                                  WineSugarRepository $wineSugarRepository,
-                                  GrapeSortRepository $grapeSortRepository,
-                                  CountryRepository $countryRepository,
-                                  ProductDataService $productDataService)
+                                  SessionInterface $session)
     {
         $vendor = $this->vendorRepository->find($vendorId);
         if (!$vendor) {
@@ -190,15 +141,15 @@ class VendorController extends AbstractController
         $productFilters = null !== $sessionFilters AND isset($sessionFilters['vendor'][$vendorId]) ?
             $sessionFilters['vendor'][$vendorId] : [];
 
-        $suppliers = $supplierRepository->findBy([], ['name' => 'ASC']);
-        $wineColors = $wineColorRepository->findAll();
-        $wineSugars = $wineSugarRepository->findAll();
-        $countries = $countryRepository->findBy([], ['name' => 'ASC']);
-        $grapeSorts = $grapeSortRepository->findBy([], ['name' => 'ASC']);
+        $suppliers = $this->supplierRepository->findBy([], ['name' => 'ASC']);
+        $wineColors = $this->wineColorRepository->findAll();
+        $wineSugars = $this->wineSugarRepository->findAll();
+        $countries = $this->countryRepository->findBy([], ['name' => 'ASC']);
+        $grapeSorts = $this->grapeSortRepository->findBy([], ['name' => 'ASC']);
 
-        $alcohol = $productDataService->getAlcohol();
-        $bottleVolumes = $productDataService->getBottleVolumes();
-        $years = $productDataService->getYears();
+        $alcohol = $this->productDataService->getAlcohol();
+        $bottleVolumes = $this->productDataService->getVendorBottleVolumes($vendor);
+        $years = $this->productDataService->getVendorYears($vendor);
 
         $sessionFilters['product'] = $sessionFilters['vendor'][$vendorId];
 
@@ -225,7 +176,6 @@ class VendorController extends AbstractController
     private function getPagination(Vendor $vendor,
                                    Request $request,
                                    SessionInterface $session,
-                                   ProductDataService $productDataService,
                                    string $filter_form_class)
     {
         $this->filter_form = $this->createForm($filter_form_class, null, array(
@@ -234,7 +184,7 @@ class VendorController extends AbstractController
         ));
 
         /** @var Query $query */
-        $query = $this->buildQuery($vendor, $session, $productDataService, $this->filter_form, self::MODEL);
+        $query = $this->buildQuery($vendor, $session, $this->filter_form, self::MODEL);
 
         $pagination = $this->paginator->paginate(
             $query, /* query NOT result */
@@ -247,7 +197,6 @@ class VendorController extends AbstractController
 
     private function buildQuery(Vendor $vendor,
                                 SessionInterface $session,
-                                ProductDataService $productDataService,
                                 FormInterface $filter_form,
                                 string $model)
     {
@@ -340,7 +289,7 @@ class VendorController extends AbstractController
                         $query->andWhere($model.'.vendor IN (:vendor)')->setParameter('vendor', $value);
                         break;
                     case 'volume':
-                        $bottleValues = $productDataService->getBottleVolumesReversed();
+                        $bottleValues = $this->productDataService->getBottleVolumesReversed();
                         foreach ($value as $bottleValue) {
                             $this->currentFilters[$filter][] = [
                                 'name' => 'объем '.$bottleValue.'л.',

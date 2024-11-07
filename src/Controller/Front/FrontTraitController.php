@@ -8,9 +8,12 @@ use App\Repository\CountryRepository;
 use App\Repository\GrapeSortRepository;
 use App\Repository\ProductGrapeSortRepository;
 use App\Repository\ProductRepository;
+use App\Repository\SupplierRepository;
 use App\Repository\VendorRepository;
+use App\Repository\WineCardRepository;
 use App\Repository\WineColorRepository;
 use App\Repository\WineSugarRepository;
+use App\Service\ProductDataService;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
@@ -36,10 +39,13 @@ trait FrontTraitController
     private $countryRepository;
     private $regionRepository;
     private $vendorRepository;
+    private $supplierRepository;
     private $wineColorRepository;
     private $wineSugarRepository;
     private $grapeSortRepository;
     private $productGrapeSortRepository;
+    private $wineCardRepository;
+    private $productDataService;
     private $cacheManager;
 
     public function __construct(EntityManagerInterface $em,
@@ -51,8 +57,11 @@ trait FrontTraitController
                                 CountryRepository $countryRepository,
                                 CountryRegionRepository $regionRepository,
                                 VendorRepository $vendorRepository,
+                                SupplierRepository $supplierRepository,
                                 GrapeSortRepository $grapeSortRepository,
                                 ProductGrapeSortRepository $productGrapeSortRepository,
+                                WineCardRepository $wineCardRepository,
+                                ProductDataService $productDataService,
                                 CacheManager $cacheManager)
     {
         $this->em = $em;
@@ -62,10 +71,14 @@ trait FrontTraitController
         $this->countryRepository = $countryRepository;
         $this->regionRepository = $regionRepository;
         $this->vendorRepository = $vendorRepository;
+        $this->supplierRepository = $supplierRepository;
         $this->wineColorRepository = $wineColorRepository;
         $this->wineSugarRepository = $wineSugarRepository;
         $this->grapeSortRepository = $grapeSortRepository;
         $this->productGrapeSortRepository = $productGrapeSortRepository;
+        $this->wineCardRepository = $wineCardRepository;
+        $this->productDataService = $productDataService;
+
         $this->cacheManager = $cacheManager;
     }
 
