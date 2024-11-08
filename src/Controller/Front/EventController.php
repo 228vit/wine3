@@ -47,6 +47,7 @@ class EventController extends AbstractController
             $dayNum = $currentDay->format('d');
             $calendar[] = [
                 'day' => $dayNum,
+//                'startTime' => $currentDay->format('H:i'),
                 'weekDay' => $currentDay->format('w'),
                 'month' => $currentDay->format('m'),
                 'isCurrentMonth' => $currentMonth === $currentDay->format('m'),

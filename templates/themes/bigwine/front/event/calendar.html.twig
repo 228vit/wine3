@@ -118,7 +118,7 @@
                                         <div class="calend__title2">
                                             {{ cday.event.name }}
                                         </div>
-                                        <div class="calend__time">16:30- 18:00</div>
+                                        <div class="calend__time">{{ cday.event.eventTime }}</div>
                                         <div class="calend__points">
                                             <a href="{{ path('front_event_show', { slug: cday.event.slug }) }}">
                                             <svg width="18" height="4" viewBox="0 0 18 4" fill="none" xmlns="http://www.w3.org/2000/svg">

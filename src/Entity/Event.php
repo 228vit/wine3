@@ -304,5 +304,9 @@ class Event
         return $this;
     }
 
+    public function getEventTime(): ?string
+    {
+        return $this->getDateTime()->format('H:i');
+    }
 
 }
