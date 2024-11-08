@@ -36,29 +36,29 @@
                                 </div>
                             </div>
                             <select class="select-el calend-top__select">
-                                <option>Вебинары</option>
+                                <option>Вебинары ???</option>
                                 <option>Вебинары 2</option>
                                 <option>Вебинары 3</option>
                                 <option>Вебинары 4</option>
                             </select>
                             <select class="select-el calend-top__select">
-                                <option>Все поставщики</option>
-                                <option>Вебинары 2</option>
-                                <option>Вебинары 3</option>
-                                <option>Вебинары 4</option>
+                                <option>Все поставщики ???</option>
+                                <option>Поставщик 2</option>
+                                <option>Поставщик 3</option>
+                                <option>Поставщик 4</option>
                             </select>
                             <select class="select-el calend-top__select calend-top__select_2">
                                 <option>Город</option>
-                                <option>Вебинары 2</option>
-                                <option>Вебинары 3</option>
-                                <option>Вебинары 4</option>
+                                <option>Москва</option>
+                                <option>Санкт-Петербург</option>
+                                <option>Нижний Новгород</option>
                             </select>
-                            <select class="select-el calend-top__select calend-top__select_2">
+                            <select id="currentMonth" class="select-el calend-top__select calend-top__select_2">
                                 {% for mnum, month in months %}
-                                    <option value="{{ month }}" {{ mnum == currentMonth ? 'selected' : '' }}>{{ month }}</option>
+                                    <option value="{{ mnum }}" {{ mnum == currentMonth ? 'selected' : '' }}>{{ month }}</option>
                                 {% endfor %}
                             </select>
-                            <select class="select-el calend-top__select calend-top__select_date">
+                            <select id="currentYear" class="select-el calend-top__select calend-top__select_date">
                                 {% for year in years %}
                                 <option value="{{ year }}" {{ year == currentYear ? 'selected' : '' }}>{{ year }}</option>
                                 {% endfor %}
@@ -179,9 +179,15 @@
 {% block extra_scripts %}
     <script>
         $(document).ready(function() {
+            $('#currentMonth').on('change', function (e) {
+                let month = $(this).val();
+                let year = $('#currentYear').val();
+                window.location = '{{ path('front_events_calendar') }}?month='+month+'&year='+year;
+            });
+
             $('.eventClick').on('click', function (e) {
                 window.location = $(this).attr('data-rel');
-            })
+            });
         })
     </script>
 {% endblock %}

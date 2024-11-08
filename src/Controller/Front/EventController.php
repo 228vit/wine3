@@ -24,13 +24,27 @@ class EventController extends AbstractController
      */
     public function calendar(Request $request, EventRepository $repository)
     {
-        $firstDay = (new \DateTime('first day of this month'));
-        $lastDay = (new \DateTime('last day of this month'));
-        $firstDayNum = $firstDay->format('w');
-        $currentMonth = $firstDay->format('m');
-        $currentYear = $firstDay->format('Y');
-        $firstDayNum = (int)$firstDayNum - 1;
-        $firstWeekDay = $firstDay->modify('-' . $firstDayNum . ' days');
+        $month = $request->query->get('month', null);
+        $year = $request->query->get('year', null);
+        if (null === $month AND null === $year) {
+            $firstDay = (new \DateTime('first day of this month'));
+            $lastDay = (new \DateTime('last day of this month'));
+            $firstDayNum = $firstDay->format('w');
+            $currentMonth = $firstDay->format('m');
+            $currentYear = $firstDay->format('Y');
+            $firstDayNum = (int)$firstDayNum - 1;
+            $firstWeekDay = $firstDay->modify('-' . $firstDayNum . ' days');
+        }
+        if (is_numeric($month) AND is_numeric($year)) {
+            $firstDay = new \DateTime("first day of {$year}-{$month}");
+            $lastDay = (new \DateTime("last day of {$year}-{$month}"));
+            $firstDayNum = $firstDay->format('w');
+            $currentMonth = $firstDay->format('m');
+            $currentYear = $firstDay->format('Y');
+            $firstDayNum = (int)$firstDayNum - 1;
+            $firstWeekDay = $firstDay->modify('-' . $firstDayNum . ' days');
+
+        }
 
         $totalCalendarDays = (5*7) - 1;
         $calendar = [];
@@ -63,8 +77,8 @@ class EventController extends AbstractController
         $endYear = $startYear + 3;
         for ($y = $startYear; $y <= $endYear; $y++) $years[] = $y;
         $months = [
-            1 => 'январь', 2 => 'февраль', 3 => 'март', 4 => 'апрель', 5 => 'май', 6 => 'июнь',
-            7 => 'июль', 8 => 'август', 9 => 'сентябрь',  10 => 'октябрь',  11 => 'ноябрь',  12 => 'декабрь',
+            '01' => 'январь', '02' => 'февраль', '03' => 'март', '04' => 'апрель', '05' => 'май', '06' => 'июнь',
+            '07' => 'июль', '08' => 'август', '09' => 'сентябрь',  '10' => 'октябрь',  '11' => 'ноябрь',  '12' => 'декабрь',
         ];
         $isAjax = $request->isXmlHttpRequest();
         $template = $isAjax ? 'front/event/calendar.html.twig' : 'front/event/calendar.html.twig';
