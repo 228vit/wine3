@@ -80,8 +80,11 @@
     <section class="sec-products">
         <div class="container-def">
             <div class="sec-products__wrap">
-                <div class="sec-products__tabs tabs tabs_2"><a class="tabs__el" href="#">Поставщики</a><a
-                            class="tabs__el active" href="#">Продукция</a><a class="tabs__el" href="#">Партнеры</a></div>
+                <div class="sec-products__tabs tabs tabs_2">
+                    <a class="tabs__el" href="#">Поставщики</a>
+                    <a class="tabs__el active" href="#">Продукция</a>
+                    <a class="tabs__el" href="#">Партнеры</a>
+                </div>
                 <div class="sec-products__content">
                     <div class="products-min swiper">
                         <div class="swiper-wrapper">
@@ -93,7 +96,7 @@
                                             src="{{ asset('/uploads/' ~ eventProduct.product.contentPic) | imagine_filter('thumb_square_160') }}" alt="">
                                         <div class="products-min-el__title">{{ eventProduct.product.name }}</div>
                                         <div class="products-min-el__info">{{ eventProduct.product.shortSUmmary }}</div>
-                                        <div class="products-min-el__cost">от {{ eventProduct.price }} £?</div>
+{#                                        <div class="products-min-el__cost">от {{ eventProduct.price }} £?</div>#}
                                     </a>
                                 </div>
                             {% endfor %}
