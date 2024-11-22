@@ -68,6 +68,11 @@ class Country
      */
     private $vendors;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Appellation::class, mappedBy="country", orphanRemoval=true)
+     */
+    private $appellations;
+
     public const WORLD_PARTS = [
         'new_world' => 'Новый свет',
         'old_world' => 'Старый свет',
@@ -85,6 +90,7 @@ class Country
         $this->products = new ArrayCollection();
         $this->aliases = new ArrayCollection();
         $this->vendors = new ArrayCollection();
+        $this->appellations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -270,6 +276,36 @@ class Country
             // set the owning side to null (unless already changed)
             if ($vendor->getCountry() === $this) {
                 $vendor->setCountry(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Appellation>
+     */
+    public function getAppellations(): Collection
+    {
+        return $this->appellations;
+    }
+
+    public function addAppellation(Appellation $appellation): self
+    {
+        if (!$this->appellations->contains($appellation)) {
+            $this->appellations[] = $appellation;
+            $appellation->setCountry($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAppellation(Appellation $appellation): self
+    {
+        if ($this->appellations->removeElement($appellation)) {
+            // set the owning side to null (unless already changed)
+            if ($appellation->getCountry() === $this) {
+                $appellation->setCountry(null);
             }
         }
 

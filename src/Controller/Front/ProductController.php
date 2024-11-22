@@ -152,9 +152,30 @@ class ProductController extends AbstractController
         ));
 
         return $this->redirectToRoute('front_catalog');
-//        $pagination = $this->getPagination($request, $session, $productDataService, FrontProductFilter::class);
-//
-//        return new JsonResponse(['totalFilteredProducts' => $pagination->getTotalItemCount()]);
+    }
+
+    /**
+     * Save filter values in session.
+     *
+     * @Route("/cabinet/save/filter/product_country", name="cabinet_save_filter_product_country", methods={"GET", "POST"})
+     */
+    public function saveProductCountry(Request $request, SessionInterface $session, ProductDataService $productDataService)
+    {
+        $filters = $request->request->get('product_filter');
+        // unset empty values
+        if (is_array($filters)) {
+            $filters = array_filter($filters, function($value) { return $value !== ''; });
+            unset($filters['_token']);
+        }
+        unset($filters['region']);
+
+//        dd($filters);
+
+        $session->set('filters', array(
+            self::MODEL => $filters,
+        ));
+
+        return $this->redirectToRoute('front_catalog');
     }
 
     /**

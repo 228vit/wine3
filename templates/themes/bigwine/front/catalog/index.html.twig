@@ -17,7 +17,7 @@
                     </div>
                 </div>
 
-                <div class="sec-catalog__sidebar filter">
+                <div class="sec-catalog__sidebar filter" >
 
                     <form method="post" id="filtersForm" action="{{ path('cabinet_save_filter_product') }}">
 
@@ -42,7 +42,6 @@
                     </form>
                 </div>
 
-
                 <!-- div class="sec-catalog__sidebar filter" -->
 
                 <div class="sec-catalog__body">
@@ -61,11 +60,21 @@
     $(document).ready(function() {
         $('#submitFilterForm').on('click', function () {
             $('#filtersForm').submit();
-        })
+        });
+
+        $('#countrySelector').on('change', function () {
+            $('#filtersForm').attr('action', '{{ path('cabinet_save_filter_product_country') }}');
+            $('#filtersForm').submit();
+        });
+
+        $('#regionSelector').on('change', function () {
+            $('#filtersForm').submit();
+        });
+
     });
 
     function submitFilter() {
-        console.log('puuuu');
+        console.log('buuuu');
     }
 </script>
 {% endblock %}

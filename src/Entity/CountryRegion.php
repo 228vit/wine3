@@ -35,9 +35,15 @@ class CountryRegion
      */
     private $products;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Appellation::class, mappedBy="countryRegion")
+     */
+    private $appellations;
+
     public function __construct()
     {
         $this->products = new ArrayCollection();
+        $this->appellations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -102,5 +108,35 @@ class CountryRegion
     public function __toString(): string
     {
         return $this->getName();
+    }
+
+    /**
+     * @return Collection<int, Appellation>
+     */
+    public function getAppellations(): Collection
+    {
+        return $this->appellations;
+    }
+
+    public function addAppellation(Appellation $appellation): self
+    {
+        if (!$this->appellations->contains($appellation)) {
+            $this->appellations[] = $appellation;
+            $appellation->setCountryRegion($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAppellation(Appellation $appellation): self
+    {
+        if ($this->appellations->removeElement($appellation)) {
+            // set the owning side to null (unless already changed)
+            if ($appellation->getCountryRegion() === $this) {
+                $appellation->setCountryRegion(null);
+            }
+        }
+
+        return $this;
     }
 }
