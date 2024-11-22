@@ -3,9 +3,12 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Appellation;
+use App\Entity\Country;
+use App\Entity\CountryRegion;
 use App\Filter\AppellationFilter;
 use App\Form\AppellationType;
 use App\Repository\AppellationRepository;
+use App\Repository\CountryRegionRepository;
 use App\Service\FileUploader;
 use Doctrine\ORM\EntityManagerInterface;
 use Lexik\Bundle\FormFilterBundle\Filter\FilterBuilderUpdaterInterface;
@@ -172,6 +175,57 @@ class AdminAppellationController extends AbstractController
             'model' => self::MODEL,
             'entity_name' => self::ENTITY_NAME,
         ));
+    }
+
+    /**
+     * Displays a form to edit an existing appellation entity.
+     *
+     * @Route("backend/appellation/import/country/{codeAlpha2}", name="backend_appellation_import", methods={"GET","POST"})
+     */
+    public function import(Country $country,
+                           CountryRegionRepository $countryRegionRepository,
+                           AppellationRepository $appellationRepository,
+                           Request $request)
+    {
+        $path = $this->getParameter('uploads_directory').'/fr.csv';
+        if (!file_exists($path)) {
+            throw new \Exception($path.' not exist');
+        }
+        $handle = fopen($path, "r"); // open in readonly mode
+        while (($row = fgetcsv($handle)) !== false) {
+            $regionName = $row[0];
+            $appellacionName = $row[1];
+
+            $region = $countryRegionRepository->findOneBy([
+                'name' => $regionName,
+                'country' => $country,
+            ]);
+
+            if (!$region) {
+                $region = (new CountryRegion())
+                    ->setName($regionName)
+                    ->setCountry($country);
+                $this->em->persist($region);
+            }
+            /** @var Appellation $appellacion */
+            $appellacion = $appellationRepository->findOneBy([
+                'name' => $appellacionName,
+                'country' => $country,
+            ]);
+
+            if (!$appellacion) {
+                $appellacion = (new Appellation())
+                    ->setCountry($country)
+                    ->setCountryRegion($region)
+                    ->setName($appellacionName);
+                $this->em->persist($appellacion);
+            }
+        }
+
+        fclose($handle);
+        $this->em->flush();
+
+        return $this->redirectToRoute('backend_appellation_index');
     }
 
     /**
