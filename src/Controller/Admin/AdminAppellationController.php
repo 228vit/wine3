@@ -61,6 +61,12 @@ class AdminAppellationController extends AbstractController
                     'sorting_field' => 'appellation.name',
                     'sortable' => true,
                 ],
+                'a.countryRegion' => [
+                    'title' => 'Region',
+                    'row_field' => 'countryRegion',
+                    'sorting_field' => 'appellation.countryRegion',
+                    'sortable' => false,
+                ],
                 'a.country' => [
                     'title' => 'Country',
                     'row_field' => 'country',
@@ -140,19 +146,12 @@ class AdminAppellationController extends AbstractController
      *
      * @Route("backend/appellation/{id}/edit", name="backend_appellation_edit", methods={"GET","POST"})
      */
-    public function editAction(Request $request, Appellation $appellation, FileUploader $fileUploader)
+    public function edit(Request $request, Appellation $appellation, FileUploader $fileUploader)
     {
         $editForm = $this->createForm(AppellationType::class, $appellation);
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
-            /** @var \Symfony\Component\HttpFoundation\File\UploadedFile $file */
-            $file = $appellation->getFlagPicFile();
-
-            if (null !== $file) {
-                $fileName = $fileUploader->upload($file);
-                $appellation->setFlagPic($fileName);
-            }
 
             $this->em->persist($appellation);
             $this->em->flush();
@@ -168,7 +167,7 @@ class AdminAppellationController extends AbstractController
 
         $deleteForm = $this->createDeleteForm($appellation);
 
-        return $this->render('admin/appellation/edit.html.twig', array(
+        return $this->render('admin/common/edit.html.twig', array(
             'row' => $appellation,
             'form' => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),
@@ -193,8 +192,10 @@ class AdminAppellationController extends AbstractController
         }
         $handle = fopen($path, "r"); // open in readonly mode
         while (($row = fgetcsv($handle)) !== false) {
-            $regionName = $row[0];
-            $appellacionName = $row[1];
+            $regionName = trim($row[1]);
+            $appellacionName = trim($row[0]);
+
+//            dd([$regionName, $appellacionName]);
 
             $region = $countryRegionRepository->findOneBy([
                 'name' => $regionName,
@@ -206,10 +207,12 @@ class AdminAppellationController extends AbstractController
                     ->setName($regionName)
                     ->setCountry($country);
                 $this->em->persist($region);
+                $this->em->flush();
             }
             /** @var Appellation $appellacion */
             $appellacion = $appellationRepository->findOneBy([
                 'name' => $appellacionName,
+                'countryRegion' => $region,
                 'country' => $country,
             ]);
 
@@ -219,6 +222,7 @@ class AdminAppellationController extends AbstractController
                     ->setCountryRegion($region)
                     ->setName($appellacionName);
                 $this->em->persist($appellacion);
+                $this->em->flush();
             }
         }
 
