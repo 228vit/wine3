@@ -144,9 +144,21 @@ class ProductController extends AbstractController
         $filters = $request->request->get('product_filter');
         // unset empty values
         if (is_array($filters)) {
-            $filters = array_filter($filters, function($value) { return $value !== ''; });
+            $filters = array_filter($filters, function($value) {
+                if (is_array($value)) {
+                    foreach ($value as $index => $subValue) {
+                        if (empty($subValue)) unset($value[$index]);
+                    }
+
+                    return boolval(count($value));
+                }
+
+                return $value !== "";
+            });
+
             unset($filters['_token']);
         }
+
         $session->set('filters', array(
             self::MODEL => $filters,
         ));
@@ -168,8 +180,6 @@ class ProductController extends AbstractController
             unset($filters['_token']);
         }
         unset($filters['region']);
-
-//        dd($filters);
 
         $session->set('filters', array(
             self::MODEL => $filters,

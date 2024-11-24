@@ -2,6 +2,8 @@
 
 namespace App\Form;
 
+use App\Entity\Appellation;
+use App\Entity\CountryRegion;
 use App\Entity\Product;
 use App\Entity\Vendor;
 use Doctrine\ORM\EntityRepository;
@@ -44,8 +46,14 @@ class ProductType extends AbstractType
                 'class' => 'App:Country',
                 'expanded' => false,
             ))
-            ->add('region', EntityType::class, array(
-                'class' => 'App:CountryRegion',
+            ->add('region',  EntityType::class, array(
+                'class' => CountryRegion::class,
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('c')
+                        ->addOrderBy('c.name', 'ASC');
+                },
+                'choice_label' => 'name',
+                'required' => false,
                 'expanded' => false,
             ))
             ->add('foods', EntityType::class, array(
@@ -97,10 +105,16 @@ class ProductType extends AbstractType
                 'label' => 'Тип ферментации',
                 'required' => false,
             ])
-            ->add('appellation', TextType::class , [
-                'label' => 'Апеллясьон',
+            ->add('appellation', EntityType::class, array(
+                'class' => Appellation::class,
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('c')
+                        ->addOrderBy('c.name', 'ASC');
+                },
+                'choice_label' => 'name',
                 'required' => false,
-            ])
+                'expanded' => false,
+            ))
             ->add('packing', TextType::class , [
                 'label' => 'Упаковка',
                 'required' => false,
@@ -118,6 +132,7 @@ class ProductType extends AbstractType
             ->add('metaDescription')
 
             ->add('content', CKEditorType::class, [
+                    'required' => false,
                     'config' => array(
                         'uiColor' => '#ffffff',
 //                        'filebrowserBrowseRoute' => 'elfinder',

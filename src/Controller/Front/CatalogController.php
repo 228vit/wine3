@@ -9,6 +9,7 @@ use App\Entity\WineCard;
 use App\Entity\WineColor;
 use App\Entity\WineSugar;
 use App\Filter\Front\FrontProductFilter;
+use App\Repository\AppellationRepository;
 use App\Repository\CountryRegionRepository;
 use App\Repository\CountryRepository;
 use App\Repository\GrapeSortRepository;
@@ -44,11 +45,8 @@ class CatalogController extends AbstractController
      */
     public function index(Request $request,
                           SessionInterface $session,
-                          CountryRegionRepository $countryRegionRepository,
                           ProductDataService $productDataService)
     {
-        $sessionFilters = $session->get('filters', []);
-
         $session_order_field = $session->get('order_field', 'name');
 
         $orderMapping = [
@@ -129,6 +127,7 @@ class CatalogController extends AbstractController
                                   GrapeSortRepository $grapeSortRepository,
                                   CountryRepository $countryRepository,
                                   CountryRegionRepository $countryRegionRepository,
+                                  AppellationRepository $appellationRepository,
                                   ProductDataService $productDataService)
     {
 //        $pagination = $this->getPagination($request, $session, $productDataService, FrontProductFilter::class);
@@ -143,6 +142,7 @@ class CatalogController extends AbstractController
         $sessionFilters['product']['country'] = $sessionFilters['product']['country'] ?? [];
         $sessionFilters['product']['regions'] = $sessionFilters['product']['regions'] ?? [];
         $sessionFilters['product']['region'] = $sessionFilters['product']['region'] ?? [];
+        $sessionFilters['product']['appellation'] = $sessionFilters['product']['appellation'] ?? [];
         $sessionFilters['product']['vendor'] = $sessionFilters['product']['vendor'] ?? [];
         $sessionFilters['product']['volume'] = $sessionFilters['product']['volume'] ?? [];
         $sessionFilters['product']['alcohol'] = $sessionFilters['product']['alcohol'] ?? [];
@@ -164,14 +164,22 @@ class CatalogController extends AbstractController
         $bottleVolumes = $productDataService->getBottleVolumes();
         $years = $productDataService->getYears();
         $alcohol = $productDataService->getAlcohol();
+
         $filterCountry = $sessionFilters['product']['country'] ? $sessionFilters['product']['country'][0] : null; // 1st elem of array!
+        $filterRegion = $sessionFilters['product']['region'] ? $sessionFilters['product']['region'][0] : null; // 1st elem of array!
 
         $regions = [];// $regionRepository->findWithWines();
-
         if ($filterCountry) {
             $regions = $countryRegionRepository->findBy([
                 'country' => $filterCountry,
             ]);
+        }
+
+        $apps = [];
+        if ($filterRegion) {
+            $apps = $appellationRepository->findBy([
+                'countryRegion' => $filterRegion,
+            ], ['name' => 'asc']);
         }
 
         return $this->render('front/catalog/filters.html.twig', array(
@@ -182,6 +190,7 @@ class CatalogController extends AbstractController
             'wineSugars' => $wineSugars,
             'countries' => $countries,
             'regions' => $regions,
+            'appellations' => $apps,
             'grapeSorts' => $grapeSorts,
             'bottleVolumes' => $bottleVolumes,
             'years' => $years,

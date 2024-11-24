@@ -238,11 +238,6 @@ class Product implements TimestampableInterface
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $appellation;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
     private $packing;
 
     /**
@@ -275,6 +270,11 @@ class Product implements TimestampableInterface
      * @ORM\OneToMany(targetEntity=EventProduct::class, mappedBy="product", orphanRemoval=true)
      */
     private $events;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Appellation::class, inversedBy="products")
+     */
+    private $appellation;
 
 
     public function __construct()
@@ -753,17 +753,6 @@ class Product implements TimestampableInterface
         return $this;
     }
 
-    public function getAppellation(): ?string
-    {
-        return $this->appellation;
-    }
-
-    public function setAppellation($appellation)
-    {
-        $this->appellation = $appellation;
-        return $this;
-    }
-
     public function getSupplier(): ?Supplier
     {
         return $this->supplier;
@@ -1021,6 +1010,18 @@ class Product implements TimestampableInterface
                 $event->setProduct(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getAppellation(): ?Appellation
+    {
+        return $this->appellation;
+    }
+
+    public function setAppellation(?Appellation $appellation): self
+    {
+        $this->appellation = $appellation;
 
         return $this;
     }

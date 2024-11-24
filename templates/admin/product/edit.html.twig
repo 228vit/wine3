@@ -44,11 +44,15 @@
                 </div>
             </div>
             {{ form_row(form.vendor) }}
+
             {{ form_row(form.country) }}
             {{ form_row(form.region) }}
+            {{ form_row(form.appellation) }}
+
             {{ form_row(form.price) }}
             {{ form_row(form.priceStatus) }}
             {{ form_row(form.alcohol) }}
+            {{ form_row(form.content, { attr: { cols: 40, rows: 4 }}) }}
 
             <!-- ratings and grape sorts -->
         </div>
@@ -60,7 +64,6 @@
             {{ form_row(form.serveTemperature) }}
             {{ form_row(form.fermentation) }}
             {{ form_row(form.agingType) }}
-            {{ form_row(form.appellation) }}
 
             {{ form_row(form.metaKeywords) }}
             {{ form_row(form.metaDescription) }}
@@ -134,7 +137,6 @@
 
     <hr />
 
-    {{ form_row(form.content) }}
 
     <div class="form-group row">
         {{ form_label(form.announcePicFile) }}
