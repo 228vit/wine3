@@ -25,6 +25,21 @@ class EventRepository extends ServiceEntityRepository
         parent::__construct($registry, Event::class);
     }
 
+    public function currentMonthFirstEvent(\DateTime $dateStart, \DateTime $dateEnd)
+    {
+        return $this->createQueryBuilder('e')
+            ->andWhere('e.dateTime >= :dateStart')
+            ->andWhere('e.dateTime < :dateEnd')
+            ->setParameter('dateStart', $dateStart)
+            ->setParameter('dateEnd', $dateEnd)
+            ->orderBy('e.id', 'ASC')
+            ->setMaxResults(30)
+            ->getQuery()
+            ->setMaxResults(1)
+            ->getOneOrNullResult()
+        ;
+    }
+
     public function currentMonthEvents(\DateTime $dateStart, \DateTime $dateEnd)
     {
         return $this->createQueryBuilder('e')

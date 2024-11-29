@@ -120,7 +120,7 @@
                                         </div>
                                         <div class="calend__time">{{ cday.event.eventTime }}</div>
                                         <div class="calend__points">
-                                            <a href="{{ path('front_event_show', { slug: cday.event.slug }) }}">
+                                            <a class="eventClick" href="{{ path('front_event_show', { slug: cday.event.slug }) }}">
                                             <svg width="18" height="4" viewBox="0 0 18 4" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                 <circle cx="2" cy="2" r="2" fill="white"></circle>
                                                 <circle cx="9" cy="2" r="2" fill="white"></circle>
@@ -143,33 +143,9 @@
 
                         </div>
                     </div>
-                    <div class="sec-calend__right event-card"><img class="event-card__img"
-                                                                   src="{{ asset('/bigwine/img/eventCard.jpg') }}" alt="">
-                        <div class="event-card__body">
-                            <div class="event-card__top">
-                                <div class="event-card__date title-def title-def_med2">26 Октября / 16:30</div>
-                                <div class="event-card__text text-def">Рождественская выставка красного вина, на лучшей
-                                    локации
-                                </div>
-                                <div class="event-card__locate icon-text icon-text_2">
-                                    <svg class="icon-text__icon" width="14" height="14" viewBox="0 0 14 14" fill="none"
-                                         xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M9.1 4.9C9.1 3.71 8.19 2.8 7 2.8C5.81 2.8 4.9 3.71 4.9 4.9C4.9 6.09 5.81 7 7 7C8.19 7 9.1 6.09 9.1 4.9ZM6.3 4.9C6.3 4.48 6.58 4.2 7 4.2C7.42 4.2 7.7 4.48 7.7 4.9C7.7 5.32 7.42 5.6 7 5.6C6.58 5.6 6.3 5.32 6.3 4.9Z"
-                                              fill="#454F56"/>
-                                        <path d="M6.23 11.41L7 12.11L7.77 11.41C10.5 8.96 11.9 6.86 11.9 4.9C11.9 2.1 9.73 0 7 0C4.27 0 2.1 2.1 2.1 4.9C2.1 6.86 3.5 8.96 6.23 11.41ZM7 1.4C8.96 1.4 10.5 2.87 10.5 4.9C10.5 6.3 9.38 8.12 7 10.22C4.62 8.12 3.5 6.3 3.5 4.9C3.5 2.87 5.04 1.4 7 1.4Z"
-                                              fill="#454F56"/>
-                                        <path d="M11.41 8.96C11.13 9.38 10.78 9.73 10.43 10.15C11.76 10.43 12.6 10.85 12.6 11.2C12.6 11.76 10.08 12.6 7 12.6C3.92 12.6 1.4 11.76 1.4 11.2C1.4 10.85 2.24 10.43 3.57 10.15C3.22 9.73 2.87 9.31 2.59 8.96C0.98 9.45 0 10.22 0 11.2C0 12.95 3.15 14 7 14C10.85 14 14 12.95 14 11.2C14 10.22 13.02 9.45 11.41 8.96Z"
-                                              fill="#454F56"/>
-                                    </svg>
-                                    <span>Москва, ул. Борисова 58/2</span></div>
-                            </div>
-                            <div class="event-card__text2 text-def text-def_2">Телеграмм бот Tripicon - полностью
-                                копирует весь функционал платформы. Вы так же можете связать свой аккаунт в телеграмм с
-                                профилем Tripicon
-                            </div>
-                            <a class="event-card__btn btn-def btn-def_3" href="#"><span>Подробнее</span></a><img
-                                    class="event-card__brand" src="{{ asset('/bigwine/img/1.png') }}" alt="">
-                        </div>
+                    <div id="eventShortInfo" class="sec-calend__right event-card">
+                        {{ render(controller('App\\Controller\\Front\\EventController::thisMonthFirstEvent',
+                            { currentYear: currentYear, currentMonth: currentMonth })) }}
                     </div>
                 </div>
             </div>
@@ -179,6 +155,15 @@
 {% block extra_scripts %}
     <script>
         $(document).ready(function() {
+            $('.eventClick').on('click', function (e) {
+                let url = $(this).attr('href');
+                $.ajax({
+                    url: url
+                }).done(function(json) {
+
+                });
+            }); // event click
+
             $('#currentMonth').on('change', function (e) {
                 let month = $(this).val();
                 let year = $('#currentYear').val();

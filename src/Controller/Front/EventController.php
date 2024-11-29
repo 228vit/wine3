@@ -117,6 +117,41 @@ class EventController extends AbstractController
     }
 
 
+    public function thisMonthFirstEvent(int $currentYear, int $currentMonth,
+                                        Request $request, EventRepository $repository)
+    {
+        $isAjax = $request->isXmlHttpRequest();
+        $template = $isAjax ? 'front/event/show_ajax.html.twig' : 'front/event/show.html.twig';
+        $formatter = new \IntlDateFormatter(
+            'ru_RU',
+            \IntlDateFormatter::LONG,
+            \IntlDateFormatter::LONG
+        );
+
+        $formatter->setPattern('d MMMM');
+
+        // get first event
+        $dateStart = new \DateTime("first day of {$currentYear}-{$currentMonth}");
+        $dateEnd = new \DateTime("last day of {$currentYear}-{$currentMonth}");
+
+        /** @var Event $event */
+        $event = $repository->currentMonthFirstEvent($dateStart, $dateEnd);
+
+        if ($event) {
+            $shortDate = ucwords($formatter->format($event->getDateTime()));
+            $eventTime = $event->getDateTime()->format('H:i');
+            return $this->render('front/event/showShortInfo.html.twig', [
+                'event' => $event,
+                'ruShortDate' => $shortDate,
+                'eventTime' => $eventTime,
+                'short_date' => $event->getDateTime()->format('d M'),
+            ]);
+        }
+
+        return new Response('');
+    }
+
+
     public function topEvent(EntityManagerInterface $em,
                                EventRepository $repository): Response
     {
