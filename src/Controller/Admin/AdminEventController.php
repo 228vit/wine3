@@ -292,6 +292,12 @@ class AdminEventController extends AbstractController
                 $event->setCollage($fileName);
 //                $this->cacheManager->remove('uploads/' . $fileName, 'thumb_square_50');
             }
+            /** @var \Symfony\Component\HttpFoundation\File\UploadedFile $file */
+            if (null !== $file = $event->getAnnouncePicFile()) {
+                $fileName = $fileUploader->uploadEventPic($file,'announce');
+                $event->setAnnouncePic($fileName);
+//                $this->cacheManager->remove('uploads/' . $fileName, 'thumb_square_50');
+            }
 
             $this->em->flush();
             $this->addFlash('success', 'Your changes were saved!');

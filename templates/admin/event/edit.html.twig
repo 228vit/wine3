@@ -23,6 +23,7 @@
 
     {{ form_start(form) }}
 
+    {{ form_row(form.organizer) }}
     {{ form_row(form.name) }}
     {{ form_row(form.dateTime) }}
 
@@ -35,6 +36,19 @@
             {% if row.collage %}
                 <a data-fancybox="gallery" target="_blank" href="{{ asset('uploads/' ~ row.collage) }}"><img
                             src="{{ asset('uploads/' ~ row.collage) | imagine_filter('thumb_square_50') }}" /></a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="form-group row">
+        {{ form_label(form.announcePicFile) }}
+        <div class="col-8">
+            {{ form_widget(form.announcePicFile) }}
+        </div>
+        <div class="col-2">
+            {% if row.announcePic %}
+                <a data-fancybox="gallery" target="_blank" href="{{ asset('uploads/' ~ row.announcePic) }}"><img
+                            src="{{ asset('uploads/' ~ row.announcePic) | imagine_filter('thumb_square_50') }}" /></a>
             {% endif %}
         </div>
     </div>

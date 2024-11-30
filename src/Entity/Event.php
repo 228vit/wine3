@@ -86,6 +86,23 @@ class Event
      */
     private $collagePicFile;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $announcePic;
+
+    /**
+     * @var File
+     *
+     * @Assert\File(mimeTypes={ "image/jpg", "image/jpeg", "image/png", "image/webp" })
+     */
+    private $announcePicFile;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Supplier::class)
+     */
+    private $organizer;
+
     public function __construct()
     {
         $this->vendors = new ArrayCollection();
@@ -308,5 +325,41 @@ class Event
     {
         return $this->getDateTime()->format('H:i');
     }
+
+    public function getAnnouncePic(): ?string
+    {
+        return $this->announcePic;
+    }
+
+    public function setAnnouncePic(?string $announcePic): self
+    {
+        $this->announcePic = $announcePic;
+
+        return $this;
+    }
+
+    public function getAnnouncePicFile(): ?File
+    {
+        return $this->announcePicFile;
+    }
+
+    public function setAnnouncePicFile(File $announcePicFile): Event
+    {
+        $this->announcePicFile = $announcePicFile;
+        return $this;
+    }
+
+    public function getOrganizer(): ?Supplier
+    {
+        return $this->organizer;
+    }
+
+    public function setOrganizer(?Supplier $organizer): self
+    {
+        $this->organizer = $organizer;
+
+        return $this;
+    }
+
 
 }

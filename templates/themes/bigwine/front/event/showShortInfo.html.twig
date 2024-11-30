@@ -1,4 +1,8 @@
+{% if event.announcePic %}
+<img class="event-card__img" src="{{ asset('uploads/' ~ event.announcePic) }}" alt="">
+{% else %}
 <img class="event-card__img" src="{{ asset('/bigwine/img/eventCard.jpg') }}" alt="">
+{% endif %}
 <div class="event-card__body">
     <div class="event-card__top">
         <div class="event-card__date title-def title-def_med2">{{ ruShortDate }} / {{ eventTime }}</div>
@@ -17,10 +21,14 @@
             </svg>
             <span>{{ event.address }}</span></div>
     </div>
-    <div class="event-card__text2 text-def text-def_2">Телеграмм бот Tripicon - полностью
-        копирует весь функционал платформы. Вы так же можете связать свой аккаунт в телеграмм с
-        профилем Tripicon
+    <div class="event-card__text2 text-def text-def_2">
+        {{ event.description }}
     </div>
-    <a class="event-card__btn btn-def btn-def_3" href="#"><span>Подробнее</span></a><img
-            class="event-card__brand" src="{{ asset('/bigwine/img/1.png') }}" alt="">
+    <a class="event-card__btn btn-def btn-def_3" href="#"><span>Подробнее</span></a>
+    {% if event.organizer %}
+        {% if event.organizer.pic %}
+            <img class="event-card__brand" src="{{ asset('uploads/' ~ event.organizer.pic) }}" alt="">
+        {% endif %}
+    {% endif %}
+{#    <img class="event-card__brand" src="{{ asset('/bigwine/img/1.png') }}" alt="">#}
 </div>

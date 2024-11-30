@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Supplier;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -29,6 +30,11 @@ class SupplierType extends AbstractType
                 ],
             ])
             ->add('contactPerson')
+            ->add('picFile', FileType::class, array(
+                'label' => 'PIC',
+                'data_class' => null,
+                'required' => false
+            ))
         ;
     }
 

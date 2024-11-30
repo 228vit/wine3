@@ -6,6 +6,8 @@ use App\Repository\SupplierRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=SupplierRepository::class)
@@ -64,6 +66,18 @@ class Supplier
      * @ORM\ManyToMany(targetEntity=Event::class, mappedBy="suppliers")
      */
     private $events;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $pic;
+
+    /**
+     * @var File
+     *
+     * @Assert\File(mimeTypes={ "image/jpg", "image/jpeg", "image/png", "image/webp" })
+     */
+    private $picFile;
 
     public function __construct()
     {
@@ -251,4 +265,29 @@ class Supplier
 
         return $this;
     }
+
+    public function getPic(): ?string
+    {
+        return $this->pic;
+    }
+
+    public function setPic(?string $pic): self
+    {
+        $this->pic = $pic;
+
+        return $this;
+    }
+
+    public function getPicFile(): ?File
+    {
+        return $this->picFile;
+    }
+
+    public function setPicFile(File $picFile): Supplier
+    {
+        $this->picFile = $picFile;
+        return $this;
+    }
+
+
 }

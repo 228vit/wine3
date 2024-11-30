@@ -117,13 +117,18 @@ class AdminSupplierController extends AbstractController
      *
      * @Route("backend/supplier/{id}/edit", name="backend_supplier_edit", methods={"GET", "POST"})
      */
-    public function editAction(Request $request, Supplier $supplier, FileUploader $fileUploader, EntityManagerInterface $em)
+    public function edit(Request $request, Supplier $supplier, FileUploader $fileUploader, EntityManagerInterface $em)
     {
         $deleteForm = $this->createDeleteForm($supplier);
         $editForm = $this->createForm(SupplierType::class, $supplier);
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
+            /** @var \Symfony\Component\HttpFoundation\File\UploadedFile $file */
+            if (null !== $file = $supplier->getPicFile()) {
+                $fileName = $fileUploader->upload($file,'supplier');
+                $supplier->setPic($fileName);
+            }
 
             $this->getDoctrine()->getManager()->persist($supplier);
             $this->getDoctrine()->getManager()->flush();
@@ -131,11 +136,12 @@ class AdminSupplierController extends AbstractController
 
             return $this->redirectToRoute('backend_supplier_edit', array('id' => $supplier->getId()));
         }
+
         if ($editForm->isSubmitted() && !$editForm->isValid()) {
             $this->addFlash('danger', 'Errors due saving object!');
         }
 
-        return $this->render('admin/common/edit.html.twig', array(
+        return $this->render('admin/supplier/edit.html.twig', array(
             'row' => $supplier,
             'form' => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),
