@@ -47,11 +47,11 @@
                                 <option>Поставщик 3</option>
                                 <option>Поставщик 4</option>
                             </select>
-                            <select class="select-el calend-top__select calend-top__select_2">
-                                <option>Город</option>
-                                <option>Москва</option>
-                                <option>Санкт-Петербург</option>
-                                <option>Нижний Новгород</option>
+                            <select id="citySelector" class="select-el calend-top__select calend-top__select_2">
+                                <option value="">Город</option>
+                                {% for city in cities %}
+                                <option value="{{ city }}" {{ city == currentCity ? 'selected' : '' }}>{{ city }}</option>
+                                {% endfor %}
                             </select>
                             <select id="currentMonth" class="select-el calend-top__select calend-top__select_2">
                                 {% for mnum, month in months %}
@@ -166,6 +166,18 @@
 
                 return false;
             }); // event click
+
+            $('#citySelector').on('change', function (e) {
+                let month = $('#currentMonth').val();
+                let year = $('#currentYear').val();
+                let city = $(this).val();
+                if ('' != city) {
+                    window.location = '{{ path('front_events_calendar') }}?month='+month+'&year='+year+'&city='+city;
+                } else {
+                    window.location = '{{ path('front_events_calendar') }}?month='+month+'&year='+year;
+                }
+
+            });
 
             $('#currentMonth').on('change', function (e) {
                 let month = $(this).val();

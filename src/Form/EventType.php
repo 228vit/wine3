@@ -19,6 +19,7 @@ class EventType extends AbstractType
             ->add('organizer')
             ->add('name')
             ->add('dateTime')
+            ->add('city')
             ->add('address')
             ->add('coordinates')
             ->add('description')

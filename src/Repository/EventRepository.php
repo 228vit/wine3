@@ -40,15 +40,23 @@ class EventRepository extends ServiceEntityRepository
         ;
     }
 
-    public function currentMonthEvents(\DateTime $dateStart, \DateTime $dateEnd)
+    public function currentMonthEvents(\DateTime $dateStart, \DateTime $dateEnd, ?string $city = null)
     {
-        return $this->createQueryBuilder('e')
+        $query = $this->createQueryBuilder('e')
             ->andWhere('e.dateTime >= :dateStart')
             ->andWhere('e.dateTime < :dateEnd')
             ->setParameter('dateStart', $dateStart)
             ->setParameter('dateEnd', $dateEnd)
-            ->orderBy('e.id', 'ASC')
-            ->setMaxResults(30)
+            ->orderBy('e.id', 'ASC');
+
+        if ($city) {
+            $query->andWhere('e.city = :city')
+                ->setParameter('city', $city)
+            ;
+        }
+
+        return
+            $query->setMaxResults(30)
             ->getQuery()
             ->getResult()
         ;

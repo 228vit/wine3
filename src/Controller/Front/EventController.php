@@ -26,6 +26,7 @@ class EventController extends AbstractController
     {
         $month = $request->query->get('month', null);
         $year = $request->query->get('year', null);
+        $city = $request->query->get('city', null);
         if (null === $month AND null === $year) {
             $firstDay = (new \DateTime('first day of this month'));
             $lastDay = (new \DateTime('last day of this month'));
@@ -47,14 +48,24 @@ class EventController extends AbstractController
         }
 
         $totalCalendarDays = (5*7) - 1;
+        $cities = [];
         $calendar = [];
         $currentDay = clone $firstWeekDay;
 
-        $thisMonthEvents = $repository->currentMonthEvents($firstDay, $lastDay);
+        // collect all cities
+        $thisMonthEvents = $repository->currentMonthEvents($firstDay, $lastDay, null);
+        /** @var Event $event */
+        foreach ($thisMonthEvents as $event) {
+            if ($event->getCity()) $cities[$event->getCity()] = trim($event->getCity());
+        }
+
+        // ?city? events
+        $thisMonthEvents = $repository->currentMonthEvents($firstDay, $lastDay, $city);
         $events = [];
         /** @var Event $event */
         foreach ($thisMonthEvents as $event) {
             $events[$event->getDateTime()->format('md')] = $event;
+            if ($event->getCity()) $cities[$event->getCity()] = trim($event->getCity());
         }
 
 //        dd($events);
@@ -93,6 +104,8 @@ class EventController extends AbstractController
         $template = $isAjax ? 'front/event/calendar.html.twig' : 'front/event/calendar.html.twig';
 
         return $this->render($template, array(
+            'currentCity' => $city,
+            'cities' => array_filter($cities),
             'calendar' => $calendar,
             'currentMonth' => $currentMonth,
             'currentYear' => $currentYear,

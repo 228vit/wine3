@@ -32,6 +32,11 @@ class Event
     private $dateTime;
 
     /**
+     * @ORM\Column(type="string", length=100, nullable=true)
+     */
+    private $city;
+
+    /**
      * @ORM\Column(type="string", length=512)
      */
     private $address;
@@ -358,6 +363,18 @@ class Event
     {
         $this->organizer = $organizer;
 
+        return $this;
+    }
+
+    public function getCity(): ?string
+    {
+        return $this->city;
+    }
+
+
+    public function setCity(?string $city)
+    {
+        $this->city = $city;
         return $this;
     }
 
