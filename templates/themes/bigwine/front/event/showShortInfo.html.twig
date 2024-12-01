@@ -24,7 +24,7 @@
     <div class="event-card__text2 text-def text-def_2">
         {{ event.description }}
     </div>
-    <a class="event-card__btn btn-def btn-def_3" href="#"><span>Подробнее</span></a>
+    <a class="event-card__btn btn-def btn-def_3" href="{{ path('front_event_show', {slug: event.slug}) }}"><span>Подробнее</span></a>
     {% if event.organizer %}
         {% if event.organizer.pic %}
             <img class="event-card__brand" src="{{ asset('uploads/' ~ event.organizer.pic) }}" alt="">

@@ -1,6 +1,6 @@
 {% extends 'layout_front_event.html.twig' %}
 
-{% block title %}Events{% endblock %}
+{% block title %}Мероприятия :: Bigwine{% endblock %}
 
 {% block body %}
     <section class="sec-page sec-calend">
@@ -35,14 +35,14 @@
                                     </svg>
                                 </div>
                             </div>
+{#                            <select class="select-el calend-top__select">#}
+{#                                <option>Вебинары ???</option>#}
+{#                                <option>Вебинары 2</option>#}
+{#                                <option>Вебинары 3</option>#}
+{#                                <option>Вебинары 4</option>#}
+{#                            </select>#}
                             <select class="select-el calend-top__select">
-                                <option>Вебинары ???</option>
-                                <option>Вебинары 2</option>
-                                <option>Вебинары 3</option>
-                                <option>Вебинары 4</option>
-                            </select>
-                            <select class="select-el calend-top__select">
-                                <option>Все поставщики ???</option>
+                                <option>Огранизатор</option>
                                 <option>Поставщик 2</option>
                                 <option>Поставщик 3</option>
                                 <option>Поставщик 4</option>
@@ -113,14 +113,14 @@
                                         <div class="calend__date">{{ cday.day }}</div>
                                     </div>
                                 {% else %}
-                                    <div class="calend__col active eventClick" data-rel="{{ path('front_event_show', { slug: cday.event.slug }) }}">
+                                    <div class="calend__col active eventClick" data-rel="{{ path('front_event_short_view', { slug: cday.event.slug }) }}">
                                         <div class="calend__date">{{ cday.day }}</div>
                                         <div class="calend__title2">
                                             {{ cday.event.name }}
                                         </div>
                                         <div class="calend__time">{{ cday.event.eventTime }}</div>
                                         <div class="calend__points">
-                                            <a class="eventClick" href="{{ path('front_event_show', { slug: cday.event.slug }) }}">
+                                            <a class="eventShow" href="{{ path('front_event_show', { slug: cday.event.slug }) }}">
                                             <svg width="18" height="4" viewBox="0 0 18 4" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                 <circle cx="2" cy="2" r="2" fill="white"></circle>
                                                 <circle cx="9" cy="2" r="2" fill="white"></circle>
@@ -156,12 +156,15 @@
     <script>
         $(document).ready(function() {
             $('.eventClick').on('click', function (e) {
-                let url = $(this).attr('href');
+                e.preventDefault();
+                let url = $(this).attr('data-rel');
                 $.ajax({
                     url: url
-                }).done(function(json) {
-
+                }).done(function(html) {
+                    $('#eventShortInfo').html(html);
                 });
+
+                return false;
             }); // event click
 
             $('#currentMonth').on('change', function (e) {
@@ -170,9 +173,9 @@
                 window.location = '{{ path('front_events_calendar') }}?month='+month+'&year='+year;
             });
 
-            $('.eventClick').on('click', function (e) {
-                window.location = $(this).attr('data-rel');
-            });
+            // $('.eventClick').on('click', function (e) {
+            //     window.location = $(this).attr('data-rel');
+            // });
         })
     </script>
 {% endblock %}

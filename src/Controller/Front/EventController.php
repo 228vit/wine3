@@ -54,10 +54,17 @@ class EventController extends AbstractController
         $events = [];
         /** @var Event $event */
         foreach ($thisMonthEvents as $event) {
-            $events[$event->getDateTime()->format('d')] = $event;
+            $events[$event->getDateTime()->format('md')] = $event;
         }
 
+//        dd($events);
+
         for ($i = 0; $i <= $totalCalendarDays; $i++) {
+            $monthDayNum = $currentDay->format('md');
+            if (isset($events[$monthDayNum])) {
+//                dd($events[$monthDayNum]);
+            }
+
             $dayNum = $currentDay->format('d');
             $calendar[] = [
                 'day' => $dayNum,
@@ -66,11 +73,13 @@ class EventController extends AbstractController
                 'month' => $currentDay->format('m'),
                 'isCurrentMonth' => $currentMonth === $currentDay->format('m'),
                 'isWeekend' => $currentDay->format('N') >= 6 ? true : false,
-                'event' => isset($events[$dayNum]) ? $events[$dayNum] : false,
+                'event' => isset($events[$monthDayNum]) ? $events[$monthDayNum] : false,
             ];
 
             $currentDay->modify('+ 1 day');
         }
+
+//        dd($calendar);
 
         $years = [];
         $startYear = (int)date('Y') - 1;
@@ -116,12 +125,11 @@ class EventController extends AbstractController
         ));
     }
 
-
-    public function thisMonthFirstEvent(int $currentYear, int $currentMonth,
-                                        Request $request, EventRepository $repository)
+    /**
+     * @Route("/event/{slug}/short_view", name="front_event_short_view")
+     */
+    public function renderShortView(Event $event)
     {
-        $isAjax = $request->isXmlHttpRequest();
-        $template = $isAjax ? 'front/event/show_ajax.html.twig' : 'front/event/show.html.twig';
         $formatter = new \IntlDateFormatter(
             'ru_RU',
             \IntlDateFormatter::LONG,
@@ -129,6 +137,22 @@ class EventController extends AbstractController
         );
 
         $formatter->setPattern('d MMMM');
+        $shortDate = ucwords($formatter->format($event->getDateTime()));
+        $eventTime = $event->getDateTime()->format('H:i');
+
+        return $this->render('front/event/showShortInfo.html.twig', [
+            'event' => $event,
+            'ruShortDate' => $shortDate,
+            'eventTime' => $eventTime,
+            'short_date' => $event->getDateTime()->format('d M'),
+        ]);
+    }
+
+    public function thisMonthFirstEvent(int $currentYear, int $currentMonth,
+                                        Request $request, EventRepository $repository)
+    {
+//        $isAjax = $request->isXmlHttpRequest();
+//        $template = $isAjax ? 'front/event/show_ajax.html.twig' : 'front/event/show.html.twig';
 
         // get first event
         $dateStart = new \DateTime("first day of {$currentYear}-{$currentMonth}");
@@ -138,14 +162,7 @@ class EventController extends AbstractController
         $event = $repository->currentMonthFirstEvent($dateStart, $dateEnd);
 
         if ($event) {
-            $shortDate = ucwords($formatter->format($event->getDateTime()));
-            $eventTime = $event->getDateTime()->format('H:i');
-            return $this->render('front/event/showShortInfo.html.twig', [
-                'event' => $event,
-                'ruShortDate' => $shortDate,
-                'eventTime' => $eventTime,
-                'short_date' => $event->getDateTime()->format('d M'),
-            ]);
+            return $this->renderShortView($event);
         }
 
         return new Response('');
