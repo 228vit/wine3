@@ -4,7 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\EventVisitor;
 use App\Filter\EventFilter;
-use App\Form\EventOrganizerType;
+use App\Form\EventVisitorType;
 use App\Form\EventType;
 use App\Repository\EventRepository;
 use App\Service\FileUploader;
@@ -85,7 +85,7 @@ class AdminEventVisitorController extends AbstractController
     public function new(Request $request, EventRepository $repository, EntityManagerInterface $em)
     {
         $event = new EventVisitor();
-        $form = $this->createForm(EventOrganizerType::class, $event);
+        $form = $this->createForm(EventVisitorType::class, $event);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -132,7 +132,7 @@ class AdminEventVisitorController extends AbstractController
     public function edit(Request $request, EventVisitor $event, FileUploader $fileUploader, EntityManagerInterface $em)
     {
         $deleteForm = $this->createDeleteForm($event);
-        $editForm = $this->createForm(EventOrganizerType::class, $event);
+        $editForm = $this->createForm(EventVisitorType::class, $event);
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
