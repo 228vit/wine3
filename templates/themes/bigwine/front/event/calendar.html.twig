@@ -76,7 +76,9 @@
                             </div>
                         </div>
                     </div>
-                    <a class="calend-top__btn btn-def" href="#"><span>+ Добавить </span></a>
+
+                    <a class="calend-top__btn btn-def btn-modal" data-modal="#modal-event-org" href="#"><span>+ Добавить </span></a>
+
                 </div>
 
                 <div class="sec-calend__content">
@@ -155,6 +157,26 @@
 {% block extra_scripts %}
     <script>
         $(document).ready(function() {
+            $('#organizerForm').on('submit', function (e) {
+                e.preventDefault();
+
+                let form = $(this);
+                $.ajax({
+                    url: form.attr('action'),
+                    data: form.serialize(),
+                    dataType: 'json',
+                    method: 'POST',
+                    success: function (data) {
+                        alert('Ваша заявка отправлена, администратор с Вами свяжется!');
+                        $('#modal-event-org').hide('slow');
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.log(textStatus, errorThrown);
+                        alert('Ошибка при отправке формы: ' + errorThrown);
+                    },
+                })
+            });
+
             $('.eventClick').on('click', function (e) {
                 e.preventDefault();
                 let url = $(this).attr('data-rel');

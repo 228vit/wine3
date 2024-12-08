@@ -3,11 +3,13 @@
 namespace App\Controller\Front;
 
 use App\Entity\Event;
+use App\Entity\EventOrganizer;
 use App\Repository\EventRepository;
 use App\Repository\PageRepository;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -15,6 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class EventController extends AbstractController
 {
+    use FrontTraitController;
 
     public const TOP_EVENTS = 3;
 
@@ -164,9 +167,6 @@ class EventController extends AbstractController
     public function thisMonthFirstEvent(int $currentYear, int $currentMonth,
                                         Request $request, EventRepository $repository)
     {
-//        $isAjax = $request->isXmlHttpRequest();
-//        $template = $isAjax ? 'front/event/show_ajax.html.twig' : 'front/event/show.html.twig';
-
         // get first event
         $dateStart = new \DateTime("first day of {$currentYear}-{$currentMonth}");
         $dateEnd = new \DateTime("last day of {$currentYear}-{$currentMonth}");
@@ -202,6 +202,37 @@ class EventController extends AbstractController
         }
 
         return new Response($event->getContent());
+    }
+
+    /**
+     * @Route("/event_organizer_new", name="front_event_organizer_new")
+     */
+    public function newOrganizer(Request $request)
+    {
+        $companyName = $request->get('companyName', null);
+        $person = $request->get('person', null);
+        $jobTitle = $request->get('jobTitle', null);
+        $phone = $request->get('phone', null);
+        $email = $request->get('email', null);
+        $description = $request->get('description', null);
+
+        $eventOrg = (new EventOrganizer())
+            ->setName($companyName)
+            ->setPerson($person)
+            ->setEmail($email)
+            ->setJobTitle($jobTitle)
+            ->setPhone($phone)
+            ->setDescription($description)
+        ;
+
+        try {
+            $this->em->persist($eventOrg);
+            $this->em->flush();
+        } catch (\Exception $e) {
+            return new JsonResponse(['message' => $e->getMessage()], 400);
+        }
+
+        return new JsonResponse(['message' => 'Success']);
     }
 
 }
