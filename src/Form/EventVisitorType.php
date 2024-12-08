@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Entity\EventVisitor;
 use App\Entity\Supplier;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -35,7 +36,7 @@ class EventVisitorType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => Supplier::class,
+            'data_class' => EventVisitor::class,
         ]);
     }
 }
