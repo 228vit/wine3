@@ -242,6 +242,7 @@ class EventController extends AbstractController
      */
     public function newVisitor(Event $event, Request $request)
     {
+        // todo: validate
         $company = $request->get('company', null);
         $name = $request->get('name', null);
         $phone = $request->get('phone', null);
