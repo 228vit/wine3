@@ -108,12 +108,18 @@ class Event
      */
     private $organizer;
 
+    /**
+     * @ORM\OneToMany(targetEntity=EventVisitor::class, mappedBy="event", orphanRemoval=true)
+     */
+    private $visitors;
+
     public function __construct()
     {
         $this->vendors = new ArrayCollection();
         $this->suppliers = new ArrayCollection();
         $this->products = new ArrayCollection();
         $this->eventPics = new ArrayCollection();
+        $this->visitors = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -375,6 +381,36 @@ class Event
     public function setCity(?string $city)
     {
         $this->city = $city;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, EventVisitor>
+     */
+    public function getVisitors(): Collection
+    {
+        return $this->visitors;
+    }
+
+    public function addVisitor(EventVisitor $visitor): self
+    {
+        if (!$this->visitors->contains($visitor)) {
+            $this->visitors[] = $visitor;
+            $visitor->setEvent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVisitor(EventVisitor $visitor): self
+    {
+        if ($this->visitors->removeElement($visitor)) {
+            // set the owning side to null (unless already changed)
+            if ($visitor->getEvent() === $this) {
+                $visitor->setEvent(null);
+            }
+        }
+
         return $this;
     }
 

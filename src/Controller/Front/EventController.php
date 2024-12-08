@@ -4,6 +4,7 @@ namespace App\Controller\Front;
 
 use App\Entity\Event;
 use App\Entity\EventOrganizer;
+use App\Entity\EventVisitor;
 use App\Repository\EventRepository;
 use App\Repository\PageRepository;
 use App\Repository\ProductRepository;
@@ -124,8 +125,9 @@ class EventController extends AbstractController
      */
     public function show(Request $request, Event $event, EventRepository $repository)
     {
-        $isAjax = $request->isXmlHttpRequest();
-        $template = $isAjax ? 'front/event/show_ajax.html.twig' : 'front/event/show.html.twig';
+//        $isAjax = $request->isXmlHttpRequest();
+//        $template = $isAjax ? 'front/event/show_ajax.html.twig' : 'front/event/show.html.twig';
+        $template = 'front/event/show.html.twig';
         $formatter = new \IntlDateFormatter(
             'ru_RU',
             \IntlDateFormatter::LONG,
@@ -135,7 +137,7 @@ class EventController extends AbstractController
         $shortDate = ucwords($formatter->format($event->getDateTime()));
 
         return $this->render($template, array(
-            'row' => $event,
+            'event' => $event,
             'ruShortDate' => $shortDate,
             'short_date' => $event->getDateTime()->format('d M'),
         ));
@@ -227,6 +229,34 @@ class EventController extends AbstractController
 
         try {
             $this->em->persist($eventOrg);
+            $this->em->flush();
+        } catch (\Exception $e) {
+            return new JsonResponse(['message' => $e->getMessage()], 400);
+        }
+
+        return new JsonResponse(['message' => 'Success']);
+    }
+
+    /**
+     * @Route("/event_visitor_new/{id}", name="front_event_visitor_new")
+     */
+    public function newVisitor(Event $event, Request $request)
+    {
+        $company = $request->get('company', null);
+        $name = $request->get('name', null);
+        $phone = $request->get('phone', null);
+        $email = $request->get('email', null);
+
+        $eventVisitor = (new EventVisitor())
+            ->setEvent($event)
+            ->setName($name)
+            ->setCompany($company)
+            ->setEmail($email)
+            ->setPhone($phone)
+        ;
+
+        try {
+            $this->em->persist($eventVisitor);
             $this->em->flush();
         } catch (\Exception $e) {
             return new JsonResponse(['message' => $e->getMessage()], 400);

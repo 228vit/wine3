@@ -1,6 +1,6 @@
 {% extends 'layout_front_event.html.twig' %}
 
-{% block title %}Event :: {{ row.name }}{% endblock %}
+{% block title %}Event :: {{ event.name }}{% endblock %}
 
 {% block body %}
     <section class="sec-page sec-event">
@@ -13,10 +13,10 @@
                 </div>
                 <div class="sec-event__top">
                     <div class="sec-event__top-left">
-                        <div class="sec-event__title title-def title-def_sec">{{ ruShortDate }} <span>/ {{ row.name }}</span>
+                        <div class="sec-event__title title-def title-def_sec">{{ ruShortDate }} <span>/ {{ event.name }}</span>
                         </div>
                         <div class="sec-event__info">
-                            <div class="sec-event__date date">{{ row.dateTime | date }}</div>
+                            <div class="sec-event__date date">{{ event.dateTime | date }}</div>
                             <div class="icon-text">
                                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
                                      xmlns="http://www.w3.org/2000/svg">
@@ -27,36 +27,26 @@
                                     <path d="M11.41 8.96C11.13 9.38 10.78 9.73 10.43 10.15C11.76 10.43 12.6 10.85 12.6 11.2C12.6 11.76 10.08 12.6 7 12.6C3.92 12.6 1.4 11.76 1.4 11.2C1.4 10.85 2.24 10.43 3.57 10.15C3.22 9.73 2.87 9.31 2.59 8.96C0.98 9.45 0 10.22 0 11.2C0 12.95 3.15 14 7 14C10.85 14 14 12.95 14 11.2C14 10.22 13.02 9.45 11.41 8.96Z"
                                           fill="#454F56"/>
                                 </svg>
-                                <span>{{ row.address }}</span></div>
+                                <span>{{ event.address }}</span></div>
                         </div>
                     </div>
                     <div class="sec-event__top-right"><img class="sec-event__imgBrand" src="../img/1.png" alt=""><a
                                 class="sec-event__btn btn-def btn-def_border btn-modal" href="#"
-                                data-modal="#modal-partner"><span>Стать партнером</span></a><a
-                                class="sec-event__btn btn-def" href="#"><span>Участвовать</span></a></div>
+                                data-modal="#modal-partner"><span>Стать партнером</span></a>
+                        <a data-modal="#modal-visitor"
+                                class="sec-event__btn btn-def btn-modal" href="#"><span>Участвовать</span></a></div>
                 </div>
-                <div class="sec-event__img"><img class="sec-event__img-img" src="{{ asset('/uploads/' ~ row.collage) }}" alt=""></div>
+                <div class="sec-event__img"><img class="sec-event__img-img" src="{{ asset('/uploads/' ~ event.collage) }}" alt=""></div>
                 <div class="sec-event__content">
                     <div class="sec-event__tabs tabs"><a class="tabs__el" href="#">О событий</a><a
                                 class="tabs__el active" href="#">Отчет события</a></div>
                     <div class="sec-event__text wrap-article text-info">
 
-                        {{ row.description }}
+                        {{ event.description }}
 
-{#                        <p>Исследование инвестиционного агенства Knight Frank показало, что во время пандемии вина Бордо#}
-{#                            приносили большую доходность, чем часы Rolex и Cartier или сумки Hermès Birkin. С мая 2020#}
-{#                            по июнь 2021 инвестиционная стоимость вин в среднем выросла на 13%, тогда как стоимость#}
-{#                            люксовых сумок в среднем упала на 3%. Люксовые часы и машины прибавили в стоимости на 5% и#}
-{#                            4%, но эти показатели все равно ниже, чем те, которые получили вина Бордо винтажей 1996 и#}
-{#                            2000.</p>#}
-{#                        <p>По словам управляющего директора Liv-ex Руперта Мияра (Rupert Millar), цены растут не только#}
-{#                            на премиальные вина из Бордо: «Вина, которые выигрывают в цене больше всего, помимо#}
-{#                            классических французских регионов как Бордо, Бургундия и Шампань, – это известные бренды из#}
-{#                            Италии и США».</p>#}
                     </div>
                     <div class="sec-event__gal gal-def row">
-
-                        {% for eventPic in row.eventPics %}
+                        {% for eventPic in event.eventPics %}
                             <div class="col-4 col-md-3 col-lg-2 col-xl-1 gal-def__el"><a
                                 class="gal-def-el"
                                 href="{{ asset('/uploads/' ~ eventPic.pic) }}"
@@ -65,13 +55,7 @@
                                     src="{{ asset('/uploads/' ~ eventPic.pic) | imagine_filter('thumb_event_pic') }}" alt=""></a>
                             </div>
                         {% endfor %}
-
-{#                        <div class="col-4 col-md-3 col-lg-2 col-xl-1 gal-def__el"><a class="gal-def-el"#}
-{#                                                                                     href="../img/gal/big/2.jpg"#}
-{#                                                                                     data-fancybox="gal"><img#}
-{#                                        class="gal-def-el__img" src="../img/gal/2.jpg" alt=""></a></div>#}
-
-                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -88,7 +72,7 @@
                 <div class="sec-products__content">
                     <div class="products-min swiper">
                         <div class="swiper-wrapper">
-                            {% for eventProduct in row.products %}
+                            {% for eventProduct in event.products %}
                                 <div class="products-min__el swiper-slide"><a
                                             class="products-min-el"
                                             href="{{ asset('/uploads/' ~ eventProduct.product.contentPic) }}"><img
@@ -106,12 +90,34 @@
             </div>
         </div>
     </section>
+{% endblock %}
 
+{% block extra_modals %}
+    {% include 'front/modals/modalVisitor.html.twig' %}
 {% endblock %}
 
 {% block extra_scripts %}
     <script>
         $(document).ready(function() {
+            $('#eventVisitorForm').on('submit', function (e) {
+                e.preventDefault();
+
+                let form = $(this);
+                $.ajax({
+                    url: form.attr('action'),
+                    data: form.serialize(),
+                    dataType: 'json',
+                    method: 'POST',
+                    success: function (data) {
+                        alert('Ваша заявка отправлена, администратор с Вами свяжется!');
+                        $('#modal-event-org').hide('slow');
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.log(textStatus, errorThrown);
+                        alert('Ошибка при отправке формы: ' + errorThrown);
+                    },
+                })
+            });
 
         })
     </script>
