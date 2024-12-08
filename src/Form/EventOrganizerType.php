@@ -32,6 +32,9 @@ class EventOrganizerType extends AbstractType
             ->add('isChecked', null, [
                 'label' => 'Проверен администратором'
             ])
+            ->add('description', null, [
+                'label' => 'Описание мероприятия'
+            ])
         ;
     }
 
