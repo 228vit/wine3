@@ -2,15 +2,18 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Event;
 use App\Entity\EventOrganizer;
 use App\Filter\EventFilter;
 use App\Form\EventOrganizerType;
 use App\Form\EventType;
+use App\Repository\EventOrganizerRepository;
 use App\Repository\EventRepository;
 use App\Service\FileUploader;
 use App\Utils\Slugger;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\HttpFoundation\Request;
@@ -152,29 +155,22 @@ class AdminEventOrganizerController extends AbstractController
     /**
      * Deletes a event_organizer entity.
      *
-     * @Route("backend/event_organizer/{id}", name="backend_event_organizer_delete", methods={"DELETE"})
+     * @Route("backend/event_organizer/{id}/delete", name="backend_event_organizer_delete", methods={"POST"})
      */
-    public function delete(Request $request, EventOrganizer $event)
+    public function delete(Request $request, EventOrganizer $row, EventOrganizerRepository $repository)
     {
-        $filter_form = $this->createDeleteForm($event);
-        $filter_form->handleRequest($request);
-
-        if ($filter_form->isSubmitted() && $filter_form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->remove($event);
-            $em->flush();
-
+        if ($this->isCsrfTokenValid('delete'.$row->getId(), $request->request->get('_token'))) {
+            $repository->remove($row);
             $this->addFlash('success', 'Record was successfully deleted!');
-        }
 
-        if (!$filter_form->isValid()) {
-            /** @var FormErrorIterator $errors */
-            $errors = $filter_form->getErrors()->__toString();
-            $this->addFlash('danger', 'Error due deletion! ' . $errors);
-        }
+            return $this->redirectToRoute('backend_event_organizer_index');
+        } else {
+            $this->addFlash('danger', 'Bad request!');
 
-        return $this->redirectToRoute('backend_event_organizer_index');
+            return $this->redirectToRoute('backend_event_organizer_edit', ['id' => $row->getId()]);
+        }
     }
+
 
     /**
      * Creates a form to delete a event_organizer entity.

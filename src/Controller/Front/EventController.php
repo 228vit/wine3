@@ -9,9 +9,11 @@ use App\Repository\EventRepository;
 use App\Repository\PageRepository;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -121,12 +123,10 @@ class EventController extends AbstractController
     }
 
     /**
-     * @Route("/event/{slug}", name="front_event_show")
+     * @Route("/event/view/{slug}", name="front_event_show")
      */
-    public function show(Request $request, Event $event, EventRepository $repository)
+    public function show(Event $event, Request $request, EventRepository $repository)
     {
-//        $isAjax = $request->isXmlHttpRequest();
-//        $template = $isAjax ? 'front/event/show_ajax.html.twig' : 'front/event/show.html.twig';
         $template = 'front/event/show.html.twig';
         $formatter = new \IntlDateFormatter(
             'ru_RU',
@@ -144,7 +144,7 @@ class EventController extends AbstractController
     }
 
     /**
-     * @Route("/event/{slug}/short_view", name="front_event_short_view")
+     * @Route("/event/short_view/{slug}", name="front_event_short_view")
      */
     public function renderShortView(Event $event)
     {
@@ -238,15 +238,25 @@ class EventController extends AbstractController
     }
 
     /**
-     * @Route("/event_visitor_new/{id}", name="front_event_visitor_new")
+     * @Route("/event_visitor_new/{slug}", name="front_event_visitor_new")
      */
-    public function newVisitor(Event $event, Request $request)
+    public function newVisitor(Event $event, Request $request, MailerInterface $mailer)
     {
         // todo: validate
         $company = $request->get('company', null);
         $name = $request->get('name', null);
         $phone = $request->get('phone', null);
         $email = $request->get('email', null);
+        $telegram = $request->get('telegram', null);
+        $vk = $request->get('vk', null);
+        $year = $request->get('birthYear', null);
+        $month = $request->get('birthMonth', null);
+        try {
+            $date = new \DateTimeImmutable("{$year}-{$month}-01");
+        } catch (\Exception $e) {
+
+            $date = null;
+        }
 
         $eventVisitor = (new EventVisitor())
             ->setEvent($event)
@@ -254,16 +264,33 @@ class EventController extends AbstractController
             ->setCompany($company)
             ->setEmail($email)
             ->setPhone($phone)
+            ->setTelegram($telegram)
+            ->setVk($vk)
+            ->setBirthDate($date)
         ;
 
         try {
             $this->em->persist($eventVisitor);
             $this->em->flush();
+
         } catch (\Exception $e) {
             return new JsonResponse(['message' => $e->getMessage()], 400);
         }
 
-        return new JsonResponse(['message' => 'Success']);
+        $senderEmail = $this->getParameter('mailer_sender_email');
+
+        $email = (new TemplatedEmail())
+            ->from($senderEmail)
+            ->to($eventVisitor->getEmail())
+            ->subject('[BigWine] Заявка на посещение мероприятия')
+            ->htmlTemplate('front/email_templates/new_event_visitor.html.twig')
+            ->context([
+                'event' => $event,
+            ])
+        ;
+        $mailer->send($email);
+
+        return new JsonResponse(['message' => 'Success', 'mail' => 'sent']);
     }
 
 }

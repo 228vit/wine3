@@ -48,6 +48,21 @@ class EventVisitor
      */
     private $isChecked;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $telegram;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $vk;
+
+    /**
+     * @ORM\Column(type="date", nullable=true)
+     */
+    private $birthDate;
+
     public function __construct()
     {
         $this->isChecked = false;
@@ -133,5 +148,41 @@ class EventVisitor
     public function __toString()
     {
         return $this->getName();
+    }
+
+    public function getTelegram(): ?string
+    {
+        return $this->telegram;
+    }
+
+    public function setTelegram(?string $telegram): self
+    {
+        $this->telegram = $telegram;
+
+        return $this;
+    }
+
+    public function getVk(): ?string
+    {
+        return $this->vk;
+    }
+
+    public function setVk(?string $vk): self
+    {
+        $this->vk = $vk;
+
+        return $this;
+    }
+
+    public function getBirthDate(): ?\DateTimeInterface
+    {
+        return $this->birthDate;
+    }
+
+    public function setBirthDate(?\DateTimeInterface $birthDate): self
+    {
+        $this->birthDate = $birthDate;
+
+        return $this;
     }
 }

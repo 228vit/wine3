@@ -109,8 +109,9 @@
                     dataType: 'json',
                     method: 'POST',
                     success: function (data) {
-                        alert('Ваша заявка отправлена, администратор с Вами свяжется!');
-                        $('#modal-visitor').hide('slow');
+                        $('#modalFlashBody').html('Ваша заявка отправлена, администратор с Вами свяжется!');
+                        $('#modal-visitor').hide();
+                        $('#modalFlash').show();
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         console.log(textStatus, errorThrown);

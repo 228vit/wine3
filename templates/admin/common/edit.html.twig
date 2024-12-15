@@ -26,12 +26,30 @@
             {{ form_end(form) }}
         </div>
         <div class="col-4 text-right">
-            {{ form_start(delete_form) }}
-            <button class="btn btn-danger delete-button" type="submit"><i class="fa fa-exclamation"></i> Delete</button>
-            {{ form_end(delete_form) }}
+            <form method="post" action="{{ path('backend_' ~ model ~ '_delete', {'id': row.id}) }}"
+                  onsubmit="return confirm('Are you sure you want to delete this item?');">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ row.id) }}">
+                <button class="btn btn-danger delete-button" type="submit"><i
+                        class="fa fa-exclamation"></i> Delete</button>
+            </form>
         </div>
     </div>
 
     <br />
 
+{% endblock %}
+{% block extra_scripts %}
+    <script>
+        $(document).ready(function() {
+            $('.confirmSubmit').on('click', function (e) {
+                e.preventDefault();
+                if (confirm('Are you sure?')) {
+
+                    $(this).parent().submit();
+                }
+
+                return false;
+            })
+        });
+    </script>
 {% endblock %}

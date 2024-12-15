@@ -17,7 +17,11 @@ class EventVisitorType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
+            ->add('company')
             ->add('name')
+            ->add('birthDate', null, [
+                'years' => range(1970, date('Y')),
+            ])
             ->add('phone')
             ->add('email', TextType::class, [
                 'constraints' => [
@@ -29,7 +33,11 @@ class EventVisitorType extends AbstractType
                     ]),
                 ],
             ])
-            ->add('company')
+            ->add('telegram')
+            ->add('vk')
+            ->add('isChecked', null, [
+                'label' => 'Проверен администратором?'
+            ])
         ;
     }
 

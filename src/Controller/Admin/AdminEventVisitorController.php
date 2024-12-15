@@ -7,6 +7,7 @@ use App\Filter\EventFilter;
 use App\Form\EventVisitorType;
 use App\Form\EventType;
 use App\Repository\EventRepository;
+use App\Repository\EventVisitorRepository;
 use App\Service\FileUploader;
 use App\Utils\Slugger;
 use Doctrine\ORM\EntityManagerInterface;
@@ -34,7 +35,7 @@ class AdminEventVisitorController extends AbstractController
      */
     public function index(Request $request, SessionInterface $session)
     {
-        $pagination = $this->getPagination($request, $session, EventFilter::class);
+        $pagination = $this->getPagination($request, $session, EventFilter::class, 'id', 'DESC');
 
         return $this->render('admin/common/index.html.twig', array(
             'pagination' => $pagination,
@@ -158,28 +159,20 @@ class AdminEventVisitorController extends AbstractController
     /**
      * Deletes a event_visitor entity.
      *
-     * @Route("backend/event_visitor/{id}", name="backend_event_visitor_delete", methods={"DELETE"})
+     * @Route("backend/event_visitor/{id}/delete", name="backend_event_visitor_delete", methods={"POST"})
      */
-    public function delete(Request $request, EventVisitor $event)
+    public function delete(Request $request, EventVisitor $row, EventVisitorRepository $repository)
     {
-        $filter_form = $this->createDeleteForm($event);
-        $filter_form->handleRequest($request);
-
-        if ($filter_form->isSubmitted() && $filter_form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->remove($event);
-            $em->flush();
-
+        if ($this->isCsrfTokenValid('delete'.$row->getId(), $request->request->get('_token'))) {
+            $repository->remove($row);
             $this->addFlash('success', 'Record was successfully deleted!');
-        }
 
-        if (!$filter_form->isValid()) {
-            /** @var FormErrorIterator $errors */
-            $errors = $filter_form->getErrors()->__toString();
-            $this->addFlash('danger', 'Error due deletion! ' . $errors);
-        }
+            return $this->redirectToRoute('backend_event_visitor_index');
+        } else {
+            $this->addFlash('danger', 'Bad request!');
 
-        return $this->redirectToRoute('backend_event_visitor_index');
+            return $this->redirectToRoute('backend_event_visitor_edit', ['id' => $row->getId()]);
+        }
     }
 
     /**

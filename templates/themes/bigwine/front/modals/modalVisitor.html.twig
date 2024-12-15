@@ -8,26 +8,59 @@
                           fill="#084ED7"/>
                 </svg>
             </div>
-            <div class="modal-content__content">
-                <form id="eventVisitorForm" action="{{ path('front_event_visitor_new', {id: event.id}) }}">
+            <div class="modal-content__content" id="eventVisitorRegister">
+                <form id="eventVisitorForm" action="{{ path('front_event_visitor_new', {slug: event.slug}) }}">
 
                 <div class="modal-content__title title-def title-def_med">Посетить мероприятие</div>
                 <div class="modal-content__form block-form">
                     <div class="modal-content__el form-el form-el_m">
                         <div class="form-el__title">Название вашей компании</div>
-                        <input name="company" class="form-el__inp inp-def" type="text" value="">
+                        <input id="companyName" name="company" class="form-el__inp inp-def" type="text" value="" required>
                     </div>
                     <div class="modal-content__el form-el form-el_m">
                         <div class="form-el__title">ФИО</div>
-                        <input name="name" class="form-el__inp inp-def" type="text" value="">
+                        <input name="name" class="form-el__inp inp-def" type="text" value="" required>
+                    </div>
+                    <div class="modal-content__el form-el form-el_m">
+{#                        <div class="form-el__title">Дата рождения</div>#}
+                            <select class="select-el calend-top__select calend-top__select_2" name="birthYear" style="display: inline;">
+                                <option value="">Год рождения</option>
+                                {% for y in 1920..2020  %}
+                                    <option value="{{ y }}">{{ y }}</option>
+                                {% endfor %}
+                            </select>
+                            <select class="select-el calend-top__select calend-top__select_2" name="birthMonth"  style="display: inline;">
+                                <option value="">Месяц</option>
+                                <option value="01">январь</option>
+                                <option value="02">февраль</option>
+                                <option value="03">март</option>
+                                <option value="04">апрель</option>
+                                <option value="05">май</option>
+                                <option value="06">июнь</option>
+                                <option value="07">июль</option>
+                                <option value="08">август</option>
+                                <option value="09">сентябрь</option>
+                                <option value="10">октябрь</option>
+                                <option value="11">ноябрь</option>
+                                <option value="12">декабрь</option>
+                            </select>
+{#                        </div>#}
+                    </div>
+                    <div class="modal-content__el form-el form-el_m">
+                        <div class="form-el__title">EMail</div>
+                        <input name="email" class="form-el__inp inp-def" type="text" value="" placeholder="user@mail.ru" required>
                     </div>
                     <div class="modal-content__el form-el form-el_m">
                         <div class="form-el__title">Телефон</div>
                         <input name="phone" class="form-el__inp inp-def" type="text" value="" placeholder="+7 900 111 2233">
                     </div>
                     <div class="modal-content__el form-el form-el_m">
-                        <div class="form-el__title">EMail</div>
-                        <input name="email" class="form-el__inp inp-def" type="text" value="" placeholder="user@mail.ru">
+                        <div class="form-el__title">Телеграм</div>
+                        <input name="telegram" class="form-el__inp inp-def" type="text" value="" placeholder="https://t.me/telegram">
+                    </div>
+                    <div class="modal-content__el form-el form-el_m">
+                        <div class="form-el__title">VKontakte</div>
+                        <input name="vk" class="form-el__inp inp-def" type="text" value="" placeholder="https://vk.com/user">
                     </div>
                     {#                    <div class="modal-content__el form-el form-el_bg form-el_m">#}
                     {#                        <div class="form-el__title">Текст сообщения</div>#}
