@@ -1,0 +1,51 @@
+{#{% form_theme form 'bootstrap_4_layout.html.twig' %}#}
+{% form_theme form 'bootstrap_4_horizontal_layout.html.twig' %}
+{% extends 'layout_admin.html.twig' %}
+
+{% block title %}
+    Start new YML import :: admin
+{% endblock %}
+
+{% block breadcrumbs %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{ path('backend_dashboard') }}"><i class="fa fa-dashboard"></i>  Dashboard</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{{ path('backend_import_yml_index') }}"><i class="fa fa-table"></i> YML Imports</a>
+        </li>
+        <li class="breadcrumb-item">
+            <span><i class="fa fa-pencil"></i> Import Step1</span>
+        </li>
+    </ol>
+{% endblock %}
+
+{% block body %}
+    {{ form_start(form) }}
+    <h1>Import YML / step1 / set URL
+        {% if mode != 'create' %}
+            <button class="btn btn-primary" type="submit"><i class="fa fa-check"></i> Update</button>
+            <button class="btn btn-success" type="submit" name="next">
+                <i class="fa fa-arrow-right"></i> Next to step2</button>
+        {% endif %}
+    </h1>
+    <hr />
+
+    {% include 'admin/flashes.html.twig' %}
+
+    {{ form_row(form.name, {'label': 'Название'}) }}
+    {{ form_row(form.supplier, {'label': 'Поставщик'}) }}
+    {{ form_row(form.url) }}
+
+    {{ form_rest(form) }}
+
+    {% if mode == 'create' %}
+        <button class="btn btn-success" type="submit"><i class="fa fa-check"></i> Create</button>
+    {% else %}
+        <button class="btn btn-primary" type="submit"><i class="fa fa-check"></i> Update</button>
+    {% endif %}
+
+    {{ form_end(form) }}
+
+
+{% endblock %}

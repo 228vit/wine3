@@ -21,6 +21,16 @@ class VendorRepository extends ServiceEntityRepository
         parent::__construct($registry, Vendor::class);
     }
 
+    public function allAsArray()
+    {
+        return $this->createQueryBuilder('c')
+            ->select('c.id, c.name')
+            ->orderBy('c.name')
+            ->getQuery()
+            ->getArrayResult()
+        ;
+    }
+
     public function findAllByIds(array $ids)
     {
         return $this->createQueryBuilder('c')

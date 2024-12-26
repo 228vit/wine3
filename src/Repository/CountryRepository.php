@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Country;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -35,6 +36,17 @@ class CountryRepository extends ServiceEntityRepository
             ->innerJoin('c.products', 'product')
             ->getQuery()
             ->getResult()
+        ;
+    }
+
+    public function allAsArray()
+    {
+        return $this->createQueryBuilder('c')
+            ->select('c.id, c.name')
+            ->orderBy('c.name')
+            ->getQuery()
+            ->getArrayResult()
+
         ;
     }
 

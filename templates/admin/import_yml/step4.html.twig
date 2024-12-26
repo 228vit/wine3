@@ -1,0 +1,95 @@
+{#{% form_theme form 'bootstrap_4_layout.html.twig' %}#}
+{#{% form_theme form 'bootstrap_4_horizontal_layout.html.twig' %}#}
+{% extends 'layout_admin.html.twig' %}
+
+{% block title %}
+    Start import, step3 :: admin
+{% endblock %}
+
+{% block breadcrumbs %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{ path('backend_dashboard') }}"><i class="fa fa-dashboard"></i>  Dashboard</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{{ path('backend_import_index') }}"><i class="fa fa-table"></i>  Imports</a>
+        </li>
+        <li class="breadcrumb-item">
+            <span><i class="fa fa-pencil"></i> Import Step4</span>
+        </li>
+    </ol>
+{% endblock %}
+
+{% block body %}
+    <style>
+        .table-responsive{
+            height: 500px;
+            overflow: scroll;
+        }
+        thead tr:nth-child(1) th{
+            color: #fff;
+            background-color: #343a40;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+    </style>
+
+    <h3>Import / step4 / view import results ({{ importLog.note }})
+        <a class="btn btn-secondary" href="{{ path('backend_import_step3', {'id': importLog.id}) }}">
+            <i class="fa fa-arrow-left"></i> Back to step3</a>
+        <a class="btn btn-success" href="{{ path('backend_offer_set_filter', { import: importLog.id }) }}">
+            <i class="fa fa-list"></i> Редактировать офферы</a>
+    </h3>
+    <hr />
+
+    {% include 'admin/flashes.html.twig' %}
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Арт.</th>
+                    <th>Название</th>
+                    <th>Тип</th>
+                    <th>Цена</th>
+                    <th>Объём, упак.</th>
+                    <th>Производитель</th>
+                    <th>Страна<br/>регион</th>
+                    <th>Сорта Винограда</th>
+                    <th>Сочетания</th>
+                    <th>Рейтинги</th>
+                    <th>Выдерж, тип.в,фермент.</th>
+                </tr>
+            </thead>
+            {% for columnNum, data in rows %}
+                <tr>
+                    <td width="1">
+                        {{ data.productCode }}
+                        {% if data.isCreated %}
+                            <span class="badge badge-warning">created</span>
+                        {% else %}
+                            <span class="badge badge-success">updated</span>
+                        {% endif %}
+                    </td>
+                    <td width="1">{{ data.name }}</td>
+                    <td width="1">{{ data.color ~ ' ' ~ data.type }}</td>
+                    <td width="1">{{ data.price }}</td>
+                    <td width="1">{{ data.volume }}<br />{{ data.packing }}</td>
+                    <td width="1">{{ data.vendor.name }}<br /><small>{{ data.vendor.website }}</small></td>
+                    <td width="1">{{ data.country }} <br /><small> {{  data.region }}</small></td>
+                    <td width="1">{{ data.grapeSortsAsString }}</td>
+                    <td width="1">{{ data.foodsAsString }}</td>
+                    <td width="1">{{ data.ratings | raw }}</td>
+                    <td width="1">{{ data.aging }} <br /><small>{{ data.agingType }}<br />{{ data.fermentation }}</small> </td>
+                </tr>
+            {% endfor %}
+        </table>
+        <a class="btn btn-success" href="{{ path('backend_offer_set_filter', { import: importLog.id }) }}">
+            <i class="fa fa-list"></i> Редактировать офферы</a>
+
+    </div>
+
+    <br />
+
+{% endblock %}

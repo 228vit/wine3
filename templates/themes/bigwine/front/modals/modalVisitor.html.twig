@@ -25,7 +25,7 @@
 {#                        <div class="form-el__title">Дата рождения</div>#}
                             <select class="select-el calend-top__select calend-top__select_2" name="birthYear" style="display: inline;">
                                 <option value="">Год рождения</option>
-                                {% for y in 1920..2020  %}
+                                {% for y in 1920..2010  %}
                                     <option value="{{ y }}">{{ y }}</option>
                                 {% endfor %}
                             </select>
@@ -61,6 +61,18 @@
                     <div class="modal-content__el form-el form-el_m">
                         <div class="form-el__title">VKontakte</div>
                         <input name="vk" class="form-el__inp inp-def" type="text" value="" placeholder="https://vk.com/user">
+                    </div>
+                    <div class="modal-content__el form-el form-el_m">
+                        <div class="form-el__title">Instagram</div>
+                        <input name="instagram" class="form-el__inp inp-def" type="text" value="" placeholder="https://www.instagram.com/user">
+                    </div>
+                    <div class="modal-content__el form-el form-el_m">
+                        <div class="form-el__title">Facebook</div>
+                        <input name="facebook" class="form-el__inp inp-def" type="text" value="" placeholder="https://www.facebook.com/id">
+                    </div>
+                    <div class="modal-content__el form-el form-el_m">
+                        <div class="form-el__title">LinkedIn</div>
+                        <input name="linkedin" class="form-el__inp inp-def" type="text" value="" placeholder="https://www.linkedin.com/id">
                     </div>
                     {#                    <div class="modal-content__el form-el form-el_bg form-el_m">#}
                     {#                        <div class="form-el__title">Текст сообщения</div>#}

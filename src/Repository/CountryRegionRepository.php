@@ -28,6 +28,16 @@ class CountryRegionRepository extends ServiceEntityRepository
             ;
     }
 
+    public function allAsArray()
+    {
+        return $this->createQueryBuilder('c')
+            ->select('c.id, c.name')
+            ->orderBy('c.country, c.name')
+            ->getQuery()
+            ->getArrayResult()
+        ;
+    }
+
 
     // /**
     //  * @return CountryRegion[] Returns an array of CountryRegion objects

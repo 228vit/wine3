@@ -249,6 +249,9 @@ class EventController extends AbstractController
         $email = $request->get('email', null);
         $telegram = $request->get('telegram', null);
         $vk = $request->get('vk', null);
+        $instagram = $request->get('instagram', null);
+        $facebook = $request->get('facebook', null);
+        $linkedin = $request->get('linkedin', null);
         $year = $request->get('birthYear', null);
         $month = $request->get('birthMonth', null);
         try {
@@ -266,6 +269,9 @@ class EventController extends AbstractController
             ->setPhone($phone)
             ->setTelegram($telegram)
             ->setVk($vk)
+            ->setInstagram($instagram)
+            ->setFacebook($facebook)
+            ->setLinkedin($linkedin)
             ->setBirthDate($date)
         ;
 

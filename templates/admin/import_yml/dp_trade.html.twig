@@ -1,0 +1,53 @@
+{% extends 'layout_admin.html.twig' %}
+
+{% block title %}
+    Import DP-Trade :: admin
+{% endblock %}
+
+{% block breadcrumbs %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{ path('backend_dashboard') }}"><i class="fa fa-dashboard"></i> Dashboard</a>
+        </li>
+        <li class="breadcrumb-item active">
+            <span><i class="fa fa-table"></i> Imports</span>
+        </li>
+    </ol>
+{% endblock %}
+
+{% block body %}
+
+<h1 class="page-header">Import</h1>
+{#<table class="table table-striped table-bordered">#}
+{#    {% for vendor in vendors %}#}
+{#        <tr>#}
+{#            <td>{{ vendor.id }}</td>#}
+{#            <td>{{ vendor.name }}</td>#}
+{#            <td>{{ vendor.country_name }}</td>#}
+{#        </tr>#}
+{#    {% endfor %}#}
+
+{#</table>#}
+    <table class="table table-striped table-bordered">
+        {% for id, name  in countries %}
+            <tr>
+                <td>{{ id }}</td>
+                <td>{{ name }}</td>
+            </tr>
+        {% endfor %}
+
+    </table>
+    <table class="table table-striped table-bordered">
+    {% for product in products %}
+        <tr>
+            <td>{{ product.id }}</td>
+            <td>{{ product.name }}</td>
+            <td>{{ product.price }}</td>
+            <td>{{ product.vendor }}</td>
+            <td>{{ product.country }}</td>
+            <td>{{ product.description }}</td>
+        </tr>
+    {% endfor %}
+
+</table>
+{% endblock %}
