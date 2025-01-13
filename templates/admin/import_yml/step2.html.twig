@@ -68,14 +68,20 @@
                             {% endfor %}
                         </select>
                         {% if found == false %}
-                            <input type="checkbox" name="newCountry[{{ id }}]" id="new_country_{{ id }}">
+                            <input type="checkbox" class="new-country" name="newCountry[{{ id }}]" id="new_country_{{ id }}">
                             <label for="new_country_{{ id }}">add this</label>
                         {% endif %}
 
                     </td>
                 </tr>
             {% endfor %}
-
+            <tfoot>
+            <tr>
+                <td></td>
+                <td></td>
+                <td><input type="checkbox" id="checkAllNewCountries"><label for="checkAllNewCountries">check all</label></td>
+            </tr>
+            </tfoot>
         </table>
 
         <h2>Map Regions</h2>
@@ -84,7 +90,7 @@
                 {% set found = false %}
                 <tr>
                     <td>{{ id }}</td>
-                    <td>({{ ymlRegion.country_name }}) - {{ ymlRegion.name }}</td>
+                    <td>({{ ymlRegion.country_name }}) - {{ ymlRegion.name | raw }}</td>
                     <td><select name="country[{{ id }}]" id="">
                             <option value="">---</option>
                             {% set ymlRegionLC = ymlRegion.name | lower %}
@@ -97,13 +103,20 @@
                             {% endfor %}
                         </select>
                         {% if found == false %}
-                            <input type="checkbox" name="newRegion[{{ id }}]" id="new_region_{{ id }}">
-                            <label for="new_country_{{ id }}">add this</label>
+                            <input type="checkbox" name="newRegion[{{ id }}]" class="new-region" id="new_region_{{ id }}">
+                            <label for="new_region_{{ id }}">add this</label>
                         {% endif %}
 
                     </td>
                 </tr>
             {% endfor %}
+            <tfoot>
+            <tr>
+                <td></td>
+                <td></td>
+                <td><input type="checkbox" id="checkAllNewRegions"><label for="checkAllNewRegions">check all</label></td>
+            </tr>
+            </tfoot>
 
         </table>
 
@@ -124,60 +137,39 @@
                             {% endfor %}
                         </select>
                         {% if found == false %}
-                        <input type="checkbox" name="newVendor[{{ id }}]" id="new_vendor_{{ id }}">
+                        <input type="checkbox" class="new-vendor" name="newVendor[{{ id }}]" id="new_vendor_{{ id }}">
                         <label for="new_vendor_{{ id }}">add this</label>
                         {% endif %}
                     </td>
                 </tr>
             {% endfor %}
+            <tfoot>
+            <tr>
+                <td></td>
+                <td></td>
+                <td><input type="checkbox" id="checkAllNewVendors"><label for="checkAllNewVendors">check all</label></td>
+            </tr>
+            </tfoot>
         </table>
 
-
-{#        <div class="table-responsive">#}
-{#            <table class="table table-bordered table-striped">#}
-{#                <thead>#}
-{#                    <tr>#}
-{#                        <th>#</th>#}
-{#                        <th>Столбец в CSV</th>#}
-{#                        <th>Значение</th>#}
-{#                        <th>Поле в базе</th>#}
-{#                    </tr>#}
-{#                </thead>#}
-{#                {% for columnNum, columnName in exampleDataRow %}#}
-{#                    <tr id="row_{{ columnNum }}">#}
-{#                        <td width="1">#}
-{#                            <a href="javascript:;" class="delete_row" rel="row_{{ columnNum }}"><span#}
-{#                                        class="badge badge-pill badge-danger"><i class="fa fa-window-close"></i></span></a>#}
-{#                        </td>#}
-{#                        <td width="1" class="text-nowrap">#}
-{#                            <input type="hidden" name="csvColNum[]" value="{{ id }}">#}
-{#                            {{ headerArr[columnNum] is defined ? headerArr[columnNum] : '---'}}#}
-{#                        </td>#}
-{#                        <td width="1" class="text-nowrap">{{ columnName }}</td>#}
-{#                        <td>#}
-{#                            <select name="csvColumnMapping[{{ columnNum }}]">#}
-{#                                <option value=""></option>#}
-{#                                {% for fieldLabel, fieldName in importFields %}#}
-{#                                    {% set selected = csvColumnMapping[columnNum] is defined and csvColumnMapping[columnNum] == fieldName ? 1 : 0 %}#}
-{#                                    <option value="{{ fieldName }}" {{ selected == 1 ? ' selected="selected"' : '' }}>{{ fieldLabel }}</option>#}
-{#                                {% endfor %}#}
-{#                            </select>#}
-{#                        </td>#}
-{#                    </tr>#}
-{#                {% endfor %}#}
-{#            </table>#}
-{#        </div>#}
     </form>
-
-    {#    {{ form_start(form) }}#}
-{#    {{ form_rest(form) }}#}
-{#    {{ form_end(form) }}#}
-
 
     <br />
 
     <script>
         $(document).ready(function () {
+            $('#checkAllNewCountries').on('click', function () {
+                $('input.new-country').not(this).prop('checked', this.checked);
+            });
+
+            $('#checkAllNewRegions').on('click', function () {
+                $('input.new-region').not(this).prop('checked', this.checked);
+            });
+
+            $('#checkAllNewVendors').on('click', function () {
+                $('input.new-vendor').not(this).prop('checked', this.checked);
+            });
+
             $('.delete_row').on('click', function (e) {
                 var rel = $(this).attr('rel');
                 var $this = $(this);
