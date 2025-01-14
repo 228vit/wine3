@@ -53,6 +53,21 @@ class ImportYml implements TimestampableInterface
     private $paramsMapping;
 
     /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $countriesMapping;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $regionsMapping;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $vendorsMapping;
+
+    /**
      * @ORM\Column(type="boolean")
      */
     private $isComplete;
@@ -151,4 +166,40 @@ class ImportYml implements TimestampableInterface
 
         return $this;
     }
+
+    public function getCountriesMapping(): ?string
+    {
+        return $this->countriesMapping;
+    }
+
+    public function setCountriesMapping(?string $countriesMapping): self
+    {
+        $this->countriesMapping = $countriesMapping;
+        return $this;
+    }
+
+    public function getRegionsMapping(): ?string
+    {
+        return $this->regionsMapping;
+    }
+
+    public function setRegionsMapping(?string $regionsMapping): self
+    {
+        $this->regionsMapping = $regionsMapping;
+        return $this;
+    }
+
+    public function getVendorsMapping(): ?string
+    {
+        return $this->vendorsMapping;
+    }
+
+    public function setVendorsMapping(?string $vendorsMapping): self
+    {
+        $this->vendorsMapping = $vendorsMapping;
+        return $this;
+    }
+
+
+
 }

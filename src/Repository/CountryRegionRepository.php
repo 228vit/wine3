@@ -30,9 +30,11 @@ class CountryRegionRepository extends ServiceEntityRepository
 
     public function allAsArray()
     {
-        return $this->createQueryBuilder('c')
-            ->select('c.id, c.name')
-            ->orderBy('c.country, c.name')
+        return $this->createQueryBuilder('region')
+            ->innerJoin('region.country', 'country')
+            ->select('region.id, region.name, country.name as c_name')
+            ->orderBy('country.name', 'ASC')
+            ->addOrderBy('region.name', 'ASC')
             ->getQuery()
             ->getArrayResult()
         ;
