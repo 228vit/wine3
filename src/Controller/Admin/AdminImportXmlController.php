@@ -10,6 +10,7 @@ use App\Entity\CountryRegion;
 use App\Entity\ImportYml;
 use App\Filter\ImportCsvFilter;
 use App\Form\ImportYmlStep1Type;
+use App\Repository\CategoryRepository;
 use App\Repository\CountryRegionRepository;
 use App\Repository\CountryRepository;
 use App\Repository\VendorRepository;
@@ -198,10 +199,10 @@ class AdminImportXmlController extends AbstractController
             <category id="00071762" parentId="00071760">Henschke</category>
          */
 
-        // get Countries / Regions / Vendors
+        // get Countries / Regions / Appellations
         foreach ($data->shop->categories->category as $row) {
             $id = strval($row['id']);
-            $name = ucfirst(strval($row));
+            $name = ucwords(strtolower(strval($row)));
 
             if (!isset($row['parentId'])) {
                 $categories[$id] = [
@@ -213,7 +214,7 @@ class AdminImportXmlController extends AbstractController
 
             $parentId = strval($row['parentId']);
 
-            // вендор - если ему принадлежат товары
+            // регион или аппеласьон - если ему принадлежат товары
             if (array_key_exists($id, $productCategories)) {
                 $vendors[$id] = [
                     'id' => $id,
@@ -287,7 +288,7 @@ class AdminImportXmlController extends AbstractController
 
         foreach ($data->shop->categories->category as $row) {
             $id = strval($row['id']);
-            $name = ucfirst(strval($row));
+            $name = ucwords(strtolower(strval($row)));
 
             if (!isset($row['parentId'])) {
                 $categories[$id] = [
@@ -318,6 +319,7 @@ class AdminImportXmlController extends AbstractController
             }
         } // foreach ($data->shop->categories->category as $row)
 
+//        dd($countries);
 
         return $this->render('admin/import_yml/step3.html.twig', [
             'row' => $importYml,
@@ -341,7 +343,7 @@ class AdminImportXmlController extends AbstractController
         }
 
         foreach ($request->request->get('newCountry', []) as $ymlCountryId => $countryName) {
-            $countryName = ucfirst($countryName);
+            $countryName = ucwords(strtolower($countryName));
             $country = $countryRepository->findOneBy([
                 'name' => $countryName,
             ]);
@@ -377,53 +379,140 @@ class AdminImportXmlController extends AbstractController
      */
     public function newRegions(ImportYml $importYml,
                                Request $request,
+                               CountryRepository $countryRepository,
                                CountryRegionRepository $regionRepository): Response
     {
+        $countryMapping = json_decode($importYml->getCountriesMapping(), true);
+        $inDbCountries = [];
+        $allC = $countryRepository->allAsArray();
+        foreach ($allC as $country) {
+            $inDbCountries[$country['id']] = $country['name'];
+        }
+
         $regions = [];
-        foreach ($request->request->get('country', []) as $ymlRegionId => $countryId) {
-            if (empty($countryId)) continue;
-            $regions[$ymlRegionId] = $countryId;
-        }
 
-        foreach ($request->request->get('newRegion', []) as $ymlRegionId => $countryName) {
-            $countryName = ucfirst($countryName);
-            $country = $regionRepository->findOneBy([
-                'name' => $countryName,
-            ]);
+        foreach ($request->request->get('newRegion', []) as $ymlCountryId => $ymlRegions) {
+            if (isset($countryMapping[$ymlCountryId])) {
+                $countryId = $countryMapping[$ymlCountryId];
+                $country = $countryRepository->find($countryId);
+                if (!$country) throw new \Exception('Country id not found: ' . $countryId);
 
-            if ($country) {
-                $regions[$ymlRegionId] = $country->getId();
-                continue;
+                foreach ($ymlRegions as $ymlRegionId => $ymlRegionName) {
+                    $region = (new CountryRegion())
+                        ->setName($ymlRegionName)
+                        ->setCountry($country);
+                    $this->em->persist($region);
+
+                    $regions[$ymlRegionId] = $countryId;
+                }
+                $this->em->flush();
             }
-
-            $country = (new CountryRegion())
-                ->setName($countryName)
-                ->setCountry(null)
-            ;
-
-            $this->em->persist($country);
-            $this->em->flush();
-
-            $regions[$ymlRegionId] = $country->getId();
         }
 
-        $importYml->setCountriesMapping(json_encode($regions));
+        $regions = [];
+        // filter possible empty values
+        foreach ($request->request->get('mapCountryRegion', []) as $ymlRegionId => $countryRegionId) {
+            if (empty($countryRegionId)) continue;
+            $regions[$ymlRegionId] = $countryRegionId;
+        }
+
+        $importYml->setRegionsMapping(json_encode($regions));
 
         $this->em->persist($importYml);
         $this->em->flush();
 
-        return $this->redirectToRoute('backend_import_yml_step2', [
+        $this->addFlash('success', 'Changes saved!');
+
+        return $this->redirectToRoute('backend_import_yml_step3', [
             'id' => $importYml->getId(),
         ]);
     }
 
     /**
-     * @Route("/backend/import_yml/step4/{id}", name="backend_import_yml_step4", methods={"POST"})
+     * @Route("/backend/import_yml/{id}/step4", name="backend_import_yml_step4", methods={"GET", "POST"})
      */
-    public function step4MapRegions(ImportYml $importYml,
-                                      FileUploader $fileUploader): Response
+    public function step4Apellations(ImportYml $importYml,
+                          CountryRepository $countryRepository,
+                          CountryRegionRepository $categoryRegionRepository): Response
     {
         $this->setStage($importYml, 4);
+        $countryMapping = json_decode($importYml->getCountriesMapping(), true);
+        $regionMapping = json_decode($importYml->getRegionsMapping(), true);
+//        dd($regionMapping);
+
+        $data = simplexml_load_file($importYml->getUrl());
+
+        $appellations = [];
+        // Appellation - если он принадлежит региону
+        foreach ($data->shop->categories->category as $row) {
+            $id = strval($row['id']);
+            $name = ucwords(strtolower(strval($row)));
+
+            if (!isset($row['parentId'])) continue; // roots
+
+            $parentId = strval($row['parentId']);
+            if (isset($regionMapping[$parentId])) {
+                $regionId = intval($regionMapping[$parentId]);
+                $region = $categoryRegionRepository->find($regionId);
+                if ($region) {
+                    $appellations[] = [
+                        'ymlId' => $id,
+                        'name' => $name,
+                        'region' => [
+                            'id' => $region->getId(),
+                            'name' => $region->getName()
+                        ],
+                        'country' => [
+                            'id' => $region->getCountry()->getId(),
+                            'name' => $region->getCountry()->getName(),
+                        ]
+                    ];
+                }
+
+            }
+        }
+
+        dd($appellations);
+
+
+        foreach ($data->shop->offers->offer as $row) {
+            $avail = strval($row->attributes()->available);
+            $avail = $avail === 'true' ? true : false;
+            if (!$avail) continue;
+
+            $name = trim(strval($row->name));
+            $description = trim(strval($row->description));
+            $price = floatval(strval($row->name));
+            $vendor = trim(strval($row->vendor));
+            $categoryId = strval($row->categoryId);
+
+            $country = false;
+            if (isset($countryMapping[$categoryId])) {
+                $country = $countryRepository->find($countryMapping[$categoryId]);
+            }
+            $region = false;
+            if (isset($regionMapping[$categoryId])) {
+                $countryId = intval($countryMapping[$categoryId]);
+                /** @var CountryRegion $region */
+                $region = $countryRepository->find($countryId);
+                if ($region) {
+                    $country = $countryRepository->find($region->getCountry()->getId());
+                }
+            } else { $region = $categoryId; }
+
+            dd([
+                $name, $description, $price, $vendor, $categoryId, $country, $region
+            ]);
+
+            $productCategories[$categoryId] = $categoryId;
+        }
+
+        return $this->render('admin/import_yml/step4.html.twig', [
+            'row' => $importYml,
+//            'importYml' => $importYml,
+//            'inDbRegions' => $inDbRegions,
+//            'ymlRegions' => $regions,
+        ]);
     }
 
     /**
@@ -532,118 +621,6 @@ class AdminImportXmlController extends AbstractController
             'dataToReview' => $dataToReview,
         ]);
     } // step 3
-
-
-    /**
-     * @Route("/backend/import_yml/step4/{id}", name="backend_import_yml_step4")
-     */
-    public function importStep4(ImportYml $importYml,
-                                FileUploader $fileUploader,
-                                OfferFactory $offerFactory): Response
-    {
-        $this->setStage($importYml, 4);
-
-        /*
-         * тут массив в формате номер колонки => имя поля в БД
-         */
-        $csvColumnMapping = json_decode($importYml->getFieldsMapping());
-
-        $reverseArr = [];
-        foreach ($csvColumnMapping as $colNum => $colName) {
-            preg_match('/(\w+)\[(\w*)\]/i', $colName, $matches); // grapeSort[], ratings[WS]
-            if ($matches) {
-                if (empty($matches[2])) {
-                    $reverseArr[$matches[1]][] = $colNum; // [grapeSort][] = 10
-                } else {
-                    $reverseArr[$matches[1]][$matches[2]] = $colNum; // [rating][WS] = 100
-                }
-            } else {
-                $reverseArr[$colName] = $colNum;
-            }
-        }
-        $handle = fopen($fileUploader->getUploadedCsvPath($importYml), 'r');
-
-        $offers = [];
-
-        $i = $created = $updated = $linked = 0;
-        // надо подготовить данные для проверки перед отправкой в БД
-        while (false !== $csvData = fgetcsv($handle, 4000, $importYml->getCsvDelimiter())) {
-            $i++;
-            if (1 === $i AND $importYml->isFileContainHeader()) {
-                continue;
-            }
-            $newRow = [];
-            // заберём из строки только нужные столбцы
-            foreach ($reverseArr as $entityFieldName => $csvColNum) {
-                // productCode || foods[]
-                if (is_array($csvColNum)) {
-                    $valueParts = [];
-                    // foods[] => 15 || ratings[WS] => 20
-                    foreach ($csvColNum as $index => $subCsvColNum) {
-                        $subCsvColNum = (int)$subCsvColNum;
-                        if (empty($csvData[$subCsvColNum])) {
-                            continue;
-                        }
-
-                        if (is_string($index)) {
-                            $valueParts[$index] = $csvData[$subCsvColNum];
-                        } else {
-                            $valueParts[] = $csvData[$subCsvColNum];
-                        }
-                    }
-                    $valueParts = array_filter($valueParts);
-
-                    if ('grapeSort' === $entityFieldName) {
-                        $valueParts = $this->parceGrapeSorts($valueParts);
-                    }
-
-                    // todo: use ternary
-                    if (0 !== count($valueParts)) {
-                        $newRow[$entityFieldName] = json_encode($valueParts);
-                    } else {
-                        $newRow[$entityFieldName] = '';
-                    }
-
-                    continue;
-                }
-
-                $csvColNum = (int)$csvColNum;
-                if (!is_int($csvColNum)) {
-                    throw new InvalidArgumentException("Invalid mapping column: {$csvColNum} => {$entityFieldName} "
-                        . print_r($csvData)
-                    );
-                }
-
-                if (!isset($csvData[$csvColNum])) {
-                    throw new InvalidArgumentException("Invalid mapping column: {$csvColNum} => {$entityFieldName} ");
-                }
-
-                $newRow[$entityFieldName] = $csvData[$csvColNum];
-
-            }
-
-            $offer = $offerFactory->makeOffer(new OfferDTO($newRow, $importYml));
-            if ($offer->getCreatedAt() === $offer->getUpdatedAt()) {
-                $created++;
-            } else {
-                $updated++;
-            }
-
-            $linked = null !== $offer->getProduct() ? $linked + 1 : $linked;
-
-            $offers[] = $offer;
-
-        } // while read file
-
-        $importYml->setNote("создано: {$created}, обновлено: {$updated}, связаны с карточками: {$linked}")
-            ->setIsComplete(true);
-        $this->setStage($importYml, 4); // save inside
-
-        return $this->render('admin/import_yml/step4.html.twig', [
-            'importLog' => $importYml,
-            'rows' => $offers,
-        ]);
-    } // step4
 
     private function parceGrapeSorts($grapeSorts): array
     {

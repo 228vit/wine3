@@ -148,6 +148,18 @@
 {#    <script src="{{ asset('js/jquery.min.js') }}"></script>#}
 {#    <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>#}
     <script src="{{ asset('js/sb-admin.js') }}"></script>
+    <script>
+        $(document).ready(function() {
+
+            $('a.confirm').on('click', function (e) {
+                e.preventDefault();
+                if (!confirm('Are you sure?')) {
+                    return false;
+                }
+                $(location).attr('href', $(this).attr('href'));
+            });
+        });
+    </script>
 {% endblock %}
 
 {% block extra_scripts %}

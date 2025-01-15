@@ -201,35 +201,14 @@ class AdminCountryController extends AbstractController
     /**
      * Deletes a country entity.
      *
-     * @Route("backend/country/{id}", name="backend_country_delete", methods={"DELETE"})
+     * @Route("backend/country/{id}/delete", name="backend_country_delete", methods={"GET", "DELETE"})
      */
-    public function deleteAction(Request $request, Country $country, FileUploader $fileUploader)
+    public function deleteAction(Country $country)
     {
-        $filter_form = $this->createDeleteForm($country);
-        $filter_form->handleRequest($request);
+        $this->em->remove($country);
+        $this->em->flush();
 
-        if ($filter_form->isSubmitted() && $filter_form->isValid()) {
-
-            /** @var \Symfony\Component\HttpFoundation\File\UploadedFile $file */
-            $file = $country->getFlagPicFile();
-
-            if (null !== $file) {
-                $fileName = $fileUploader->upload($file);
-                $country->setFlagPic($fileName);
-            }
-
-
-            $this->em->remove($country);
-            $this->em->flush($country);
-
-            $this->addFlash('success', 'Record was successfully deleted!');
-        }
-
-        if (!$filter_form->isValid()) {
-            /** @var FormErrorIterator $errors */
-            $errors = $filter_form->getErrors()->__toString();
-            $this->addFlash('danger', 'Error due deletion! ' . $errors);
-        }
+        $this->addFlash('success', 'Record was successfully deleted!');
 
         return $this->redirectToRoute('backend_country_index');
     }

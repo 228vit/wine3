@@ -78,6 +78,8 @@
                 <td>
                     <a class="btn btn-sm btn-success" href="{{ path('backend_' ~ model ~ '_edit', { 'id': row.id }) }}">
                         <i class="fa fa-pencil" aria-hidden="true"></i> edit</a>
+                    <a class="btn btn-sm btn-danger confirm" href="{{ path('backend_country_delete', { 'id': row.id }) }}">
+                        <i class="fa fa-pencil" aria-hidden="true"></i> edit</a>
                 </td>
             </tr>
         {% endfor %}

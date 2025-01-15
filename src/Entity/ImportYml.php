@@ -68,6 +68,11 @@ class ImportYml implements TimestampableInterface
     private $vendorsMapping;
 
     /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $appellationsMapping;
+
+    /**
      * @ORM\Column(type="boolean")
      */
     private $isComplete;
@@ -197,6 +202,17 @@ class ImportYml implements TimestampableInterface
     public function setVendorsMapping(?string $vendorsMapping): self
     {
         $this->vendorsMapping = $vendorsMapping;
+        return $this;
+    }
+
+    public function getAppellationsMapping()
+    {
+        return $this->appellationsMapping;
+    }
+
+    public function setAppellationsMapping($appellationsMapping)
+    {
+        $this->appellationsMapping = $appellationsMapping;
         return $this;
     }
 

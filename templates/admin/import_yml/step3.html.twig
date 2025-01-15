@@ -49,27 +49,30 @@
             <form method="post" action="{{ path('backend_import_yml_new_regions', {'id': row.id}) }}">
                 <h2>Map Regions</h2>
                 <table class="table table-striped table-bordered">
-                    {% for id, ymlRegion in ymlRegions %}
+                    {% for ymlRegionId, ymlRegion in ymlRegions %}
                         {% set found = false %}
                         <tr>
-                            <td>{{ id }}</td>
+                            <td>{{ ymlRegionId }}</td>
                             <td>({{ ymlRegion.country_name }}) - {{ ymlRegion.name | raw }}</td>
-                            <td><select name="country[{{ id }}]" id="">
+                            <td><select name="mapCountryRegion[{{ ymlRegionId }}]" id="">
                                     <option value="">---</option>
                                     {% set ymlRegionLC = ymlRegion.name | lower %}
-                                    {% for c_id, c_name in inDbRegions %}
-                                        {% set inDbRegionLC = c_name | lower %}
+                                    {% for inDbRegionId, inDbRegionName in inDbRegions %}
+                                        {% set inDbRegionLC = inDbRegionName | lower %}
                                         {% if ymlRegionLC in inDbRegionLC %}
                                             {% set found = true %}
                                         {% endif %}
-                                        <option value="{{ inDbRegionLC }}"{{ ymlRegionLC in inDbRegionLC ? ' selected' : '' }}>{{ c_name }}</option>
+                                        <option value="{{ inDbRegionId }}"
+                                            {{ ymlRegionLC in inDbRegionLC ? ' selected' : '' }}>{{ inDbRegionName }}</option>
                                     {% endfor %}
                                 </select>
                                 {% if found == false %}
-                                    <input type="checkbox" name="newRegion[{{ id }}]" class="new-region" id="new_region_{{ id }}">
-                                    <label for="new_region_{{ id }}">add this</label>
+                                    <input type="checkbox"
+                                           value="{{ ymlRegion.name }}"
+                                           name="newRegion[{{ ymlRegion.country_id }}][{{ ymlRegionId }}]"
+                                           class="new-region" id="new_region_{{ ymlRegionId }}">
+                                    <label for="new_region_{{ ymlRegionId }}">add this</label>
                                 {% endif %}
-
                             </td>
                         </tr>
                     {% endfor %}
@@ -82,31 +85,21 @@
                     </tfoot>
 
                 </table>
+
+                <button class="btn btn-success" type="submit"><i class="fa fa-check"></i> Save Regions</button>
+
             </form>
 
         </div>
-    </form>
-
-    {#    {{ form_start(form) }}#}
-{#    {{ form_rest(form) }}#}
-{#    {{ form_end(form) }}#}
-
 
     <br />
 
     <script>
         $(document).ready(function () {
-            $('.delete_row').on('click', function (e) {
-                var rel = $(this).attr('rel');
-                var $this = $(this);
-                // console.log('remove ' + rel);
-                $('#' + rel).addClass('alert-danger');
-                setTimeout(function() {
-                    $('#'+rel).remove();
-                    console.log('remove ' + rel);
-                }, 200);
+            $('#checkAllNewRegions').on('click', function () {
+                $('input.new-region').not(this).prop('checked', this.checked);
+            });
 
-            })
-        })
+        });
     </script>
 {% endblock %}
