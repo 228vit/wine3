@@ -323,11 +323,18 @@ class AdminImportXmlController extends AbstractController
             }
         } // foreach ($data->shop->categories->category as $row)
 
+        $regionsMapping = $importYml->getRegionsMapping();
+
+        if (!empty($regionsMapping)) {
+            $regionsMapping = json_decode($regionsMapping, true); // 'ymlId': dbId
+        }
+
         return $this->render('admin/import_yml/step3.html.twig', [
             'row' => $importYml,
             'importYml' => $importYml,
             'inDbRegions' => $inDbRegions,
             'ymlRegions' => $regions,
+            'regionsMapping' => $regionsMapping,
         ]);
     }
 
