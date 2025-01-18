@@ -5,11 +5,13 @@ namespace App\Controller\Admin;
 use App\DTO\OfferDTO;
 use App\DTO\ProductDTO;
 use App\Entity\Admin;
+use App\Entity\Appellation;
 use App\Entity\Country;
 use App\Entity\CountryRegion;
 use App\Entity\ImportYml;
 use App\Filter\ImportCsvFilter;
 use App\Form\ImportYmlStep1Type;
+use App\Repository\AppellationRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\CountryRegionRepository;
 use App\Repository\CountryRepository;
@@ -17,6 +19,7 @@ use App\Repository\VendorRepository;
 use App\Service\FileUploader;
 use App\Service\OfferFactory;
 use Lexik\Bundle\FormFilterBundle\Filter\FilterBuilderUpdaterInterface;
+use mysql_xdevapi\Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -319,8 +322,6 @@ class AdminImportXmlController extends AbstractController
             }
         } // foreach ($data->shop->categories->category as $row)
 
-//        dd($countries);
-
         return $this->render('admin/import_yml/step3.html.twig', [
             'row' => $importYml,
             'importYml' => $importYml,
@@ -372,7 +373,6 @@ class AdminImportXmlController extends AbstractController
             'id' => $importYml->getId(),
         ]);
     }
-
 
     /**
      * @Route("/backend/import_yml/{id}/new_regions", name="backend_import_yml_new_regions", methods={"POST"})
@@ -429,16 +429,77 @@ class AdminImportXmlController extends AbstractController
     }
 
     /**
+     * @Route("/backend/import_yml/{id}/new_vendors", name="backend_import_yml_new_vendors", methods={"POST"})
+     */
+    public function newVendors(ImportYml $importYml,
+                                    Request $request,
+                                    CountryRepository $countryRepository,
+                                    CountryRegionRepository $regionRepository): Response
+    {
+        dd($_REQUEST);
+    }
+
+    /**
+     * @Route("/backend/import_yml/{id}/new_appellations", name="backend_import_yml_new_appellations", methods={"POST"})
+     */
+    public function newAppellations(ImportYml $importYml,
+                                    Request $request,
+                                    CountryRepository $countryRepository,
+                                    CountryRegionRepository $regionRepository): Response
+    {
+//        dd($_REQUEST);
+//        $countryMapping = json_decode($importYml->getCountriesMapping(), true);
+
+        $inDbCountries = [];
+        $inDbRegions = [];
+        $regions = $regionRepository->findAll();
+        foreach ($regions as $region) {
+            $inDbRegions[$region->getId()] = $region;
+            $inDbCountries[$region->getCountry()->getId()] = $region->getCountry();
+        }
+
+        $appellationMapping = [];
+        foreach ($request->request->get('mapAppellation', []) as $ymlAppellationId => $appellationId) {
+            if (empty($appellationId)) continue;
+            $appellationMapping[$ymlAppellationId] = $appellationId;
+        }
+
+        foreach ($request->request->get('newAppellation', []) as $regionId => $newApps) {
+            foreach ($newApps as $ymlAppellationId => $newAppellationName) {
+                if (!isset($inDbRegions[$regionId])) throw new \Exception('Wrong Region id:' . $regionId);
+
+                /** @var CountryRegion $region */
+                $region = $inDbRegions[$regionId];
+                $country = $region->getCountry();
+                $appellation = (new Appellation())
+                    ->setName($newAppellationName)
+                    ->setCountryRegion($region)
+                    ->setCountry($country);
+                $this->em->persist($appellation);
+                $this->em->flush();;
+
+                $appellationMapping[$ymlAppellationId] = $appellation->getId();
+            }
+        }
+
+        $importYml->setAppellationsMapping(json_encode($appellationMapping));
+        $this->em->persist($importYml);
+        $this->em->flush();
+
+        return $this->redirectToRoute('backend_import_yml_step4', ['id' => $importYml->getId()]);
+
+    }
+
+    /**
      * @Route("/backend/import_yml/{id}/step4", name="backend_import_yml_step4", methods={"GET", "POST"})
      */
     public function step4Apellations(ImportYml $importYml,
                           CountryRepository $countryRepository,
+                          AppellationRepository $appellationRepository,
                           CountryRegionRepository $categoryRegionRepository): Response
     {
         $this->setStage($importYml, 4);
-        $countryMapping = json_decode($importYml->getCountriesMapping(), true);
         $regionMapping = json_decode($importYml->getRegionsMapping(), true);
-//        dd($regionMapping);
 
         $data = simplexml_load_file($importYml->getUrl());
 
@@ -454,74 +515,82 @@ class AdminImportXmlController extends AbstractController
             if (isset($regionMapping[$parentId])) {
                 $regionId = intval($regionMapping[$parentId]);
                 $region = $categoryRegionRepository->find($regionId);
-                if ($region) {
-                    $appellations[] = [
-                        'ymlId' => $id,
-                        'name' => $name,
-                        'region' => [
-                            'id' => $region->getId(),
-                            'name' => $region->getName()
-                        ],
-                        'country' => [
-                            'id' => $region->getCountry()->getId(),
-                            'name' => $region->getCountry()->getName(),
-                        ]
-                    ];
-                }
+                if (!$region) continue;
 
+                $appellations[] = [
+                    'ymlId' => $id,
+                    'name' => $name,
+                    'region' => [
+                        'id' => $region->getId(),
+                        'name' => $region->getName()
+                    ],
+                    'country' => [
+                        'id' => $region->getCountry()->getId(),
+                        'name' => $region->getCountry()->getName(),
+                    ]
+                ];
             }
         }
 
-        dd($appellations);
+        $inDbAppellations = [];
+        $allApps = $appellationRepository->allAsArray();
+        foreach ($allApps as $row) {
+//            $inDbAppellations[$row['id']] =  "({$row['c_name']} - {$row['r_name']}) {$row['name']}";
+            $inDbAppellations[$row['id']] = $row['name'];
+        }
 
+        return $this->render('admin/import_yml/step4.html.twig', [
+            'row' => $importYml,
+            'importYml' => $importYml,
+            'inDbAppellations' => $inDbAppellations,
+            'ymlAppellations' => $appellations,
+        ]);
+//        dd($appellations);
+    }
 
+    /**
+     * @Route("/backend/import_yml/{id}/step5", name="backend_import_yml_step5", methods={"GET"})
+     */
+    public function step5Vendors(ImportYml $importYml, VendorRepository $vendorRepository): Response
+    {
+        $data = simplexml_load_file($importYml->getUrl());
+        $this->setStage($importYml, 5);
+
+        $vendors = [];
         foreach ($data->shop->offers->offer as $row) {
             $avail = strval($row->attributes()->available);
             $avail = $avail === 'true' ? true : false;
             if (!$avail) continue;
 
-            $name = trim(strval($row->name));
-            $description = trim(strval($row->description));
-            $price = floatval(strval($row->name));
-            $vendor = trim(strval($row->vendor));
-            $categoryId = strval($row->categoryId);
-
-            $country = false;
-            if (isset($countryMapping[$categoryId])) {
-                $country = $countryRepository->find($countryMapping[$categoryId]);
-            }
-            $region = false;
-            if (isset($regionMapping[$categoryId])) {
-                $countryId = intval($countryMapping[$categoryId]);
-                /** @var CountryRegion $region */
-                $region = $countryRepository->find($countryId);
-                if ($region) {
-                    $country = $countryRepository->find($region->getCountry()->getId());
-                }
-            } else { $region = $categoryId; }
-
-            dd([
-                $name, $description, $price, $vendor, $categoryId, $country, $region
-            ]);
-
-            $productCategories[$categoryId] = $categoryId;
+            $vendors[] = trim(strval($row->vendor));
         }
 
-        return $this->render('admin/import_yml/step4.html.twig', [
+        $inDbVendors = [];
+        foreach ($vendorRepository->allAsArray() as $row) {
+            $inDbVendors[$row['id']] = $row['name'];
+        }
+
+//        dd($inDbVendors);
+//        return new Response('qqq');
+        return $this->render('admin/import_yml/step5.html.twig', [
             'row' => $importYml,
-//            'importYml' => $importYml,
-//            'inDbRegions' => $inDbRegions,
-//            'ymlRegions' => $regions,
+            'importYml' => $importYml,
+            'inDbVendors' => $inDbVendors,
+            'ymlVendors' => $vendors,
         ]);
     }
 
     /**
-     * @Route("/backend/import_yml/step5/{id}", name="backend_import_yml_step5", methods={"POST"})
+     * @Route("/backend/import_yml/{id}/step6", name="backend_import_yml_step6", methods={"POST"})
      */
-    public function step5MapVendors(ImportYml $importYml,
-                                      FileUploader $fileUploader): Response
+    public function step6offers(ImportYml $importYml, VendorRepository $vendorRepository): Response
     {
-        $this->setStage($importYml, 5);
+        return $this->render('admin/import_yml/step6.html.twig', [
+            'row' => $importYml,
+            'importYml' => $importYml,
+//            'inDbVendors' => $inDbVendors,
+//            'ymlVendors' => $vendors,
+        ]);
     }
 
     /**

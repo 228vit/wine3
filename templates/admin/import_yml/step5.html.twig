@@ -1,0 +1,106 @@
+{#{% form_theme form 'bootstrap_4_layout.html.twig' %}#}
+{#{% form_theme form 'bootstrap_4_horizontal_layout.html.twig' %}#}
+{% extends 'layout_admin.html.twig' %}
+
+{% block title %}
+    YML import, step5 :: admin
+{% endblock %}
+
+{% block breadcrumbs %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{ path('backend_dashboard') }}"><i class="fa fa-dashboard"></i>  Dashboard</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{{ path('backend_import_index') }}"><i class="fa fa-table"></i>  Imports</a>
+        </li>
+        <li class="breadcrumb-item">
+            <span><i class="fa fa-pencil"></i> Import YML / Map Vendors</span>
+        </li>
+    </ol>
+{% endblock %}
+
+{% block body %}
+    <style>
+        .table-responsive{
+            height: 500px;
+            overflow: scroll;
+        }
+        thead tr:nth-child(1) th{
+            color: #fff;
+            background-color: #343a40;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+    </style>
+
+    <h3>Import / step4 / Map Vendors
+        <a class="btn btn-secondary" href="{{ path('backend_import_yml_step4', { 'id': row.id }) }}">
+            <i class="fa fa-arrow-left"></i> Back to step4</a>
+        <a class="btn btn-success" href="{{ path('backend_import_yml_step6', { 'id': row.id }) }}">
+            <i class="fa fa-list"></i> Next step 6</a>
+    </h3>
+    <hr />
+
+    {% include 'admin/flashes.html.twig' %}
+
+    <div class="table-responsive">
+
+        <form method="post" action="{{ path('backend_import_yml_new_vendors', {'id': row.id}) }}">
+            <h2>Map Vendors</h2>
+            <table class="table table-striped table-bordered">
+                {% for id, ymlVendorName in ymlVendors %}
+                    {% set found = false %}
+                    <tr>
+                        <td>{{ ymlVendorName | raw }}</td>
+                        <td><select name="mapVendor[]" id="vendor_{{ id }}">
+                                <option value="">---</option>
+                                {% set ymlVendorNameLC = ymlVendorName | lower %}
+                                {% for v_id, v_name in inDbVendors %}
+                                    {% set inDbVendorLC = v_name | lower %}
+
+{#                                    {% if inDbVendorLC == ymlVendorNameLC %}#}
+{#                                        {% set found = true %}#}
+{#                                        <option value="{{ v_id }}" selected>{{ v_name }}</option>#}
+{#                                    {% else %}#}
+                                        <option value="{{ v_id }}">{{ ymlVendorNameLC }} {{ inDbVendorLC }}</option>
+{#                                    {% endif %}#}
+                                {% endfor %}
+                            </select>
+                            {% if found == false %}
+                                <input type="checkbox" class="new-vendor"
+                                       value="{{ ymlVendorName }}"
+                                       name="newVendor[]"
+                                       id="new_vendor_{{ id }}">
+                                <label for="new_vendor_{{ id }}">add this</label>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                <tfoot>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td><input type="checkbox" id="checkAllNewVendors"><label
+                                for="checkAllNewVendors"> check all</label></td>
+                </tr>
+                </tfoot>
+            </table>
+
+            <button class="btn btn-success" type="submit"><i class="fa fa-check"></i> Save Regions</button>
+
+        </form>
+    </div>
+
+    <br />
+
+    <script>
+        $(document).ready(function () {
+            $('#checkAllNewVendors').on('click', function () {
+                $('input.new-vendor').not(this).prop('checked', this.checked);
+            });
+        });
+    </script>
+
+{% endblock %}

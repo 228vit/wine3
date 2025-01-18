@@ -23,6 +23,20 @@ class AppellationRepository extends ServiceEntityRepository
         parent::__construct($registry, Appellation::class);
     }
 
+    public function allAsArray()
+    {
+        return $this->createQueryBuilder('appellation')
+//            ->innerJoin('appellation.country', 'country')
+//            ->innerJoin('appellation.countryRegion', 'region')
+//            ->select('appellation.id, appellation.name, region.id as r_id, region.name as r_name, country.name as c_name')
+//            ->orderBy('country.name', 'ASC')
+//            ->addOrderBy('region.name', 'ASC')
+            ->addOrderBy('appellation.name', 'ASC')
+            ->getQuery()
+            ->getArrayResult()
+        ;
+    }
+
     /**
      * @throws ORMException
      * @throws OptimisticLockException
