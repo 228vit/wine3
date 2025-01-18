@@ -105,15 +105,15 @@ class AdminImportXmlController extends AbstractController
     /**
      * @Route("/backend/import_yml/{id}/step1", name="backend_import_yml_step1", methods={"GET", "POST"})
      */
-    public function step1(ImportYml $import, Request $request, FileUploader $fileUploader): Response
+    public function step1(ImportYml $importYml, Request $request, FileUploader $fileUploader): Response
     {
-        $form = $this->createForm(ImportYmlStep1Type::class, $import);
+        $this->setStage($importYml, 1);
+        $form = $this->createForm(ImportYmlStep1Type::class, $importYml);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $import->setStage(1);
 
-            $this->em->persist($import);
+            $this->em->persist($importYml);
             $this->em->flush();
 
             $this->addFlash('success', 'Успешно обновлено');
@@ -124,11 +124,11 @@ class AdminImportXmlController extends AbstractController
         }
 
         if ($request->request->has('next')) {
-            return $this->redirectToRoute('backend_import_yml_step2', ['id' => $import->getId()]);
+            return $this->redirectToRoute('backend_import_yml_step2', ['id' => $importYml->getId()]);
         }
 
         return $this->render('admin/import_yml/step1.html.twig', [
-            'row' => $import,
+            'row' => $importYml,
             'form' => $form->createView(),
             'model' => 'import_yml',
             'mode' => 'edit',
@@ -144,6 +144,7 @@ class AdminImportXmlController extends AbstractController
                           VendorRepository $vendorRepository,
                           Request $request): Response
     {
+        $this->setStage($importYml, 2);
         $data = simplexml_load_file($importYml->getUrl());
 
         $productCategories = [];
@@ -274,6 +275,7 @@ class AdminImportXmlController extends AbstractController
                           VendorRepository $vendorRepository,
                           Request $request): Response
     {
+        $this->setStage($importYml, 3);
         $data = simplexml_load_file($importYml->getUrl());
 
         $inDbRegions = [];
@@ -286,7 +288,6 @@ class AdminImportXmlController extends AbstractController
         $categories = [];
         $countries = [];
         $regions = [];
-        $vendors = [];
         $root = null;
 
         foreach ($data->shop->categories->category as $row) {
@@ -553,8 +554,8 @@ class AdminImportXmlController extends AbstractController
      */
     public function step5Vendors(ImportYml $importYml, VendorRepository $vendorRepository): Response
     {
-        $data = simplexml_load_file($importYml->getUrl());
         $this->setStage($importYml, 5);
+        $data = simplexml_load_file($importYml->getUrl());
 
         $vendors = [];
         foreach ($data->shop->offers->offer as $row) {
