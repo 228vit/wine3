@@ -53,7 +53,7 @@
             <tr>
                 <td>{{ row.id }}</td>
                 <td>
-                    <a href="{{ path('backend_import_step' ~ row.stage, {'id': row.id}) }}">{{ row.name }}</a>
+                    <a href="{{ path('backend_import_yml_step' ~ row.stage, {'id': row.id}) }}">{{ row.name }}</a>
                     {% if row.isComplete %}
                         <br />
                         <a class="badge badge-success" href="{{ path('backend_offer_set_filter', { import: row.id }) }}">

@@ -53,15 +53,19 @@
             {% for ymlId, ymlCountry in ymlCountries %}
                 {% set found = false %}
                 {% set selected = false %}
+                {% set mappedCountryId = attribute(countriesMapping, ymlId) | default(0) %}
                 <tr>
-                    <td>{{ ymlId }}</td>
+                    <td>{{ ymlId }} / {{ mappedCountryId }}</td>
                     <td>{{ ymlCountry.name }}</td>
                     <td><select name="country[{{ ymlId }}]">
                             <option value="">---</option>
                             {% set ymlCountryLC = ymlCountry.name | lower %}
                             {% for c_id, c_name in inDbCountries %}
                                 {% set inDbCountryLC = c_name | lower %}
-                                {% if ymlCountryLC in inDbCountryLC %}
+                                {% if c_id == mappedCountryId %}
+                                    {% set found = true %}
+                                    <option selected value="{{ c_id }}">{{ c_name }}</option>
+                                {% elseif ymlCountryLC in inDbCountryLC %}
                                     {% set found = true %}
                                     <option selected value="{{ c_id }}">{{ c_name }}</option>
                                 {% else %}
@@ -88,6 +92,7 @@
             </tfoot>
         </table>
         <button class="btn btn-success" type="submit"><i class="fa fa-check"></i> Save Countries</button>
+{#        <pre>{{ row.countriesMapping }}</pre>#}
     </form>
 
     <hr>
