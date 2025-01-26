@@ -9,6 +9,8 @@ use App\Entity\Appellation;
 use App\Entity\Country;
 use App\Entity\CountryRegion;
 use App\Entity\ImportYml;
+use App\Entity\Offer;
+use App\Entity\Vendor;
 use App\Filter\ImportCsvFilter;
 use App\Form\ImportYmlStep1Type;
 use App\Repository\AppellationRepository;
@@ -18,6 +20,7 @@ use App\Repository\CountryRepository;
 use App\Repository\VendorRepository;
 use App\Service\FileUploader;
 use App\Service\OfferFactory;
+use App\Utils\Slugger;
 use Lexik\Bundle\FormFilterBundle\Filter\FilterBuilderUpdaterInterface;
 use mysql_xdevapi\Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -338,6 +341,234 @@ class AdminImportXmlController extends AbstractController
         ]);
     }
 
+
+    /**
+     * @Route("/backend/import_yml/{id}/step4", name="backend_import_yml_step4", methods={"GET", "POST"})
+     */
+    public function step4Apellations(ImportYml $importYml,
+                                     CountryRepository $countryRepository,
+                                     AppellationRepository $appellationRepository,
+                                     CountryRegionRepository $categoryRegionRepository): Response
+    {
+        $this->setStage($importYml, 4);
+        $regionMapping = json_decode($importYml->getRegionsMapping(), true);
+//        dd($regionMapping);
+//        "00071754" => "394"
+//        "00071762" => "395"
+//        "00073058" => "396"
+
+        $data = simplexml_load_file($importYml->getUrl());
+
+        $appellations = [];
+        // Appellation - если он принадлежит региону
+        foreach ($data->shop->categories->category as $row) {
+            $id = strval($row['id']);
+            $name = ucwords(strtolower(strval($row)));
+
+            if (!isset($row['parentId'])) continue; // roots
+
+            $parentId = strval($row['parentId']);
+            if (isset($regionMapping[$parentId])) {
+                $regionId = intval($regionMapping[$parentId]);
+                $region = $categoryRegionRepository->find($regionId);
+                if (!$region) continue;
+
+                $appellations[] = [
+                    'ymlId' => $id,
+                    'name' => $name,
+                    'region' => [
+                        'id' => $region->getId(),
+                        'name' => $region->getName()
+                    ],
+                    'country' => [
+                        'id' => $region->getCountry()->getId(),
+                        'name' => $region->getCountry()->getName(),
+                    ]
+                ];
+            }
+        }
+
+//        dd($appellations);
+
+        $inDbAppellations = [];
+//        $allApps
+        $inDbAppellations = $appellationRepository->allAsArray();
+//        foreach ($allApps as $row) {
+//            $inDbAppellations[$row['id']] =  "({$row['c_name']} - {$row['r_name']}) {$row['name']}";
+//            $inDbAppellations[$row['id']] = $row['name'];
+//        }
+
+        return $this->render('admin/import_yml/step4.html.twig', [
+            'row' => $importYml,
+            'importYml' => $importYml,
+            'inDbAppellations' => $inDbAppellations,
+            'ymlAppellations' => $appellations,
+        ]);
+//        dd($appellations);
+    }
+
+    /**
+     * @Route("/backend/import_yml/{id}/step5", name="backend_import_yml_step5", methods={"GET"})
+     */
+    public function step5Vendors(ImportYml $importYml, VendorRepository $vendorRepository): Response
+    {
+        $this->setStage($importYml, 5);
+        $data = simplexml_load_file($importYml->getUrl());
+
+        $vendors = [];
+        $onlyVendors = [];
+        foreach ($data->shop->offers->offer as $row) {
+            $avail = strval($row->attributes()->available);
+            $avail = $avail === 'true' ? true : false;
+            if (!$avail) continue;
+            $countryName = '';
+            $vendorName = null;
+            foreach ($row->param as $param) {
+                if ($param->attributes()->name == 'tovmarka') {
+                    $vendorName = trim(strval($param));
+                    if (empty($vendorName)) continue;
+                }
+                if ($param->attributes()->name == 'strana') {
+                    $countryName = trim(strval($param));
+                }
+            }
+            if (!empty($vendorName)) {
+                $onlyVendors[$vendorName] = $vendorName;
+            }
+
+            if (!isset($vendorName[$countryName][$vendorName])) {
+                $vendors[$countryName][$vendorName] = $vendorName;
+            }
+        }
+
+//        dd($vendors);
+
+        $inDbVendors = [];
+        foreach ($vendorRepository->allAsArray() as $row) {
+            $inDbVendors[$row['id']] = $row['name'];
+        }
+
+        return $this->render('admin/import_yml/step5.html.twig', [
+            'row' => $importYml,
+            'importYml' => $importYml,
+            'inDbVendors' => $inDbVendors,
+            'ymlVendors' => $onlyVendors,
+        ]);
+    }
+
+    /**
+     * @Route("/backend/import_yml/{id}/step6", name="backend_import_yml_step6", methods={"GET"})
+     */
+    public function step6offers(ImportYml $importYml,
+                                CountryRepository $countryRepository,
+                                CountryRegionRepository $regionRepository,
+                                AppellationRepository $appellationRepository,
+                                VendorRepository $vendorRepository): Response
+    {
+        $this->setStage($importYml, 6);
+        $data = simplexml_load_file($importYml->getUrl());
+
+        $countries = json_decode($importYml->getCountriesMapping(), true);
+        $regions = json_decode($importYml->getRegionsMapping(), true);
+        $appellations = json_decode($importYml->getAppellationsMapping(), true);
+        $vendors = json_decode($importYml->getVendorsMapping(), true); // "Gaja" => "140"
+
+        $offers = [];
+        foreach ($data->shop->offers->offer as $row) {
+            $offerId = strval($row->attributes()->id);
+            $avail = strval($row->attributes()->available);
+            $avail = $avail === 'true' ? true : false;
+            if (!$avail) continue;
+
+            $name = strval($row->name);
+            $description = strval($row->description);
+            $categoryId = strval($row->categoryId);
+            $price = strval($row->price);
+            $pic = strval($row->picture);
+            $appellation = null;
+            $region = null;
+            $country = null;
+
+            if (isset($appellations[$categoryId])) {
+                $appellationInDb = $appellationRepository->find($appellations[$categoryId]);
+                if ($appellationInDb) {
+                    $appellation = $appellationInDb->getName();
+                    $region = $appellationInDb->getCountryRegion()->getName();
+                    $country = $appellationInDb->getCountry()->getName();
+                }
+            }
+
+            if (isset($regions[$categoryId])) {
+                $regionInDb = $regionRepository->find($regions[$categoryId]);
+                if ($regionInDb) {
+                    $region = $regionInDb->getName();
+                    $country = $regionInDb->getCountry()->getName();
+                }
+            }
+            if (isset($countries[$categoryId])) {
+               $countryInDb = $countryRepository->find($countries[$categoryId]);
+               if ($countryInDb) {
+                   $country = $countryInDb->getName();
+               }
+            }
+
+            $vendorName = $this->getYmlParam($row, 'tovmarka');
+            if (isset($vendors[$vendorName])) {
+                $vendor = $vendorRepository->find($vendors[$vendorName]);
+                $vendor = $vendor ? $vendor->getName() : null;
+            } //? $vendors[$vendorName] : null;
+
+            $grapeSort1 = $this->getYmlParam($row, 'sortvin1');
+            $valueGrapeSort1 = $this->getYmlParam($row, 'dolyasort1');
+            $grapeSort2 = $this->getYmlParam($row, 'sortvin2');
+            $valueGrapeSort2 = $this->getYmlParam($row, 'dolyasort2');
+            $grapeSort3 = $this->getYmlParam($row, 'sortvin3');
+            $valueGrapeSort3 = $this->getYmlParam($row, 'dolyasort3');
+            $grapeSort4 = $this->getYmlParam($row, 'sortvin4');
+            $valueGrapeSort4 = $this->getYmlParam($row, 'dolyasort4');
+
+            $wineColor = $this->getYmlParam($row, 'typenom');
+            $sugar = $this->getYmlParam($row, 'vidvina');
+
+            $offers[$offerId] = [
+                'name' => $name,
+                'description' => $description,
+                'price' => floatval($price),
+                'pic' => $pic,
+                'country' => $country,
+                'region' => $region,
+                'appellation' => $appellation,
+                'vendor' => $vendor,
+                'grapeSorts' => implode ("\n", [
+                   "{$grapeSort1}: {$valueGrapeSort1}",
+                   "{$grapeSort2}: {$valueGrapeSort2}",
+                   "{$grapeSort3}: {$valueGrapeSort3}",
+                   "{$grapeSort4}: {$valueGrapeSort4}",
+                ]),
+                'wineColor' => $wineColor,
+                'sugar' => $sugar,
+            ];
+        }
+
+        return $this->render('admin/import_yml/step6.html.twig', [
+            'row' => $importYml,
+            'importYml' => $importYml,
+            'offers' => $offers,
+//            'ymlVendors' => $vendors,
+        ]);
+    }
+
+    private function getYmlParam($row, $name = 'name')
+    {
+        foreach ($row->param as $param) {
+            if ($param->attributes()->name == $name) {
+                return trim(strval($param));
+            }
+        }
+
+        return null;
+    }
+
     /**
      * @Route("/backend/import_yml/{id}/new_countries", name="backend_import_yml_new_countries", methods={"POST"})
      */
@@ -380,6 +611,108 @@ class AdminImportXmlController extends AbstractController
         return $this->redirectToRoute('backend_import_yml_step2', [
             'id' => $importYml->getId(),
         ]);
+    }
+
+    /**
+     * @Route("/backend/import_yml/{id}/new_offer/{yml_id}", name="backend_import_yml_new_offer", methods={"GET"})
+     */
+    public function newOffer(ImportYml $importYml,
+                             string $yml_id,
+                             CountryRepository $countryRepository,
+                             VendorRepository $vendorRepository,
+                             AppellationRepository $appellationRepository,
+                             CountryRegionRepository $regionRepository): Response
+    {
+        $data = simplexml_load_file($importYml->getUrl());
+
+        $countries = json_decode($importYml->getCountriesMapping(), true);
+        $regions = json_decode($importYml->getRegionsMapping(), true);
+        $appellations = json_decode($importYml->getAppellationsMapping(), true);
+        $vendors = json_decode($importYml->getVendorsMapping(), true); // "Gaja" => "140"
+
+        foreach ($data->shop->offers->offer as $row) {
+            $offerId = strval($row->attributes()->id);
+            if ($yml_id != $offerId) continue;
+
+            $name = strval($row->name);
+            $description = strval($row->description);
+            $categoryId = strval($row->categoryId); // country - region - appel-tion
+            $price = strval($row->price);
+            $pic = strval($row->picture);
+            $appellation = null;
+            $region = null;
+            $country = null;
+
+            if (isset($appellations[$categoryId])) {
+                $appellationInDb = $appellationRepository->find($appellations[$categoryId]);
+                if ($appellationInDb) {
+                    $appellation = $appellationInDb->getName();
+                    $region = $appellationInDb->getCountryRegion();
+                    $country = $appellationInDb->getCountry();
+                }
+            }
+
+            if (isset($regions[$categoryId])) {
+                $regionInDb = $regionRepository->find($regions[$categoryId]);
+                if ($regionInDb) {
+                    $region = $regionInDb;
+                    $country = $regionInDb->getCountry();
+                }
+            }
+
+            if (isset($countries[$categoryId])) {
+                $countryInDb = $countryRepository->find($countries[$categoryId]);
+                if ($countryInDb) {
+                    $country = $countryInDb;
+                }
+            }
+
+            $vendorName = $this->getYmlParam($row, 'tovmarka');
+            if (isset($vendors[$vendorName])) {
+                $vendor = $vendorRepository->find($vendors[$vendorName]);
+                $vendor = $vendor ? $vendor->getName() : null;
+            } //? $vendors[$vendorName] : null;
+
+            $grapeSort[1] = $this->getYmlParam($row, 'sortvin1');
+            $valueGrapeSort[1] = $this->getYmlParam($row, 'dolyasort1');
+            $grapeSort[2] = $this->getYmlParam($row, 'sortvin2');
+            $valueGrapeSort[2] = $this->getYmlParam($row, 'dolyasort2');
+            $grapeSort[3] = $this->getYmlParam($row, 'sortvin3');
+            $valueGrapeSort[3] = $this->getYmlParam($row, 'dolyasort3');
+            $grapeSort[4] = $this->getYmlParam($row, 'sortvin4');
+            $valueGrapeSort[4] = $this->getYmlParam($row, 'dolyasort4');
+            $grapeSort[5] = $this->getYmlParam($row, 'sortvin5');
+            $valueGrapeSort[5] = $this->getYmlParam($row, 'dolyasort5');
+
+            $grapeSort = array_filter($grapeSort);
+            $valueGrapeSort = array_filter($valueGrapeSort);
+
+            $grapeSorts = array_combine($grapeSort, $valueGrapeSort);
+
+            $wineColor = $this->getYmlParam($row, 'typenom');
+            $sugar = $this->getYmlParam($row, 'vidvina');
+
+            $offer = (new Offer())
+                ->setName($name)
+                ->setDescription($description)
+                ->setSlug(Slugger::urlSlug($name))
+                ->setPrice(floatval($price))
+                ->setCountry($country)
+                ->setRegion($region)
+                ->setAppellation($appellation)
+                ->setType($sugar)
+                ->setColor($wineColor)
+                ->setGrapeSort(json_encode($grapeSorts));
+
+            $this->em->persist($offer);
+            $this->em->flush();
+
+            return $this->redirectToRoute('backend_offer_link', [
+                'id' => $offer->getId()
+            ]);
+        }
+
+        return new Response('Wrong YML id');
     }
 
     /**
@@ -441,10 +774,41 @@ class AdminImportXmlController extends AbstractController
      */
     public function newVendors(ImportYml $importYml,
                                     Request $request,
-                                    CountryRepository $countryRepository,
+                                    VendorRepository $vendorRepository,
                                     CountryRegionRepository $regionRepository): Response
     {
-        dd($_REQUEST);
+        $vendorMapping = array_filter($request->request->get('mapVendor', []));
+        $newVendors = array_filter($request->request->get('newVendor', []));
+
+//        dd($newVendors);
+
+        foreach ($newVendors as $vendorName) {
+            $vendorExist = $vendorRepository->findOneBy([
+                'name' => $vendorName,
+            ]);
+
+            if ($vendorExist) continue;
+
+            $vendor = (new Vendor())
+                ->setName($vendorName)
+                ->setSlug(Slugger::urlSlug($vendorName))
+                ->setCountry(null)
+            ;
+
+            $this->em->persist($vendor);
+            $this->em->flush();
+            $vendorMapping[] = [$vendor->getId(), $vendor->getName()];
+        }
+
+        $importYml->setVendorsMapping(json_encode($vendorMapping));
+
+        $this->em->persist($importYml);
+        $this->em->flush();
+
+        $this->addFlash('success', "Vendors are mapped!");
+//        dd($vendorMapping);
+
+        return $this->redirectToRoute('backend_import_yml_step5', ['id' => $importYml->getId()]);
     }
 
     /**
@@ -455,9 +819,14 @@ class AdminImportXmlController extends AbstractController
                                     CountryRepository $countryRepository,
                                     CountryRegionRepository $regionRepository): Response
     {
-//        dd($_REQUEST);
-//        $countryMapping = json_decode($importYml->getCountriesMapping(), true);
+        // 1. map existing
+        /** @var array $appellationMapping */
+        $appellationMapping = $request->request->get('mapAppellation', []);
+        $appellationMapping = array_filter($appellationMapping);
 
+//        dd($appellationMapping);
+
+        // 2. create and map new
         $inDbCountries = [];
         $inDbRegions = [];
         $regions = $regionRepository->findAll();
@@ -472,9 +841,8 @@ class AdminImportXmlController extends AbstractController
             $appellationMapping[$ymlAppellationId] = $appellationId;
         }
 
-        foreach ($request->request->get('newAppellation', []) as $regionId => $newApps) {
-            foreach ($newApps as $ymlAppellationId => $newAppellationName) {
-                if (!isset($inDbRegions[$regionId])) throw new \Exception('Wrong Region id:' . $regionId);
+        foreach ($request->request->get('newAppellation', []) as $regionId => $ymlNewAppellation) {
+            foreach ($ymlNewAppellation as $ymlAppellationId => $newAppellationName) {
 
                 /** @var CountryRegion $region */
                 $region = $inDbRegions[$regionId];
@@ -498,108 +866,6 @@ class AdminImportXmlController extends AbstractController
 
     }
 
-    /**
-     * @Route("/backend/import_yml/{id}/step4", name="backend_import_yml_step4", methods={"GET", "POST"})
-     */
-    public function step4Apellations(ImportYml $importYml,
-                          CountryRepository $countryRepository,
-                          AppellationRepository $appellationRepository,
-                          CountryRegionRepository $categoryRegionRepository): Response
-    {
-        $this->setStage($importYml, 4);
-        $regionMapping = json_decode($importYml->getRegionsMapping(), true);
-
-        $data = simplexml_load_file($importYml->getUrl());
-
-        $appellations = [];
-        // Appellation - если он принадлежит региону
-        foreach ($data->shop->categories->category as $row) {
-            $id = strval($row['id']);
-            $name = ucwords(strtolower(strval($row)));
-
-            if (!isset($row['parentId'])) continue; // roots
-
-            $parentId = strval($row['parentId']);
-            if (isset($regionMapping[$parentId])) {
-                $regionId = intval($regionMapping[$parentId]);
-                $region = $categoryRegionRepository->find($regionId);
-                if (!$region) continue;
-
-                $appellations[] = [
-                    'ymlId' => $id,
-                    'name' => $name,
-                    'region' => [
-                        'id' => $region->getId(),
-                        'name' => $region->getName()
-                    ],
-                    'country' => [
-                        'id' => $region->getCountry()->getId(),
-                        'name' => $region->getCountry()->getName(),
-                    ]
-                ];
-            }
-        }
-
-        $inDbAppellations = [];
-        $allApps = $appellationRepository->allAsArray();
-        foreach ($allApps as $row) {
-//            $inDbAppellations[$row['id']] =  "({$row['c_name']} - {$row['r_name']}) {$row['name']}";
-            $inDbAppellations[$row['id']] = $row['name'];
-        }
-
-        return $this->render('admin/import_yml/step4.html.twig', [
-            'row' => $importYml,
-            'importYml' => $importYml,
-            'inDbAppellations' => $inDbAppellations,
-            'ymlAppellations' => $appellations,
-        ]);
-//        dd($appellations);
-    }
-
-    /**
-     * @Route("/backend/import_yml/{id}/step5", name="backend_import_yml_step5", methods={"GET"})
-     */
-    public function step5Vendors(ImportYml $importYml, VendorRepository $vendorRepository): Response
-    {
-        $this->setStage($importYml, 5);
-        $data = simplexml_load_file($importYml->getUrl());
-
-        $vendors = [];
-        foreach ($data->shop->offers->offer as $row) {
-            $avail = strval($row->attributes()->available);
-            $avail = $avail === 'true' ? true : false;
-            if (!$avail) continue;
-
-            $vendors[] = trim(strval($row->vendor));
-        }
-
-        $inDbVendors = [];
-        foreach ($vendorRepository->allAsArray() as $row) {
-            $inDbVendors[$row['id']] = $row['name'];
-        }
-
-//        dd($inDbVendors);
-//        return new Response('qqq');
-        return $this->render('admin/import_yml/step5.html.twig', [
-            'row' => $importYml,
-            'importYml' => $importYml,
-            'inDbVendors' => $inDbVendors,
-            'ymlVendors' => $vendors,
-        ]);
-    }
-
-    /**
-     * @Route("/backend/import_yml/{id}/step6", name="backend_import_yml_step6", methods={"POST"})
-     */
-    public function step6offers(ImportYml $importYml, VendorRepository $vendorRepository): Response
-    {
-        return $this->render('admin/import_yml/step6.html.twig', [
-            'row' => $importYml,
-            'importYml' => $importYml,
-//            'inDbVendors' => $inDbVendors,
-//            'ymlVendors' => $vendors,
-        ]);
-    }
 
     /**
      * @Route("/backend/old_import_yml/step3/{id}", name="old_backend_import_yml_step3")

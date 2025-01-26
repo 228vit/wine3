@@ -66,6 +66,11 @@ class Offer implements TimestampableInterface
     private $name;
 
     /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $description;
+
+    /**
      * @ORM\Column(type="string", length=512)
      */
     private $slug;
@@ -172,6 +177,8 @@ class Offer implements TimestampableInterface
 
     public function __construct()
     {
+        $this->alcohol = 0;
+        $this->volume = 0.7;
         $this->priceStatus = 1;
         $this->decantation = true;
         $this->foods = new ArrayCollection();
@@ -572,6 +579,17 @@ class Offer implements TimestampableInterface
             $this->getYear().'г',
             $this->getAlcohol().'%',
         ]);
+    }
+
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    public function setDescription($description)
+    {
+        $this->description = $description;
+        return $this;
     }
 
 }

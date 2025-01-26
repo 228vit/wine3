@@ -57,11 +57,13 @@
                         <td>({{ appellation.country.name }} - {{ appellation.region.name }}) {{ appellation.name | raw }}</td>
                         <td><select name="mapAppellation[{{ appellation.ymlId }}]" id="appellation_{{ id }}">
                                 <option value="">---</option>
-                                {% for v_id, v_name in inDbAppellations %}
-                                    {% if appellation.name == v_name %}
+                                {% for inDbAppellation in inDbAppellations %}
+                                    {% if appellation.name == inDbAppellation.name %}
                                         {% set found = true %}
                                     {% endif %}
-                                    <option value="{{ v_id }}"{{ appellation.name == v_name ? ' selected' : '' }}>{{ v_name }}</option>
+                                    <option value="{{ inDbAppellation.id }}"
+                                        {{ appellation.name == inDbAppellation.name ? ' selected' : '' }}>
+                                        ({{ inDbAppellation.c_name }}) {{ inDbAppellation.name }}</option>
                                 {% endfor %}
                             </select>
                             {% if found == false %}
@@ -84,7 +86,7 @@
                 </tfoot>
             </table>
 
-            <button class="btn btn-success" type="submit"><i class="fa fa-check"></i> Save Regions</button>
+            <button class="btn btn-success" type="submit"><i class="fa fa-check"></i> Save Appellations</button>
 
         </form>
     </div>

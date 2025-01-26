@@ -26,15 +26,37 @@ class AppellationRepository extends ServiceEntityRepository
     public function allAsArray()
     {
         return $this->createQueryBuilder('appellation')
-//            ->innerJoin('appellation.country', 'country')
-//            ->innerJoin('appellation.countryRegion', 'region')
-//            ->select('appellation.id, appellation.name, region.id as r_id, region.name as r_name, country.name as c_name')
-//            ->orderBy('country.name', 'ASC')
-//            ->addOrderBy('region.name', 'ASC')
+            ->select('appellation.id, appellation.name, region.id as r_id, region.name as r_name, country.name as c_name')
+            ->innerJoin('appellation.country', 'country')
+            ->innerJoin('appellation.countryRegion', 'region')
+            ->orderBy('country.name', 'ASC')
+            ->addOrderBy('region.name', 'ASC')
             ->addOrderBy('appellation.name', 'ASC')
             ->getQuery()
             ->getArrayResult()
         ;
+    }
+
+
+    public function asShortArray()
+    {
+        $rows = $this->createQueryBuilder('appellation')
+            ->select('appellation.id, appellation.name, region.id as r_id, region.name as r_name, country.name as c_name')
+            ->innerJoin('appellation.country', 'country')
+            ->innerJoin('appellation.countryRegion', 'region')
+            ->orderBy('country.name', 'ASC')
+            ->addOrderBy('region.name', 'ASC')
+            ->addOrderBy('appellation.name', 'ASC')
+            ->getQuery()
+            ->getArrayResult()
+        ;
+
+        $arr = [];
+        foreach ($rows as $row) {
+            $arr[$row['id']] = $row['name'];
+        }
+
+        return $arr;
     }
 
     /**
