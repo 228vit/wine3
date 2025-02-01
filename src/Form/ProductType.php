@@ -62,7 +62,7 @@ class ProductType extends AbstractType
                 'expanded' => true,
             ))
 
-            ->add('productCode', TextType::class, [
+            ->add('productCode', HiddenType::class, [
                 'label' => 'Артикул',
             ])
             ->add('name')

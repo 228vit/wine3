@@ -78,7 +78,7 @@ class Vendor
      */
     private $logo;
 
-    public function __construct()
+    public function e__construct()
     {
         $this->products = new ArrayCollection();
         $this->events = new ArrayCollection();

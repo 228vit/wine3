@@ -17,6 +17,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Product implements TimestampableInterface
 {
     use TimestampableTrait;
+    use TimestampableTrait;
 
     /**
      * @ORM\Id

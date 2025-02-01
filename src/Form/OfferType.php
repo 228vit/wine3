@@ -27,16 +27,6 @@ class OfferType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-//            ->add('product', EntityType::class, array(
-//                'class' => Product::class,
-//                'query_builder' => function (EntityRepository $er) {
-//                    return $er->createQueryBuilder('c')
-//                        ->addOrderBy('c.name', 'ASC');
-//                },
-//                'choice_label' => 'name',
-//                'required' => false,
-//                'expanded' => false,
-//            ))
             ->add('product', SuggestType::class, [
                 'suggester' => 'product',
                 'required' => false,
@@ -74,16 +64,16 @@ class OfferType extends AbstractType
                 'class' => 'App:CountryRegion',
                 'expanded' => false,
             ))
+            ->add('appellation', SuggestType::class, [
+                'suggester' => 'appellation',
+                'required' => false,
+            ])
             ->add('foods', EntityType::class, array(
                 'class' => 'App:Food',
                 'multiple' => true,
                 'expanded' => true,
             ))
 
-//            ->add('productCode', NumberType::class, [
-//                'label' => 'Артикул',
-//                'attr' => [ 'type' => 'number' ]
-//            ])
             ->add('name')
             ->add('price')
             ->add('priceStatus', ChoiceType::class, [
@@ -111,10 +101,10 @@ class OfferType extends AbstractType
                 'label' => 'Тип ферментации',
                 'required' => false,
             ])
-            ->add('appellation', TextType::class , [
-                'label' => 'Апеллясьон',
-                'required' => false,
-            ])
+//            ->add('appellation', TextType::class , [
+//                'label' => 'Апеллясьон',
+//                'required' => false,
+//            ])
             ->add('packing', TextType::class , [
                 'label' => 'Упаковка',
                 'required' => false,

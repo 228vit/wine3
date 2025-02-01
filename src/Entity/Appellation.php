@@ -26,7 +26,7 @@ class Appellation
     private $country;
 
     /**
-     * @ORM\ManyToOne(targetEntity=countryRegion::class, inversedBy="appellations")
+     * @ORM\ManyToOne(targetEntity=CountryRegion::class, inversedBy="appellations")
      */
     private $countryRegion;
 
@@ -137,4 +137,14 @@ class Appellation
 
         return $this;
     }
+
+    public function getSummary(): string
+    {
+        return implode(', ', array_filter([
+            null !== $this->getCountry() ? $this->getCountry()->__toString() : null,
+            null !== $this->getCountryRegion() ? $this->getCountryRegion()->__toString() : null,
+            $this->getName(),
+        ]));
+    }
+
 }

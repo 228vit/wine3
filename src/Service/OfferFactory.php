@@ -55,7 +55,7 @@ final class OfferFactory
         $this->wineSugarService = $wineSugarService;
     }
 
-    public function makeOffer(OfferDTO $dto): Offer
+    public function emakeOffer(OfferDTO $dto): Offer
     {
         $offer = $this->offerRepository->findOneBy([
             'productCode' => $dto->productCode,

@@ -147,11 +147,6 @@ class Offer implements TimestampableInterface
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $appellation;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
     private $packing;
 
     /**
@@ -174,6 +169,11 @@ class Offer implements TimestampableInterface
      * @ORM\ManyToOne(targetEntity=ImportLog::class, inversedBy="products")
      */
     private $import;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Appellation::class)
+     */
+    private $appellation;
 
     public function __construct()
     {
@@ -496,17 +496,6 @@ class Offer implements TimestampableInterface
         return $this;
     }
 
-    public function getAppellation(): ?string
-    {
-        return $this->appellation;
-    }
-
-    public function setAppellation($appellation)
-    {
-        $this->appellation = $appellation;
-        return $this;
-    }
-
     public function getSupplier(): ?Supplier
     {
         return $this->supplier;
@@ -589,6 +578,18 @@ class Offer implements TimestampableInterface
     public function setDescription($description)
     {
         $this->description = $description;
+        return $this;
+    }
+
+    public function getAppellation(): ?Appellation
+    {
+        return $this->appellation;
+    }
+
+    public function setAppellation(?Appellation $appellation): self
+    {
+        $this->appellation = $appellation;
+
         return $this;
     }
 

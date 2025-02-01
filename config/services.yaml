@@ -54,3 +54,8 @@ sirian_suggest:
             property: summary
             search:
                 name: ~
+        appellation:
+            class: "App:Appellation"
+            property: summary
+            search:
+                name: ~

@@ -78,7 +78,7 @@ final class OfferDTO
         return floatval($this->cleanNumber($value));
     }
 
-    private function getIntValue(?string $value): ?int
+    private function egetIntValue(?string $value): ?int
     {
 
         return intval($this->cleanNumber($value));
