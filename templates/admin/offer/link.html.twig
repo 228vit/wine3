@@ -19,6 +19,7 @@
 
     <div class="row">
         <div class="col-6">
+            {{ form_row(form.ymlId) }}
             {{ form_row(form.name) }}
             {{ form_row(form.slug) }}
             {{ form_row(form.category) }}
@@ -79,11 +80,9 @@
         <div class="col-6">
             <h4>Найти товар</h4>
             {{ form_widget(form.product) }}
-{#            <div class="breadcrumb mt-2 mb-2">#}
-{#                Не нашли интересующий Вас товар?#}
-{#            </div>#}
             <a class="btn btn-warning mt-2 mb-2" id="makeCard" href="{{ path('backend_offer_to_product', { id: row.id }) }}">
                 <i class="fa fa-plus"></i> Создать карточку на основе текущего оффера</a>
+            {%  if products | length > 0 %}
             <h4>Похожие варианты</h4>
             <table class="table table-striped">
                 {% for product in products %}
@@ -98,7 +97,19 @@
                     </tr>
                 {% endfor %}
             </table>
+            {% else %}
+                <h5>Похожие варианты не найдены...</h5>
+            {% endif %}
+            <h5>Description</h5>
+            {{ form_widget(form.description) }}
+
+            {% if row.picUrl %}
+                <a target="_blank" href="{{ row.picUrl }}">view pic <i class="fa fa-search"></i></a>
+            {% endif %}
+
+            <hr>
             <button class="btn btn-success" type="submit"><i class="fa fa-check"></i> Update</button>
+
         </div>
     </div>
 

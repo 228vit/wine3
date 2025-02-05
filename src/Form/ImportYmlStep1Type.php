@@ -20,6 +20,7 @@ class ImportYmlStep1Type extends AbstractType
                 'placeholder' => 'Например "Италия - новинки"'
             ]])
             ->add('supplier')
+            ->add('rotatePicAngle')
             ->add('url')
         ;
 

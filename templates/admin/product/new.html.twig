@@ -25,6 +25,8 @@
             {{ form_row(form.vendor) }}
             {{ form_row(form.country) }}
             {{ form_row(form.region) }}
+            {{ form_row(form.appellation) }}
+
             {{ form_row(form.price) }}
             {{ form_row(form.priceStatus) }}
             <div class="form-group row">
@@ -52,6 +54,8 @@
 
             {{ form_row(form.alcohol, {label_attr: {class: 'radio-custom'} }) }}
 
+            {{ form_row(form.content) }}
+
             <!-- ratings and grape sorts -->
         </div>
         <div class="col-6">
@@ -62,7 +66,6 @@
             {{ form_row(form.serveTemperature) }}
             {{ form_row(form.fermentation) }}
             {{ form_row(form.agingType) }}
-            {{ form_row(form.appellation) }}
 
             {{ form_row(form.metaKeywords) }}
             {{ form_row(form.metaDescription) }}
@@ -133,10 +136,7 @@
         </div>
     </div>
 
-
     <hr />
-
-    {{ form_row(form.content) }}
 
     <div class="form-group row">
         {{ form_label(form.announcePicFile) }}

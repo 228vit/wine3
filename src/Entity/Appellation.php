@@ -120,7 +120,7 @@ class Appellation
     {
         if (!$this->products->contains($product)) {
             $this->products[] = $product;
-            $product->setAppellacion($this);
+            $product->setAppellation($this);
         }
 
         return $this;
@@ -130,8 +130,8 @@ class Appellation
     {
         if ($this->products->removeElement($product)) {
             // set the owning side to null (unless already changed)
-            if ($product->getAppellacion() === $this) {
-                $product->setAppellacion(null);
+            if ($product->getAppellation() === $this) {
+                $product->setAppellation(null);
             }
         }
 

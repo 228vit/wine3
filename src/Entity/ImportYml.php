@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\ImportYmlRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Knp\DoctrineBehaviors\Contract\Entity\TimestampableInterface;
 use Knp\DoctrineBehaviors\Model\Timestampable\TimestampableTrait;
@@ -77,10 +78,22 @@ class ImportYml implements TimestampableInterface
      */
     private $isComplete;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $rotatePicAngle;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Offer::class, mappedBy="importYml")
+     */
+    private $offers;
+
     public function __construct()
     {
+        $this->rotatePicAngle = 0;
         $this->stage = 1;
         $this->isComplete = false;
+        $this->offers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -213,6 +226,48 @@ class ImportYml implements TimestampableInterface
     public function setAppellationsMapping($appellationsMapping)
     {
         $this->appellationsMapping = $appellationsMapping;
+        return $this;
+    }
+
+    public function getRotatePicAngle(): ?int
+    {
+        return $this->rotatePicAngle;
+    }
+
+    public function setRotatePicAngle(?int $rotatePicAngle): self
+    {
+        $this->rotatePicAngle = $rotatePicAngle;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Offer>
+     */
+    public function getOffers(): Collection
+    {
+        return $this->offers;
+    }
+
+    public function addOffer(Offer $offer): self
+    {
+        if (!$this->offers->contains($offer)) {
+            $this->offers[] = $offer;
+            $offer->setImportYml($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOffer(Offer $offer): self
+    {
+        if ($this->offers->removeElement($offer)) {
+            // set the owning side to null (unless already changed)
+            if ($offer->getImportYml() === $this) {
+                $offer->setImportYml(null);
+            }
+        }
+
         return $this;
     }
 

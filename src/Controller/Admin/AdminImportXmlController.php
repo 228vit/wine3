@@ -17,6 +17,7 @@ use App\Repository\AppellationRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\CountryRegionRepository;
 use App\Repository\CountryRepository;
+use App\Repository\OfferRepository;
 use App\Repository\VendorRepository;
 use App\Service\FileUploader;
 use App\Service\OfferFactory;
@@ -463,6 +464,7 @@ class AdminImportXmlController extends AbstractController
                                 CountryRepository $countryRepository,
                                 CountryRegionRepository $regionRepository,
                                 AppellationRepository $appellationRepository,
+                                OfferRepository $offerRepository,
                                 VendorRepository $vendorRepository): Response
     {
         $this->setStage($importYml, 6);
@@ -472,6 +474,7 @@ class AdminImportXmlController extends AbstractController
         $regions = json_decode($importYml->getRegionsMapping(), true);
         $appellations = json_decode($importYml->getAppellationsMapping(), true);
         $vendors = json_decode($importYml->getVendorsMapping(), true); // "Gaja" => "140"
+        $supplierOffers = $offerRepository->getSupplierOffers($importYml->getSupplier());
 
         $offers = [];
         foreach ($data->shop->offers->offer as $row) {
@@ -547,6 +550,7 @@ class AdminImportXmlController extends AbstractController
                 ]),
                 'wineColor' => $wineColor,
                 'sugar' => $sugar,
+                'productOfferId' => isset($supplierOffers[$offerId]) ? $supplierOffers[$offerId] : null,
             ];
         }
 
@@ -638,15 +642,17 @@ class AdminImportXmlController extends AbstractController
             $description = strval($row->description);
             $categoryId = strval($row->categoryId); // country - region - appel-tion
             $price = strval($row->price);
-            $pic = strval($row->picture);
+            $picUrl = strval($row->picture);
             $appellation = null;
             $region = null;
             $country = null;
+            preg_match('/\s([0-9]{4})/', $name, $matches);
+            $year = (isset($matches[1])) ? $matches[1] : null;
 
             if (isset($appellations[$categoryId])) {
                 $appellationInDb = $appellationRepository->find($appellations[$categoryId]);
                 if ($appellationInDb) {
-                    $appellation = $appellationInDb->getName();
+                    $appellation = $appellationInDb;
                     $region = $appellationInDb->getCountryRegion();
                     $country = $appellationInDb->getCountry();
                 }
@@ -668,9 +674,10 @@ class AdminImportXmlController extends AbstractController
             }
 
             $vendorName = $this->getYmlParam($row, 'tovmarka');
+            $vendor = null;
             if (isset($vendors[$vendorName])) {
-                $vendor = $vendorRepository->find($vendors[$vendorName]);
-                $vendor = $vendor ? $vendor->getName() : null;
+                $vendorId = $vendors[$vendorName];
+                $vendor = $vendorRepository->find($vendorId);
             } //? $vendors[$vendorName] : null;
 
             $grapeSort[1] = $this->getYmlParam($row, 'sortvin1');
@@ -693,16 +700,23 @@ class AdminImportXmlController extends AbstractController
             $sugar = $this->getYmlParam($row, 'vidvina');
 
             $offer = (new Offer())
+                ->setImportYml($importYml)
+                ->setYmlId($offerId)
                 ->setName($name)
+                ->setYear($year)
                 ->setDescription($description)
                 ->setSlug(Slugger::urlSlug($name))
                 ->setPrice(floatval($price))
                 ->setCountry($country)
                 ->setRegion($region)
                 ->setAppellation($appellation)
+                ->setVendor($vendor)
+                ->setSupplier($importYml->getSupplier())
                 ->setType($sugar)
                 ->setColor($wineColor)
-                ->setGrapeSort(json_encode($grapeSorts));
+                ->setGrapeSort(json_encode($grapeSorts))
+                ->setPicUrl($picUrl)
+            ;
 
             $this->em->persist($offer);
             $this->em->flush();
@@ -777,10 +791,12 @@ class AdminImportXmlController extends AbstractController
                                     VendorRepository $vendorRepository,
                                     CountryRegionRepository $regionRepository): Response
     {
+        /* "Gaja" => "140"
+         * "Terras Gauda" => "141" */
         $vendorMapping = array_filter($request->request->get('mapVendor', []));
         $newVendors = array_filter($request->request->get('newVendor', []));
 
-//        dd($newVendors);
+//        dd($vendorMapping);
 
         foreach ($newVendors as $vendorName) {
             $vendorExist = $vendorRepository->findOneBy([
@@ -797,7 +813,7 @@ class AdminImportXmlController extends AbstractController
 
             $this->em->persist($vendor);
             $this->em->flush();
-            $vendorMapping[] = [$vendor->getId(), $vendor->getName()];
+            $vendorMapping[$vendor->getName()] = $vendor->getId();
         }
 
         $importYml->setVendorsMapping(json_encode($vendorMapping));

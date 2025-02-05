@@ -3,8 +3,10 @@
 namespace App\Repository;
 
 use App\Entity\Offer;
+use App\Entity\Supplier;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\VarExporter\Internal\Hydrator;
 
 /**
  * @method Offer|null find($id, $lockMode = null, $lockVersion = null)
@@ -41,6 +43,24 @@ class OfferRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
 
         return 0 === (int)$res ? false : true;
+    }
+
+    public function getSupplierOffers(Supplier $supplier)
+    {
+        $result = $this->createQueryBuilder('offer')
+            ->select('offer.id, offer.ymlId')
+            ->where('offer.supplier = :supplier')
+            ->andWhere('offer.ymlId IS NOT NULL')
+            ->setParameter('supplier', $supplier)
+            ->getQuery()
+            ->getArrayResult()
+        ;
+        $resp = [];
+        foreach ($result as $item) {
+            $resp[$item['ymlId']] = $item['id'];
+        }
+
+        return $resp;
     }
 
     public function getByIds(array $ids)

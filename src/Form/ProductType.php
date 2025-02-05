@@ -15,6 +15,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -131,18 +132,19 @@ class ProductType extends AbstractType
             ->add('metaKeywords')
             ->add('metaDescription')
 
-            ->add('content', CKEditorType::class, [
-                    'required' => false,
-                    'config' => array(
-                        'uiColor' => '#ffffff',
+            ->add('content', TextareaType::class)
+//            ->add('content', CKEditorType::class, [
+//                    'required' => false,
+//                    'config' => array(
+//                        'uiColor' => '#ffffff',
 //                        'filebrowserBrowseRoute' => 'elfinder',
 //                        'filebrowserBrowseRouteParameters' => array(
 //                            'instance' => 'default',
 //                            'homeFolder' => ''
 //                        )
-                    ),
-                ]
-            )
+//                    ),
+//                ]
+//            )
             ->add('announcePicFile', FileType::class, array(
                 'label' => 'Announce PIC',
                 'data_class' => null,
@@ -159,6 +161,8 @@ class ProductType extends AbstractType
                 'required' => false
             ))
             ->add('isActive', CheckboxType::class, ['required' => false])
+            ->add('announcePic', HiddenType::class)
+            ->add('contentPic', HiddenType::class)
         ;
 
 

@@ -64,23 +64,33 @@
                     <th>Grape sorts</th>
                     <th>Vendor</th>
                     <th>Price</th>
+                    <th>Pic</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for id, offer in offers %}
                     <tr>
                         <td>{{ id }}
-                            <a class="btn btn-sm btn-success"
-                               href="{{ path('backend_import_yml_new_offer', { id: row.id, yml_id: id }) }}">+ offer</a>
+                            {% if offer.productOfferId is not null %}
+                                <a class="btn btn-sm btn-primary"
+                                   href="{{ path('backend_offer_link', { id: offer.productOfferId }) }}">view offer</a>
+                            {% else %}
+                                <a class="btn btn-sm btn-success"
+                                   href="{{ path('backend_import_yml_new_offer', { id: row.id, yml_id: id }) }}">+ offer</a>
+                            {% endif %}
                         </td>
                         <td>{{ offer.name | raw }} <br> <small>{{ offer.wineColor }} {{ offer.sugar }}</small></td>
-                        <td>{{ offer.description | raw }}</td>
+                        <td style="height: 100px; overflow: hidden;">{{ offer.description | raw }}</td>
                         <td>{{ offer.country }} /
                             {{ offer.region }} / {{ offer.appellation }}
                         </td>
                         <td>{{ offer.grapeSorts }}</td>
                         <td>{{ offer.vendor }}</td>
                         <td>{{ offer.price }}</td>
+                        <td>{% if offer.pic %}
+                                <a target="_blank" href="{{ offer.pic }}">pic</a>
+                            {% endif %}
+                        </td>
 {#                        <td><img class="rotateThumb" src="{{ offer.pic }}" alt=""></td>#}
 
                     </tr>

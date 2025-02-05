@@ -79,6 +79,8 @@
                 <td>
                     <a class="btn btn-sm btn-success" href="{{ path('backend_offer_link', { 'id': row.id }) }}">
                         <i class="fa fa-pencil" aria-hidden="true"></i> edit</a>
+                    <a class="btn btn-sm btn-danger confirm" href="{{ path('backend_offer_delete', { 'id': row.id }) }}">
+                        <i class="fa fa-exclamation" aria-hidden="true"></i> delete</a>
                 </td>
             </tr>
         {% endfor %}

@@ -5,12 +5,11 @@ namespace App\Service;
 use App\Entity\EventPic;
 use App\Entity\ImportLog;
 use App\Entity\Product;
-use App\Entity\User;
 use App\Entity\Vendor;
 use App\Utils\Slugger;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Ramsey\Uuid\Uuid;
-
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class FileUploader
 {
@@ -20,13 +19,15 @@ class FileUploader
     private $vendorPicsSubDirectory;
     private $eventPicsSubDirectory;
     private $importFilesDirectory;
-    
+    private $httpClient;
+
     public function __construct(string $uploadsDirectory,
                                 string $importFilesDirectory,
                                 string $productPicsSubDirectory,
                                 string $vendorLogoSubDirectory,
                                 string $vendorPicsSubDirectory,
-                                string $eventPicsSubDirectory)
+                                string $eventPicsSubDirectory,
+                                HttpClientInterface $httpClient)
     {
         $this->eventPicsSubDirectory = $eventPicsSubDirectory;
         $this->uploadsDirectory = $uploadsDirectory;
@@ -34,6 +35,7 @@ class FileUploader
         $this->vendorLogoSubDirectory = $vendorLogoSubDirectory;
         $this->vendorPicsSubDirectory = $vendorPicsSubDirectory;
         $this->importFilesDirectory = $importFilesDirectory;
+        $this->httpClient = $httpClient;
     }
 
     // todo:
@@ -158,6 +160,51 @@ class FileUploader
             $this->getImportFilesDirectory(),
             $importLog->getCsv()
         );
+    }
+
+    public function grabOfferPic(string $url, int $rotationAngle = 270)
+    {
+        $info = pathinfo($url);
+        $extension = strtolower($info['extension']);
+
+//        $response = $this->httpClient->request(
+//            'GET',
+//            $url
+//        );
+//        $image = $response->getContent();
+//        dd($image);
+
+        switch($extension) {
+            case "jpg":
+                $img = imagecreatefromjpeg($url);
+                break;
+            case "jpeg":
+                $img = imagecreatefromjpeg($url);
+                break;
+            case "png":
+                $img = imagecreatefrompng($url);
+                break;
+            case "gif":
+                $img = imagecreatefromgif($url);
+                break;
+            default:
+                $img = imagecreatefromjpeg($url);
+        }
+
+        $img = imagerotate($img, $rotationAngle, 0);
+
+        $fileName = 'offer_'.rand(100000, 999999).'.'.$extension;
+        $path = $this->getUploadsDirectory() . DIRECTORY_SEPARATOR .$this->productPicsSubDirectory
+            . DIRECTORY_SEPARATOR . $fileName;
+
+        if (!file_exists($path)) {
+            $f = fopen($path, 'w');
+            fclose($f);
+        }
+
+        imagejpeg($img, $path);
+
+        return $this->productPicsSubDirectory . DIRECTORY_SEPARATOR . $fileName;
     }
 
 }

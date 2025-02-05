@@ -175,6 +175,21 @@ class Offer implements TimestampableInterface
      */
     private $appellation;
 
+    /**
+     * @ORM\Column(type="string", length=1024, nullable=true)
+     */
+    private $picUrl;
+
+    /**
+     * @ORM\Column(type="string", length=32, nullable=true)
+     */
+    private $ymlId;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=ImportYml::class, inversedBy="offers")
+     */
+    private $importYml;
+
     public function __construct()
     {
         $this->alcohol = 0;
@@ -589,6 +604,42 @@ class Offer implements TimestampableInterface
     public function setAppellation(?Appellation $appellation): self
     {
         $this->appellation = $appellation;
+
+        return $this;
+    }
+
+    public function getPicUrl(): ?string
+    {
+        return $this->picUrl;
+    }
+
+    public function setPicUrl(?string $picUrl): self
+    {
+        $this->picUrl = $picUrl;
+
+        return $this;
+    }
+
+    public function getYmlId(): ?string
+    {
+        return $this->ymlId;
+    }
+
+    public function setYmlId(?string $ymlId): self
+    {
+        $this->ymlId = $ymlId;
+
+        return $this;
+    }
+
+    public function getImportYml(): ?ImportYml
+    {
+        return $this->importYml;
+    }
+
+    public function setImportYml(?ImportYml $importYml): self
+    {
+        $this->importYml = $importYml;
 
         return $this;
     }

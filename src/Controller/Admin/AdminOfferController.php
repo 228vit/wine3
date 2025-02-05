@@ -17,6 +17,7 @@ use App\Repository\ProductGrapeSortRepository;
 use App\Repository\ProductRatingRepository;
 use App\Repository\ProductRepository;
 use App\Repository\RatingRepository;
+use App\Service\FileUploader;
 use App\Service\WineColorService;
 use App\Service\WineSugarService;
 use App\Utils\Slugger;
@@ -328,19 +329,21 @@ class AdminOfferController extends AbstractController
                                       ProductRatingRepository $productRatingRepository,
                                       WineColorService $wineColorService,
                                       WineSugarService $wineSugarService,
-                                      SessionInterface $session)
+                                      SessionInterface $session,
+                                      FileUploader $fileUploader)
     {
         $session->set('offer_id', $offer->getId());
 
         $product = (new Product())
             ->setName($offer->getName())
+            ->setContent($offer->getDescription())
             ->setVendor($offer->getVendor())
             ->setCategory($offer->getCategory())
             ->setCountry($offer->getCountry())
             ->setRegion($offer->getRegion())
             ->setName($offer->getName())
             ->setSlug($offer->getSlug())
-            ->setProductCode($offer->getProductCode())
+//            ->setProductCode($offer->getProductCode())
             ->setPrice($offer->getPrice())
             ->setPriceStatus($offer->getPriceStatus())
             ->setPacking($offer->getPacking())
@@ -364,6 +367,19 @@ class AdminOfferController extends AbstractController
             ->setAging($offer->getAging())
             ->setAgingType($offer->getAgingType())
         ;
+
+        if ($offer->getPicUrl()) {
+            $picPathRelative = $fileUploader->grabOfferPic(
+                $offer->getPicUrl(),
+                $offer->getImportYml() ? $offer->getImportYml()->getRotatePicAngle() : 0
+            );
+            if ($picPathRelative) {
+                $product
+                    ->setContentPic($picPathRelative)
+                    ->setAnnouncePic($picPathRelative)
+                ;
+            }
+        }
 
         /** @var Food $food */
         foreach ($offer->getFoods() as $food) {
@@ -480,10 +496,18 @@ class AdminOfferController extends AbstractController
     /**
      * Deletes a offer entity.
      *
-     * @Route("backend/offer/{id}", name="backend_offer_delete", methods={"DELETE"})
+     * @Route("backend/offer/{id}/delete", name="backend_offer_delete", methods={"DELETE", "GET"})
      */
-    public function deleteAction(Request $request, Offer $offer)
+    public function delete(Request $request, Offer $offer)
     {
+        if ($request->isMethod(Request::METHOD_GET)) {
+            $this->em->remove($offer);
+            $this->em->flush($offer);
+
+            $this->addFlash('success', 'Record was successfully deleted!');
+            return $this->redirectToRoute('backend_offer_index');
+        }
+
         $filter_form = $this->createDeleteForm($offer);
         $filter_form->handleRequest($request);
 
