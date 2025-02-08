@@ -74,10 +74,14 @@
                         <div class="form-el__title">LinkedIn</div>
                         <input name="linkedin" class="form-el__inp inp-def" type="text" value="" placeholder="https://www.linkedin.com/id">
                     </div>
-                    {#                    <div class="modal-content__el form-el form-el_bg form-el_m">#}
-                    {#                        <div class="form-el__title">Текст сообщения</div>#}
-                    {#                        <textarea class="form-el__textarea textarea-def"></textarea>#}
-                    {#                    </div>#}
+
+                    <div id="captcha-container"
+                         style="height: 100px;"
+                         class="smart-captcha"
+                         data-sitekey="ysc1_e5KJHYgZWem3nzq4CzaKLNL2RtO6YbkDcuS0og9Ke7bdc0f7">
+                        <input type="hidden" id="yandex-smart-token" name="smart-token" value="">
+                    </div>
+
                     <button class="block-form__btn btn-def btn-def_2"><span>Отправить</span></button>
                 </div>
                 </form>

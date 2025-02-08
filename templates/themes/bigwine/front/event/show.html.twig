@@ -38,7 +38,7 @@
                 </div>
                 <div class="sec-event__img"><img class="sec-event__img-img" src="{{ asset('/uploads/' ~ event.collage) }}" alt=""></div>
                 <div class="sec-event__content">
-                    <div class="sec-event__tabs tabs"><a class="tabs__el" href="#">О событий</a><a
+                    <div class="sec-event__tabs tabs"><a class="tabs__el" href="#">О событии</a><a
                                 class="tabs__el active" href="#">Отчет события</a></div>
                     <div class="sec-event__text wrap-article text-info">
 
@@ -97,10 +97,26 @@
 {% endblock %}
 
 {% block extra_scripts %}
+    <script src="https://smartcaptcha.yandexcloud.net/captcha.js" defer></script>
     <script>
         $(document).ready(function() {
             $('#eventVisitorForm').on('submit', function (e) {
                 e.preventDefault();
+                // check captcha!
+                let captchaToken = $('#yandex--smart-token').val();
+                $.ajax({
+                    url: '',
+                    data: { captchaToken: captchaToken},
+                    success: function (data) {
+                        $('#popupBody').html('Ваша заявка отправлена, администратор с Вами свяжется!')
+                        // $('#modal-event-org').hide('slow');
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.log(textStatus, errorThrown);
+                        alert('Ошибка при проверке капчи: ' + errorThrown);
+                    },
+
+                });
 
                 let form = $(this);
                 $.ajax({

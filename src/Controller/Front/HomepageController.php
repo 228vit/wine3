@@ -6,6 +6,8 @@ use App\Entity\Product;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
@@ -28,6 +30,40 @@ class HomepageController extends AbstractController
             'last_username' => $lastUsername,
             'error' => $error,
         ]);
+    }
+    /**
+     * @Route("/yandex_captcha", name="yandex_captcha")
+     */
+    public function yandexCaptcha(Request $request): Response
+    {
+        $token = $request->get('captchaToken', null);
+        $ip = $request->getClientIp();
+        $ch = curl_init("https://smartcaptcha.yandexcloud.net/validate");
+
+        $args = [
+            "secret" => 'ysc2_e5KJHYgZWem3nzq4CzaKFbQr6xRRagwh0nw7wGSJ96aa3eb6',
+            "token" => $token,
+            "ip" => $ip, // Нужно передать IP-адрес пользователя.
+        ];
+        curl_setopt($ch, CURLOPT_TIMEOUT, 1);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($args));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        $server_output = curl_exec($ch);
+        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($httpcode !== 200) {
+            return new JsonResponse(['message' => "Allow access due to an error: code=$httpcode; message=$server_output", 400]);
+        }
+
+        $resp = json_decode($server_output);
+        if ($resp->status === "ok") {
+            return new JsonRequest();
+        }
+
+        return new JsonRequest($resp, 400);
     }
 
     /**
