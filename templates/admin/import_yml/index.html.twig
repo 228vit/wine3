@@ -78,6 +78,8 @@
                 <td>
                     <a class="btn btn-sm btn-success" href="{{ path('backend_import_yml_step' ~ row.stage, {'id': row.id} ) }}">
                         <i class="fa fa-pencil" aria-hidden="true"></i> edit</a>
+                    <a class="btn btn-sm btn-danger confirm" href="{{ path('backend_import_yml_delete', {'id': row.id} ) }}">
+                        <i class="fa fa-exclamation" aria-hidden="true"></i> delete</a>
 {#                    <a class="btn btn-sm btn-primary copy-import" href="{{ path('backend_import_copy', {'id': row.id} ) }}">#}
 {#                        <i class="fa fa-copy" aria-hidden="true"></i> copy</a>#}
                 </td>

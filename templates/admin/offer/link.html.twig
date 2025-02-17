@@ -130,6 +130,10 @@
             <button class="btn btn-success" type="submit"><i class="fa fa-check"></i> Update</button>
             {{ form_end(form) }}
         </div>
+        <div class="col-4 text-right">
+            <a class="btn btn-danger confirm" href="{{ path('backend_offer_delete', { id: row.id }) }}"><i
+                class="fa fa-exclamation"></i> delete</a>
+        </div>
     </div>
 
     <br />

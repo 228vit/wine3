@@ -13,6 +13,7 @@ parameters:
     product_pics_subdirectory: 'products'
     mailer_sender_email: '%env(MAILER_SENDER_EMAIL)%'
     mailer_send_confirm_email: '%env(MAILER_SEND_CONFIRM_REGISTER)%'
+    yandex_smartcaptcha_key: '%env(YANDEX_CAPTCHA_SERVER_KEY)%'
 
 services:
     # default configuration for services in *this* file

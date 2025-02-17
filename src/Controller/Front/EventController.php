@@ -237,12 +237,49 @@ class EventController extends AbstractController
         return new JsonResponse(['message' => 'Success']);
     }
 
+    private function validateCaptcha(string $token, string $ip)
+    {
+        $key = $this->getParameter('yandex_smartcaptcha_key');
+        $ch = curl_init("https://smartcaptcha.yandexcloud.net/validate");
+        $args = [
+            "secret" => $key,
+            "token" => $token,
+            "ip" => $ip, // Нужно передать IP-адрес пользователя.
+            // Способ получения IP-адреса пользователя зависит от вашего прокси.
+        ];
+        curl_setopt($ch, CURLOPT_TIMEOUT, 1);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($args));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        $server_output = curl_exec($ch);
+        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($httpcode !== 200) {
+//            echo "Allow access due to an error: code=$httpcode; message=$server_output\n";
+            return ['code' => $httpcode, 'message' => $server_output];
+        }
+
+        $resp = json_decode($server_output);
+        return $resp->status === "ok";
+    }
+
     /**
      * @Route("/event_visitor_new/{slug}", name="front_event_visitor_new")
      */
     public function newVisitor(Event $event, Request $request, MailerInterface $mailer)
     {
-        // todo: validate
+        // validate captcha
+        $token = $request->request->get('smart-token', null);
+        $ip = $request->getClientIp();
+
+        $response = $this->validateCaptcha($token, $ip);
+        if (is_array($response)) {
+            return new JsonResponse(array_merge(['message' => 'Captcha fail'], $response), 400);
+        }
+
+        // todo: validate request
         $company = $request->get('company', null);
         $name = $request->get('name', null);
         $phone = $request->get('phone', null);
@@ -257,7 +294,6 @@ class EventController extends AbstractController
         try {
             $date = new \DateTimeImmutable("{$year}-{$month}-01");
         } catch (\Exception $e) {
-
             $date = null;
         }
 

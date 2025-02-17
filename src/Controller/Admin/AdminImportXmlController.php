@@ -93,6 +93,10 @@ class AdminImportXmlController extends AbstractController
             $this->em->persist($import);
             $this->em->flush();
 
+            return $this->redirectToRoute('backend_import_yml_step1', [
+                'id' => $import->getId(),
+            ]);
+
         }
 
         if ($form->isSubmitted() && !$form->isValid()) {
@@ -532,6 +536,7 @@ class AdminImportXmlController extends AbstractController
 
             $wineColor = $this->getYmlParam($row, 'typenom');
             $sugar = $this->getYmlParam($row, 'vidvina');
+            $alcohol = floatval($this->getYmlParam($row, 'degree'));
 
             $offers[$offerId] = [
                 'name' => $name,
@@ -646,8 +651,6 @@ class AdminImportXmlController extends AbstractController
             $appellation = null;
             $region = null;
             $country = null;
-            preg_match('/\s([0-9]{4})/', $name, $matches);
-            $year = (isset($matches[1])) ? $matches[1] : null;
 
             if (isset($appellations[$categoryId])) {
                 $appellationInDb = $appellationRepository->find($appellations[$categoryId]);
@@ -697,13 +700,15 @@ class AdminImportXmlController extends AbstractController
             $grapeSorts = array_combine($grapeSort, $valueGrapeSort);
 
             $wineColor = $this->getYmlParam($row, 'typenom');
-            $sugar = $this->getYmlParam($row, 'vidvina');
+            $wineSugar = $this->getYmlParam($row, 'vidvina');
+            $year = intval($this->getYmlParam($row, 'year'));
+            $volume = floatval($this->getYmlParam($row, 'vol')); // 0.75l
+            $alcohol = floatval($this->getYmlParam($row, 'degree')); // 0.75l
 
             $offer = (new Offer())
                 ->setImportYml($importYml)
                 ->setYmlId($offerId)
                 ->setName($name)
-                ->setYear($year)
                 ->setDescription($description)
                 ->setSlug(Slugger::urlSlug($name))
                 ->setPrice(floatval($price))
@@ -712,7 +717,10 @@ class AdminImportXmlController extends AbstractController
                 ->setAppellation($appellation)
                 ->setVendor($vendor)
                 ->setSupplier($importYml->getSupplier())
-                ->setType($sugar)
+                ->setYear($year)
+                ->setVolume($volume)
+                ->setAlcohol($alcohol)
+                ->setType($wineSugar)
                 ->setColor($wineColor)
                 ->setGrapeSort(json_encode($grapeSorts))
                 ->setPicUrl($picUrl)
@@ -1033,6 +1041,17 @@ class AdminImportXmlController extends AbstractController
         $importYml->setStage($stage);
         $this->em->persist($importYml);
         $this->em->flush();
+    }
+
+    /**
+     * @Route("/backend/import_yml/{id}/delete", name="backend_import_yml_delete", methods={"GET", "POST"})
+     */
+    public function delete(ImportYml $importYml, Request $request)
+    {
+        $this->em->remove($importYml);
+        $this->em->flush();
+
+        return $this->redirectToRoute('backend_import_yml_index');
     }
 
     /**
