@@ -23,8 +23,10 @@ final class WineColorService
         $this->wineColors = $this->getWineColors();
     }
 
-    public function getWineColor(string $color): ?WineColor
+    public function getWineColor(?string $color): ?WineColor
     {
+        if (null === $color) return null;
+        
         $color = mb_strtolower($color);
         // TODO: if not set, save as WineColorAlias
         $color = isset($this->wineColors[$color]) ? $this->wineColors[$color] : null;
