@@ -26,19 +26,19 @@ final class WineColorService
     public function getWineColor(?string $color): ?WineColor
     {
         if (null === $color) return null;
-        
+
         $color = mb_strtolower($color);
         // TODO: if not set, save as WineColorAlias
-        $color = isset($this->wineColors[$color]) ? $this->wineColors[$color] : null;
+        $wineColor = isset($this->wineColors[$color]) ? $this->wineColors[$color] : null;
         if (null === $color) {
             /** @var WineColorAlias $colorAlias */
             $colorAlias = $this->wineColorAliasRepository->findLikeName($color);
             if ($colorAlias) {
-                $color = $colorAlias->getWineColor();
+                $wineColor = $colorAlias->getWineColor();
             }
         }
 
-        return $color;
+        return $wineColor;
     }
 
     public function getWineColors(): array
