@@ -18,7 +18,16 @@ class WineColorAliasRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, WineColorAlias::class);
     }
-
+    public function findLikeName(string $name)
+    {
+        return $this->createQueryBuilder('w')
+            ->innerJoin('w.wineColor', 'wineColor')
+            ->andWhere('w.name LIKE :val')
+            ->setParameter('val', "%$name%")
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
     // /**
     //  * @return WineColorAlias[] Returns an array of WineColorAlias objects
     //  */

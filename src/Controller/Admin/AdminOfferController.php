@@ -334,6 +334,7 @@ class AdminOfferController extends AbstractController
     {
         $session->set('offer_id', $offer->getId());
 
+
         $product = (new Product())
             ->setName($offer->getName())
             ->setContent($offer->getDescription())
