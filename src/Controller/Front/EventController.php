@@ -207,10 +207,19 @@ class EventController extends AbstractController
     }
 
     /**
-     * @Route("/event_organizer_new", name="front_event_organizer_new")
+     * @Route("/event_organizer_new", name="front_event_organizer_new", methods={"POST"})
      */
-    public function newOrganizer(Request $request)
+    public function newOrganizer(Event $event, Request $request, MailerInterface $mailer)
     {
+        // validate captcha
+        $token = $request->request->get('smart-token', null);
+        $ip = $request->getClientIp();
+
+        $response = $this->validateCaptcha($token, $ip);
+        if (is_array($response)) {
+            return new JsonResponse(array_merge(['message' => 'Captcha fail'], $response), 400);
+        }
+
         $companyName = $request->get('companyName', null);
         $person = $request->get('person', null);
         $jobTitle = $request->get('jobTitle', null);
@@ -234,7 +243,75 @@ class EventController extends AbstractController
             return new JsonResponse(['message' => $e->getMessage()], 400);
         }
 
-        return new JsonResponse(['message' => 'Success']);
+        $adminEmail = $this->getParameter('admin_email');
+        $senderEmail = $this->getParameter('mailer_sender_email');
+
+        $email = (new TemplatedEmail())
+            ->from($senderEmail)
+            ->to($adminEmail)
+            ->subject('[BigWine] Заявка на роль организатора мероприятия')
+            ->htmlTemplate('front/email_templates/new_event_organizer.html.twig')
+            ->context([
+                'event' => $event,
+            ])
+        ;
+        $mailer->send($email);
+
+        return new JsonResponse(['message' => 'Success', 'mail' => 'sent']);
+    }
+
+    /**
+     * @Route("/event_partner_new/{slug}", name="front_event_partner_new", methods={"POST"})
+     */
+    public function newEventPartner(Event $event, Request $request, MailerInterface $mailer)
+    {
+        // validate captcha
+        $token = $request->request->get('smart-token', null);
+        $ip = $request->getClientIp();
+
+        $response = $this->validateCaptcha($token, $ip);
+        if (is_array($response)) {
+            return new JsonResponse(array_merge(['message' => 'Captcha fail'], $response), 400);
+        }
+
+        $companyName = $request->get('companyName', null);
+        $person = $request->get('person', null);
+        $jobTitle = $request->get('jobTitle', null);
+        $phone = $request->get('phone', null);
+        $email = $request->get('email', null);
+        $description = $request->get('description', null);
+
+        $eventOrg = (new EventOrganizer())
+            ->setName($companyName)
+            ->setPerson($person)
+            ->setEmail($email)
+            ->setJobTitle($jobTitle)
+            ->setPhone($phone)
+            ->setDescription($description)
+        ;
+
+        try {
+            $this->em->persist($eventOrg);
+            $this->em->flush();
+        } catch (\Exception $e) {
+            return new JsonResponse(['message' => $e->getMessage()], 400);
+        }
+
+        $adminEmail = $this->getParameter('admin_email');
+        $senderEmail = $this->getParameter('mailer_sender_email');
+
+        $email = (new TemplatedEmail())
+            ->from($senderEmail)
+            ->to($adminEmail)
+            ->subject('[BigWine] Заявка на роль организатора мероприятия')
+            ->htmlTemplate('front/email_templates/new_event_organizer.html.twig')
+            ->context([
+                'event' => $event,
+            ])
+        ;
+        $mailer->send($email);
+
+        return new JsonResponse(['message' => 'Success', 'mail' => 'sent']);
     }
 
     private function validateCaptcha(string $token, string $ip)
@@ -266,7 +343,7 @@ class EventController extends AbstractController
     }
 
     /**
-     * @Route("/event_visitor_new/{slug}", name="front_event_visitor_new")
+     * @Route("/event_visitor_new/{slug}", name="front_event_visitor_new", methods={"POST"})
      */
     public function newVisitor(Event $event, Request $request, MailerInterface $mailer)
     {

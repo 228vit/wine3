@@ -9,20 +9,30 @@
                 </svg>
             </div>
             <div class="modal-content__content">
+{#                <form id="evenPartnerForm" method="post" action="{{ path('front_event_organizer_new', {slug: event.slug}) }}">#}
+
                 <div class="modal-content__title title-def title-def_med">Стать партнером</div>
                 <div class="modal-content__form block-form">
                     <div class="modal-content__el form-el form-el_m">
                         <div class="form-el__title">Название компании</div>
-                        <input class="form-el__inp inp-def" type="text" value="Veuve Clicquot Ponsardin">
+                        <input class="form-el__inp inp-def" type="text" required value="">
                     </div>
                     <div class="modal-content__el form-el form-el_m">
                         <div class="form-el__title">Телефон</div>
-                        <input class="form-el__inp inp-def" type="text" value="+375 29 688-28-92">
+                        <input class="form-el__inp inp-def" type="text" required placeholder="+7 900 111-22-33" value="">
                     </div>
                     <div class="modal-content__el form-el form-el_bg form-el_m">
                         <div class="form-el__title">Текст сообщения</div>
                         <textarea class="form-el__textarea textarea-def"></textarea>
                     </div>
+
+                    <div id="captcha-container"
+                         style="height: 100px;"
+                         class="smart-captcha"
+                         data-sitekey="ysc1_e5KJHYgZWem3nzq4CzaKLNL2RtO6YbkDcuS0og9Ke7bdc0f7">
+                        <input type="hidden" id="yandex-smart-token" name="smart-token" value="">
+                    </div>
+
                     <button class="block-form__btn btn-def btn-def_2"><span>Отправить</span></button>
                 </div>
             </div>

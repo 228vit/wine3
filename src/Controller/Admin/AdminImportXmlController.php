@@ -520,6 +520,7 @@ class AdminImportXmlController extends AbstractController
             }
 
             $vendorName = $this->getYmlParam($row, 'tovmarka');
+            $vendor = null;
             if (isset($vendors[$vendorName])) {
                 $vendor = $vendorRepository->find($vendors[$vendorName]);
                 $vendor = $vendor ? $vendor->getName() : null;
@@ -537,6 +538,7 @@ class AdminImportXmlController extends AbstractController
             $wineColor = $this->getYmlParam($row, 'typenom');
             $sugar = $this->getYmlParam($row, 'vidvina');
             $alcohol = floatval($this->getYmlParam($row, 'degree'));
+            $volume = floatval($this->getYmlParam($row, 'vol'));
 
             $offers[$offerId] = [
                 'name' => $name,
@@ -547,6 +549,8 @@ class AdminImportXmlController extends AbstractController
                 'region' => $region,
                 'appellation' => $appellation,
                 'vendor' => $vendor,
+                'volume' => $volume,
+                'alcohol' => $alcohol,
                 'grapeSorts' => implode ("\n", [
                    "{$grapeSort1}: {$valueGrapeSort1}",
                    "{$grapeSort2}: {$valueGrapeSort2}",
@@ -651,6 +655,11 @@ class AdminImportXmlController extends AbstractController
             $appellation = null;
             $region = null;
             $country = null;
+            $wineColor = $this->getYmlParam($row, 'typenom');
+            $wineSugar = $this->getYmlParam($row, 'vidvina');
+            $year = intval($this->getYmlParam($row, 'year'));
+            $volume = floatval($this->getYmlParam($row, 'vol')); // 0.75l
+            $alcohol = floatval($this->getYmlParam($row, 'degree')); // 0.75l
 
             if (isset($appellations[$categoryId])) {
                 $appellationInDb = $appellationRepository->find($appellations[$categoryId]);
@@ -698,12 +707,6 @@ class AdminImportXmlController extends AbstractController
             $valueGrapeSort = array_filter($valueGrapeSort);
 
             $grapeSorts = array_combine($grapeSort, $valueGrapeSort);
-
-            $wineColor = $this->getYmlParam($row, 'typenom');
-            $wineSugar = $this->getYmlParam($row, 'vidvina');
-            $year = intval($this->getYmlParam($row, 'year'));
-            $volume = floatval($this->getYmlParam($row, 'vol')); // 0.75l
-            $alcohol = floatval($this->getYmlParam($row, 'degree')); // 0.75l
 
             $offer = (new Offer())
                 ->setImportYml($importYml)

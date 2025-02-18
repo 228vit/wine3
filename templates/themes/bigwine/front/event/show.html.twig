@@ -100,23 +100,43 @@
     <script src="https://smartcaptcha.yandexcloud.net/captcha.js" defer></script>
     <script>
         $(document).ready(function() {
-            $('#eventVisitorForm').on('submit', function (e) {
+            $('#evenPartnerForm').on('submit', function (e) {
                 e.preventDefault();
-                // check captcha!
-                let captchaToken = $('#yandex--smart-token').val();
+                let form = $(this);
                 $.ajax({
-                    url: '',
-                    data: { captchaToken: captchaToken},
+                    url: form.attr('action'),
+                    data: form.serialize(),
+                    dataType: 'json',
+                    method: 'POST',
                     success: function (data) {
-                        $('#popupBody').html('Ваша заявка отправлена, администратор с Вами свяжется!')
-                        // $('#modal-event-org').hide('slow');
+                        $('#modalFlashBody').html('Ваша заявка отправлена, администратор с Вами свяжется!');
+                        $('#modal-partner').hide();
+                        $('#modalFlash').show();
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         console.log(textStatus, errorThrown);
-                        alert('Ошибка при проверке капчи: ' + errorThrown);
+                        alert('Ошибка при отправке формы: ' + errorThrown);
                     },
+                })
+            });
 
-                });
+            $('#eventVisitorForm').on('submit', function (e) {
+                e.preventDefault();
+                // check captcha!
+                // let captchaToken = $('#yandex--smart-token').val();
+                // $.ajax({
+                //     url: '',
+                //     data: { captchaToken: captchaToken},
+                //     success: function (data) {
+                //         $('#popupBody').html('Ваша заявка отправлена, администратор с Вами свяжется!')
+                //         // $('#modal-event-org').hide('slow');
+                //     },
+                //     error: function(jqXHR, textStatus, errorThrown) {
+                //         console.log(textStatus, errorThrown);
+                //         alert('Ошибка при проверке капчи: ' + errorThrown);
+                //     },
+                //
+                // });
 
                 let form = $(this);
                 $.ajax({

@@ -79,7 +79,9 @@
                                    href="{{ path('backend_import_yml_new_offer', { id: row.id, yml_id: id }) }}">+ offer</a>
                             {% endif %}
                         </td>
-                        <td>{{ offer.name | raw }} <br> <small>{{ offer.wineColor }} {{ offer.sugar }}</small></td>
+                        <td>{{ offer.name | raw }} <br>
+                            <small>{{ offer.wineColor }}, {{ offer.sugar }}, {{ offer.alcohol }}гр, {{ offer.volume }}л. </small>
+                        </td>
                         <td style="height: 100px; overflow: hidden;">{{ offer.description | raw }}</td>
                         <td>{{ offer.country }} /
                             {{ offer.region }} / {{ offer.appellation }}
