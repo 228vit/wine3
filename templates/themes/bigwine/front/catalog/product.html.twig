@@ -18,7 +18,7 @@
                     </div>
                     <div class="product-card__top-right">
                         <div class="product-card__info">
-                            <div class="product-card__cost">от {{ row.price }} £</div>
+                            <div class="product-card__cost">от {{ row.price }} ₽</div>
                             <a class="product-card__provider" href="#">{{ row.offers | length }} поставщиков</a>
                         </div>
                         <img class="product-card__country" src="{{ asset('svg/flags/' ~ row.country.codeAlpha2 ~ '.svg') }}" alt="">
@@ -79,16 +79,17 @@
                             <li class="product-card-descrp__el"><strong>Тип:</strong> {{ row.wineColor }}</li>
                             <li class="product-card-descrp__el"><strong>Страна:</strong> {{ row.country }}</li>
                             <li class="product-card-descrp__el"><strong>Регион:</strong> {{ row.region }}</li>
+                            <li class="product-card-descrp__el"><strong>Аппелясьон:</strong> {{ row.appellation }}</li>
                             <li class="product-card-descrp__el"><strong>Производитель:</strong>
                                 <a href="{{ path('vendor_view', { slug: row.vendor.slug }) }}">{{ row.vendor }}</a>
                             </li>
                             <li class="product-card-descrp__el"><strong>Импортер:</strong> ???</li>
-                            <li class="product-card-descrp__el"><strong>Сорт винограда:</strong> {{ row.grapeSortsAsString }}
+                            <li class="product-card-descrp__el"><strong>Сорт винограда:</strong>
+                                {{ row.productGrapeSortsAsString }}
                             </li>
                             <li class="product-card-descrp__el"><strong>Год урожая:</strong> {{ row.year }}</li>
                             <li class="product-card-descrp__el"><strong>Объем:</strong> {{ row.volume }} л</li>
                             <li class="product-card-descrp__el"><strong>Крепость:</strong> {{ row.alcohol }}</li>
-                            <li class="product-card-descrp__el"><strong>Аппелясьон:</strong> {{ row.appellation }}</li>
                             <li class="product-card-descrp__el"><strong>Выдержка в емкости:</strong> {{ row.aging }}</li>
                             <li class="product-card-descrp__el"><strong>Сахар:</strong> {{ row.wineSugar }}</li>
                         </ul>
