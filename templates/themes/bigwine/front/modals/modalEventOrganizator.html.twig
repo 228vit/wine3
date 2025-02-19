@@ -10,8 +10,7 @@
             </div>
             <div id="popupBody" class="modal-content__content">
                 <div class="modal-content__title title-def title-def_med">Предложить мероприятие</div>
-{#                <form id="evenPartnerForm" method="post" action="{{ path('front_event_organizer_new', {slug: event.slug}) }}">#}
-                <form id="organizerForm" action="{{ path('front_event_organizer_new') }}">
+                <form id="organizerForm" method="post" action="{{ path('front_event_organizer_new') }}">
                 <div class="modal-content__form block-form">
                     <div class="modal-content__el form-el form-el_m">
                         <div class="form-el__title">Название компании</div>

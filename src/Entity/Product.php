@@ -978,7 +978,7 @@ class Product implements TimestampableInterface
         }
     }
 
-    public function productGrapeSortsAsString(): ?string 
+    public function productGrapeSortsAsString(): ?string
     {
         $res = [];
         foreach ($this->productGrapeSortsAsArray() as [$key, $value]) {
