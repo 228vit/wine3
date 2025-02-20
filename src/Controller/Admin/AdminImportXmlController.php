@@ -426,24 +426,28 @@ class AdminImportXmlController extends AbstractController
             $avail = strval($row->attributes()->available);
             $avail = $avail === 'true' ? true : false;
             if (!$avail) continue;
-            $countryName = '';
-            $vendorName = null;
-            foreach ($row->param as $param) {
-                if ($param->attributes()->name == 'tovmarka') {
-                    $vendorName = trim(strval($param));
-                    if (empty($vendorName)) continue;
-                }
-                if ($param->attributes()->name == 'strana') {
-                    $countryName = trim(strval($param));
-                }
-            }
+
+            $vendorName = strval($row->vendor);
             if (!empty($vendorName)) {
                 $onlyVendors[$vendorName] = $vendorName;
             }
 
-            if (!isset($vendorName[$countryName][$vendorName])) {
-                $vendors[$countryName][$vendorName] = $vendorName;
-            }
+//            foreach ($row->param as $param) {
+//                if ($param->attributes()->name == 'tovmarka') {
+//                    $vendorName = trim(strval($param));
+//                    if (empty($vendorName)) continue;
+//                }
+//                if ($param->attributes()->name == 'strana') {
+//                    $countryName = trim(strval($param));
+//                }
+//            }
+//            if (!empty($vendorName)) {
+//                $onlyVendors[$vendorName] = $vendorName;
+//            }
+//
+//            if (!isset($vendorName[$countryName][$vendorName])) {
+//                $vendors[$countryName][$vendorName] = $vendorName;
+//            }
         }
 
 //        dd($vendors);
@@ -519,7 +523,8 @@ class AdminImportXmlController extends AbstractController
                }
             }
 
-            $vendorName = $this->getYmlParam($row, 'tovmarka');
+//            $vendorName = $this->getYmlParam($row, 'tovmarka');
+            $vendorName = strval($row->vendor);;
             $vendor = null;
             if (isset($vendors[$vendorName])) {
                 $vendor = $vendorRepository->find($vendors[$vendorName]);
@@ -685,7 +690,9 @@ class AdminImportXmlController extends AbstractController
                 }
             }
 
-            $vendorName = $this->getYmlParam($row, 'tovmarka');
+//            $vendorName = $this->getYmlParam($row, 'tovmarka');
+            $vendorName = strval($row->vendor);
+
             $vendor = null;
             if (isset($vendors[$vendorName])) {
                 $vendorId = $vendors[$vendorName];

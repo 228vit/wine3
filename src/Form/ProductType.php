@@ -6,6 +6,7 @@ use App\Entity\Appellation;
 use App\Entity\CountryRegion;
 use App\Entity\Product;
 use App\Entity\Vendor;
+use Doctrine\DBAL\Types\FloatType;
 use Doctrine\ORM\EntityRepository;
 use FOS\CKEditorBundle\Form\Type\CKEditorType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -95,7 +96,7 @@ class ProductType extends AbstractType
                 'expanded' => false,
             ))
 
-            ->add('alcohol')
+            ->add('alcohol', NumberType::class)
             ->add('year')
             ->add('volume')
             ->add('serveTemperature', TextType::class, [

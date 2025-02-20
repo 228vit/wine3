@@ -374,7 +374,7 @@ class Product implements TimestampableInterface
         return $this;
     }
 
-    public function getAlcohol(): ?int
+    public function getAlcohol(): ?float
     {
         return $this->alcohol;
     }
