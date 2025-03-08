@@ -99,8 +99,7 @@ class AdminUserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $user->setSlug($this->makeSlug($user, $repository));
-
+            $user->setPassword(md5(time().rand(100000, 999999)));
             $em->persist($user);
             $em->flush();
             $this->addFlash('success', 'New record was created!');
