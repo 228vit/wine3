@@ -370,7 +370,7 @@ class AdminOfferController extends AbstractController
         ;
 
         if ($offer->getPicUrl()) {
-            $picPathRelative = $fileUploader->grabOfferPic(
+            $picPathRelative = $fileUploader->makePng(
                 $offer->getPicUrl(),
                 $offer->getImportYml() ? $offer->getImportYml()->getRotatePicAngle() : 0
             );
