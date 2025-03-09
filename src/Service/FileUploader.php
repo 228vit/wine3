@@ -225,7 +225,8 @@ class FileUploader
         if (!$image) {
             die('Failed to load image');
         }
-
+        imagealphablending($image, true);
+        imagesavealpha($image, true);
 
         if ($rotationAngle !== 0) {
             $image = imagerotate($image, $rotationAngle, 0);

@@ -1069,7 +1069,7 @@ class AdminImportXmlController extends AbstractController
      */
     public function png(FileUploader $fileUploader)
     {
-        $url = 'https://wine-dp-trade.ru/756483/wine/00075210_1.png';
+        $url = 'https://wine-dp-trade.ru/756483/wine/00074546_1.png';
 
         $imgPath = $fileUploader->makePng($url, 270);
 
