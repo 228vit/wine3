@@ -1065,6 +1065,18 @@ class AdminImportXmlController extends AbstractController
     }
 
     /**
+     * @Route("/backend/png", name="backend_png", methods={"GET", "POST"})
+     */
+    public function png(FileUploader $fileUploader)
+    {
+        $url = 'https://wine-dp-trade.ru/756483/wine/00075210_1.png';
+
+        $imgPath = $fileUploader->makePng($url, 270);
+
+        dd($imgPath);
+    }
+
+    /**
      * @Route("/backend/import_yml/xml/dp-trade", name="backend_import_yml_yml-dp-traid", methods={"GET", "POST"})
      */
     public function importDpTrade(Request $request, SessionInterface $session, FilterBuilderUpdaterInterface $query_builder_updater)

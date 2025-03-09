@@ -167,13 +167,6 @@ class FileUploader
         $info = pathinfo($url);
         $extension = strtolower($info['extension']);
 
-//        $response = $this->httpClient->request(
-//            'GET',
-//            $url
-//        );
-//        $image = $response->getContent();
-//        dd($image);
-
         switch($extension) {
             case "jpg":
                 $img = imagecreatefromjpeg($url);
@@ -203,6 +196,72 @@ class FileUploader
         }
 
         imagejpeg($img, $path);
+
+        return $this->productPicsSubDirectory . DIRECTORY_SEPARATOR . $fileName;
+    }
+
+    public function makePng(string $url, int $rotationAngle = 270)
+    {
+        $info = pathinfo($url);
+        $extension = strtolower($info['extension']);
+
+        switch($extension) {
+            case "jpg":
+                $image = imagecreatefromjpeg($url);
+                break;
+            case "jpeg":
+                $image = imagecreatefromjpeg($url);
+                break;
+            case "png":
+                $image = imagecreatefrompng($url);
+                break;
+            case "gif":
+                $image = imagecreatefromgif($url);
+                break;
+            default:
+                $image = imagecreatefromjpeg($url);
+        }
+
+        if (!$image) {
+            die('Failed to load image');
+        }
+
+
+        if ($rotationAngle !== 0) {
+            $image = imagerotate($image, $rotationAngle, 0);
+        }
+
+        $bgColor = imagecolorat($image, 0, 0);
+
+        $width = imagesx($image);
+        $height = imagesy($image);
+
+        $newImage = imagecreatetruecolor($width, $height);
+        imagesavealpha($newImage, true);
+        $transparency = imagecolorallocatealpha($newImage, 0, 0, 0, 127);
+        imagefill($newImage, 0, 0, $transparency);
+
+        for ($x = 0; $x < $width; $x++) {
+            for ($y = 0; $y < $height; $y++) {
+                if (imagecolorat($image, $x, $y) !== $bgColor) {
+                    imagesetpixel($newImage, $x, $y, imagecolorat($image, $x, $y));
+                }
+            }
+        }
+
+        $fileName = 'offer_'.rand(100000, 999999).'.'.$extension;
+        $path = $this->getUploadsDirectory() . DIRECTORY_SEPARATOR .$this->productPicsSubDirectory
+            . DIRECTORY_SEPARATOR . $fileName;
+
+        if (!file_exists($path)) {
+            $f = fopen($path, 'w');
+            fclose($f);
+        }
+
+        imagepng($newImage, $path);
+        imagedestroy($image);
+        imagedestroy($newImage);
+
 
         return $this->productPicsSubDirectory . DIRECTORY_SEPARATOR . $fileName;
     }
