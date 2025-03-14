@@ -232,7 +232,6 @@ class ProductRepository extends ServiceEntityRepository
         ;
     }
 
-
     public function findAllByYears(array $years)
     {
         return $this->createQueryBuilder('c')
@@ -243,5 +242,15 @@ class ProductRepository extends ServiceEntityRepository
         ;
     }
 
+    public function massDeleteRows(array $ids)
+    {
+        return $this->createQueryBuilder('e')
+            ->delete()
+            ->andWhere('e.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->getQuery()
+            ->execute()
+        ;
+    }
 
 }

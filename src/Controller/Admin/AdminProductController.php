@@ -759,6 +759,26 @@ class AdminProductController extends AbstractController
     }
 
     /**
+     * @Route("backend/element/mass_delete", name="backend_element_mass_delete", methods={"POST"})
+     */
+    public function massDelete(Request $request,
+                               ProductRepository $productRepository)
+    {
+        $ids = $request->get('deleteId', []);
+
+        if (0 === count($ids)) {
+            $this->addFlash('danger', 'Please check at least one element.');
+            return $this->redirectToRoute('backend_element_index');
+        }
+
+        $productRepository->massDeleteRows(array_keys($ids));
+
+        $this->addFlash('success', 'Rows deleted successfully.');
+
+        return $this->redirectToRoute('backend_element_index');
+    }
+
+    /**
      * Deletes a product entity.
      *
      * @Route("backend/product/{id}", name="backend_product_delete", methods={"DELETE"})

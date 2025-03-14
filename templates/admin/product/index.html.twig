@@ -39,6 +39,7 @@
     <form action="{{ path('backend_products_update') }}" method="post">
     <table class="table table-striped">
         <tr>
+            <th>-</th>
             <th{% if pagination.isSorted('a.id') %} class="sorted"{% endif %}>
                 {{ knp_pagination_sortable(pagination, 'ID', 'product.id') }}
             </th>
@@ -64,6 +65,7 @@
         {# table body #}
         {% for row in pagination %}
             <tr>
+                <td><input type="checkbox" name="deleteId[]" value="{{ row.id }}"></td>
                 <td>{{ row.id }}</td>
                 <td>
                     <a href="{{ path('backend_' ~ model ~ '_edit', { 'id': row.id }) }}">{{ row.name }}</a>
@@ -120,6 +122,13 @@
                 </td>
             </tr>
         {% endfor %}
+        <tfoot>
+            <tr>
+                <td colspan="5">
+                    <a href="" class="btn btn-sm btn-danger">delete selected</a>
+                </td>
+            </tr>
+        </tfoot>
     </table>
 
     {# display navigation #}
