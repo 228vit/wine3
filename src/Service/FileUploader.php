@@ -262,69 +262,73 @@ class FileUploader
 
     public function makePng(string $url, int $rotationAngle = 270)
     {
-        $info = pathinfo($url);
-        $extension = strtolower($info['extension']);
+        try {
+            $info = pathinfo($url);
+            $extension = strtolower($info['extension']);
 
-        switch($extension) {
-            case "jpg":
-                $image = imagecreatefromjpeg($url);
-                break;
-            case "jpeg":
-                $image = imagecreatefromjpeg($url);
-                break;
-            case "png":
-                $image = imagecreatefrompng($url);
-                break;
-            case "gif":
-                $image = imagecreatefromgif($url);
-                break;
-            default:
-                $image = imagecreatefromjpeg($url);
-        }
+            switch ($extension) {
+                case "jpg":
+                    $image = imagecreatefromjpeg($url);
+                    break;
+                case "jpeg":
+                    $image = imagecreatefromjpeg($url);
+                    break;
+                case "png":
+                    $image = imagecreatefrompng($url);
+                    break;
+                case "gif":
+                    $image = imagecreatefromgif($url);
+                    break;
+                default:
+                    $image = imagecreatefromjpeg($url);
+            }
 
-        if (!$image) {
-            die('Failed to load image');
-        }
-        imagealphablending($image, true);
-        imagesavealpha($image, true);
+            if (!$image) {
+                die('Failed to load image');
+            }
+            imagealphablending($image, true);
+            imagesavealpha($image, true);
 
-        if ($rotationAngle !== 0) {
-            $image = imagerotate($image, $rotationAngle, 0);
-        }
+            if ($rotationAngle !== 0) {
+                $image = imagerotate($image, $rotationAngle, 0);
+            }
 
-        $bgColor = imagecolorat($image, 0, 0);
+            $bgColor = imagecolorat($image, 0, 0);
 
-        $width = imagesx($image);
-        $height = imagesy($image);
+            $width = imagesx($image);
+            $height = imagesy($image);
 
-        $newImage = imagecreatetruecolor($width, $height);
-        imagesavealpha($newImage, true);
-        $transparency = imagecolorallocatealpha($newImage, 0, 0, 0, 127);
-        imagefill($newImage, 0, 0, $transparency);
+            $newImage = imagecreatetruecolor($width, $height);
+            imagesavealpha($newImage, true);
+            $transparency = imagecolorallocatealpha($newImage, 0, 0, 0, 127);
+            imagefill($newImage, 0, 0, $transparency);
 
-        for ($x = 0; $x < $width; $x++) {
-            for ($y = 0; $y < $height; $y++) {
-                if (imagecolorat($image, $x, $y) !== $bgColor) {
-                    imagesetpixel($newImage, $x, $y, imagecolorat($image, $x, $y));
+            for ($x = 0; $x < $width; $x++) {
+                for ($y = 0; $y < $height; $y++) {
+                    if (imagecolorat($image, $x, $y) !== $bgColor) {
+                        imagesetpixel($newImage, $x, $y, imagecolorat($image, $x, $y));
+                    }
                 }
             }
+
+            $fileName = 'offer_' . rand(100000, 999999) . '.' . $extension;
+            $path = $this->getUploadsDirectory() . DIRECTORY_SEPARATOR . $this->productPicsSubDirectory
+                . DIRECTORY_SEPARATOR . $fileName;
+
+            if (!file_exists($path)) {
+                $f = fopen($path, 'w');
+                fclose($f);
+            }
+
+            imagepng($newImage, $path);
+            imagedestroy($image);
+            imagedestroy($newImage);
+
+
+            return $this->productPicsSubDirectory . DIRECTORY_SEPARATOR . $fileName;
+        } catch (\Exception $e) {
+            return null;
         }
-
-        $fileName = 'offer_'.rand(100000, 999999).'.'.$extension;
-        $path = $this->getUploadsDirectory() . DIRECTORY_SEPARATOR .$this->productPicsSubDirectory
-            . DIRECTORY_SEPARATOR . $fileName;
-
-        if (!file_exists($path)) {
-            $f = fopen($path, 'w');
-            fclose($f);
-        }
-
-        imagepng($newImage, $path);
-        imagedestroy($image);
-        imagedestroy($newImage);
-
-
-        return $this->productPicsSubDirectory . DIRECTORY_SEPARATOR . $fileName;
     }
 
 }

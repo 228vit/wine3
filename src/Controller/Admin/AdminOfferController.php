@@ -334,7 +334,6 @@ class AdminOfferController extends AbstractController
     {
         $session->set('offer_id', $offer->getId());
 
-
         $product = (new Product())
             ->setName($offer->getName())
             ->setContent($offer->getDescription())
@@ -344,7 +343,7 @@ class AdminOfferController extends AbstractController
             ->setRegion($offer->getRegion())
             ->setName($offer->getName())
             ->setSlug($offer->getSlug())
-//            ->setProductCode($offer->getProductCode())
+            ->setBarcode($offer->getBarcode())
             ->setPrice($offer->getPrice())
             ->setPriceStatus($offer->getPriceStatus())
             ->setPacking($offer->getPacking())

@@ -190,6 +190,11 @@ class Offer implements TimestampableInterface
      */
     private $importYml;
 
+    /**
+     * @ORM\Column(type="string", length=32, nullable=true)
+     */
+    private $barcode;
+
     public function __construct()
     {
         $this->alcohol = 0;
@@ -640,6 +645,18 @@ class Offer implements TimestampableInterface
     public function setImportYml(?ImportYml $importYml): self
     {
         $this->importYml = $importYml;
+
+        return $this;
+    }
+
+    public function getBarcode(): ?string
+    {
+        return $this->barcode;
+    }
+
+    public function setBarcode(?string $barcode): self
+    {
+        $this->barcode = $barcode;
 
         return $this;
     }

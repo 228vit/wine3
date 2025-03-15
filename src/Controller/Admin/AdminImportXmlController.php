@@ -8,8 +8,15 @@ use App\Entity\Admin;
 use App\Entity\Appellation;
 use App\Entity\Country;
 use App\Entity\CountryRegion;
+use App\Entity\Food;
+use App\Entity\GrapeSort;
+use App\Entity\GrapeSortAlias;
 use App\Entity\ImportYml;
 use App\Entity\Offer;
+use App\Entity\Product;
+use App\Entity\ProductGrapeSort;
+use App\Entity\ProductRating;
+use App\Entity\Rating;
 use App\Entity\Vendor;
 use App\Filter\ImportCsvFilter;
 use App\Form\ImportYmlStep1Type;
@@ -17,10 +24,17 @@ use App\Repository\AppellationRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\CountryRegionRepository;
 use App\Repository\CountryRepository;
+use App\Repository\GrapeSortAliasRepository;
+use App\Repository\GrapeSortRepository;
 use App\Repository\OfferRepository;
+use App\Repository\ProductGrapeSortRepository;
+use App\Repository\ProductRatingRepository;
+use App\Repository\RatingRepository;
 use App\Repository\VendorRepository;
 use App\Service\FileUploader;
 use App\Service\OfferFactory;
+use App\Service\WineColorService;
+use App\Service\WineSugarService;
 use App\Utils\Slugger;
 use Lexik\Bundle\FormFilterBundle\Filter\FilterBuilderUpdaterInterface;
 use mysql_xdevapi\Exception;
@@ -466,9 +480,300 @@ class AdminImportXmlController extends AbstractController
     }
 
     /**
+     * @Route("/backend/import_yml/{id}/make_offers", name="backend_import_yml_make_offers", methods={"GET"})
+     */
+    public function makeOffers(ImportYml $importYml,
+                                CountryRepository $countryRepository,
+                                CountryRegionRepository $regionRepository,
+                                AppellationRepository $appellationRepository,
+                                OfferRepository $offerRepository,
+                                VendorRepository $vendorRepository,
+                                WineColorService $wineColorService,
+                                WineSugarService $wineSugarService,
+                                FileUploader $fileUploader): Response
+    {
+        $data = simplexml_load_file($importYml->getUrl());
+        $limit = 5;
+        $row = 0;
+        $countries = json_decode($importYml->getCountriesMapping(), true);
+        $regions = json_decode($importYml->getRegionsMapping(), true);
+        $appellations = json_decode($importYml->getAppellationsMapping(), true);
+        $vendors = json_decode($importYml->getVendorsMapping(), true); // "Gaja" => "140"
+
+        foreach ($data->shop->offers->offer as $row) {
+            $offerId = strval($row->attributes()->id);
+            /** @var Offer $offer */
+            $offer = $offerRepository->findOneBy([
+                'ymlId' => $offerId,
+            ]);
+
+            if ($offer) {
+                $price = strval($row->price);
+                $offer->setPrice($price);
+                $this->em->persist($offer);
+                $this->em->flush();
+
+                $this->makeProduct($offer, $wineColorService, $wineSugarService, $fileUploader);
+                continue;
+            }
+
+            $name = strval($row->name);
+            $barcode = isset($row->barcode) ? strval($row->barcode) : null;
+            $description = strval($row->description);
+            $categoryId = strval($row->categoryId); // country - region - appel-tion
+            $price = strval($row->price);
+            $picUrl = strval($row->picture);
+            $appellation = null;
+            $region = null;
+            $country = null;
+            $wineColor = $this->getYmlParam($row, 'typenom');
+            $wineSugar = $this->getYmlParam($row, 'vidvina');
+            $year = intval($this->getYmlParam($row, 'year'));
+            $volume = floatval($this->getYmlParam($row, 'vol')); // 0.75l
+            $alcohol = floatval($this->getYmlParam($row, 'degree')); // 0.75l
+
+            if (isset($appellations[$categoryId])) {
+                $appellationInDb = $appellationRepository->find($appellations[$categoryId]);
+                if ($appellationInDb) {
+                    $appellation = $appellationInDb;
+                    $region = $appellationInDb->getCountryRegion();
+                    $country = $appellationInDb->getCountry();
+                }
+            }
+
+            if (isset($regions[$categoryId])) {
+                $regionInDb = $regionRepository->find($regions[$categoryId]);
+                if ($regionInDb) {
+                    $region = $regionInDb;
+                    $country = $regionInDb->getCountry();
+                }
+            }
+
+            if (isset($countries[$categoryId])) {
+                $countryInDb = $countryRepository->find($countries[$categoryId]);
+                if ($countryInDb) {
+                    $country = $countryInDb;
+                }
+            }
+
+//            $vendorName = $this->getYmlParam($row, 'tovmarka');
+            $vendorName = strval($row->vendor);
+
+            $vendor = null;
+            if (isset($vendors[$vendorName])) {
+                $vendorId = $vendors[$vendorName];
+                $vendor = $vendorRepository->find($vendorId);
+            } //? $vendors[$vendorName] : null;
+
+            $grapeSort[1] = $this->getYmlParam($row, 'sortvin1');
+            $valueGrapeSort[1] = $this->getYmlParam($row, 'dolyasort1');
+            $grapeSort[2] = $this->getYmlParam($row, 'sortvin2');
+            $valueGrapeSort[2] = $this->getYmlParam($row, 'dolyasort2');
+            $grapeSort[3] = $this->getYmlParam($row, 'sortvin3');
+            $valueGrapeSort[3] = $this->getYmlParam($row, 'dolyasort3');
+            $grapeSort[4] = $this->getYmlParam($row, 'sortvin4');
+            $valueGrapeSort[4] = $this->getYmlParam($row, 'dolyasort4');
+            $grapeSort[5] = $this->getYmlParam($row, 'sortvin5');
+            $valueGrapeSort[5] = $this->getYmlParam($row, 'dolyasort5');
+
+            $grapeSort = array_filter($grapeSort);
+            $valueGrapeSort = array_filter($valueGrapeSort);
+
+            $grapeSorts = [];
+            if (count($grapeSort) == count($valueGrapeSort)) {
+                $grapeSorts = array_combine($grapeSort, $valueGrapeSort);
+            }
+
+            $offer = (new Offer())
+                ->setImportYml($importYml)
+                ->setYmlId($offerId)
+                ->setName($name)
+                ->setBarcode($barcode)
+                ->setDescription($description)
+                ->setSlug(Slugger::urlSlug($name))
+                ->setPrice(floatval($price))
+                ->setCountry($country)
+                ->setRegion($region)
+                ->setAppellation($appellation)
+                ->setVendor($vendor)
+                ->setSupplier($importYml->getSupplier())
+                ->setYear($year)
+                ->setVolume($volume)
+                ->setAlcohol($alcohol)
+                ->setType($wineSugar)
+                ->setColor($wineColor)
+                ->setGrapeSort(json_encode($grapeSorts))
+                ->setPicUrl($picUrl)
+            ;
+
+            $this->em->persist($offer);
+            $this->em->flush();
+
+            $this->makeProduct($offer, $wineColorService, $wineSugarService, $fileUploader);
+            ++$row;
+
+            if ($row >= $limit) break;
+        }
+
+        // make product, link offer
+
+        return $this->redirectToRoute('backend_import_yml_step6', [
+            'id' => $importYml->getId()
+        ]);
+    }
+
+    private function makeProduct(Offer $offer,
+                                 WineColorService $wineColorService,
+                                 WineSugarService $wineSugarService,
+                                 FileUploader $fileUploader)
+    {
+        $grapeSortRepository = $this->em->getRepository(GrapeSort::class);
+        $grapeSortAliasRepository = $this->em->getRepository(GrapeSortAlias::class);
+        $productGrapeSortRepository = $this->em->getRepository(ProductGrapeSort::class);
+        $ratingRepository = $this->em->getRepository(Rating::class);
+        $productRepository = $this->em->getRepository(Product::class);
+        $productRatingRepository = $this->em->getRepository(ProductRating::class);
+        $productRatingRepository = $this->em->getRepository(ProductRating::class);
+
+        $product = $productRepository->findOneBy([
+            'barcode' => $offer->getBarcode(),
+        ]);
+
+        if (null === $product) {
+            $product = $productRepository->findOneBy([
+                'name' => $offer->getName(),
+            ]);
+        }
+
+        if ($product) return true;
+
+        $product = (new Product())
+            ->setName($offer->getName())
+            ->setContent($offer->getDescription())
+            ->setVendor($offer->getVendor())
+            ->setCategory($offer->getCategory())
+            ->setCountry($offer->getCountry())
+            ->setRegion($offer->getRegion())
+            ->setName($offer->getName())
+            ->setSlug($offer->getSlug())
+            ->setBarcode($offer->getBarcode())
+            ->setPrice($offer->getPrice())
+            ->setPriceStatus($offer->getPriceStatus())
+            ->setPacking($offer->getPacking())
+            // wine color
+            ->setColor($offer->getColor())
+            ->setWineColor($wineColorService->getWineColor($offer->getColor()))
+            // wine sugar
+            ->setType($offer->getType())
+            ->setWineSugar($wineSugarService->getWineSugar($offer->getType()))
+
+            ->setAlcohol($offer->getAlcohol())
+            ->setGrapeSort($offer->getGrapeSort())
+            ->setRatings($offer->getRatings())
+            ->setYear($offer->getYear())
+            ->setVolume($offer->getVolume())
+            ->setServeTemperature($offer->getServeTemperature())
+            ->setDecantation($offer->getDecantation())
+            ->setAppellation($offer->getAppellation())
+            ->setPacking($offer->getPacking())
+            ->setFermentation($offer->getFermentation())
+            ->setAging($offer->getAging())
+            ->setAgingType($offer->getAgingType())
+        ;
+
+        if ($offer->getPicUrl()) {
+            $picPathRelative = $fileUploader->makePng(
+                $offer->getPicUrl(),
+                $offer->getImportYml() ? $offer->getImportYml()->getRotatePicAngle() : 0
+            );
+            if ($picPathRelative) {
+                $product
+                    ->setContentPic($picPathRelative)
+                    ->setAnnouncePic($picPathRelative)
+                ;
+            }
+        }
+
+        /** @var Food $food */
+        foreach ($offer->getFoods() as $food) {
+            $product->addFood($food);
+        }
+
+        // todo: loop over grape sorts
+        $grapeSorts = json_decode($offer->getGrapeSort(), true);
+
+        if (JSON_ERROR_NONE === json_last_error() AND (is_array($grapeSorts))) {
+            foreach ($grapeSorts as $grapeSortName => $value) {
+                // strip double spaces
+                $grapeSortName = trim(preg_replace('/\s{2,}/', ' ', $grapeSortName));
+
+                if (strlen($grapeSortName) < 3) continue;
+
+                // get by alias
+                $alias = $grapeSortAliasRepository->findOneBy(['name' => $grapeSortName]);
+
+                // todo: test it!!!
+                if (null !== $alias) {
+                    $grapeSort = $alias->getParent();
+                } else {
+                    // get by name
+                    $grapeSort = $grapeSortRepository->findOrCreateByName($grapeSortName, $this->em);
+                }
+
+                $uniqueSorts[$grapeSort->getName()] = $grapeSort->getName();
+                // make m-m relation
+                $productGrapeSort = $productGrapeSortRepository->findOneBy([
+                    'product' => $product,
+                    'grapeSort' => $grapeSort
+                ]);
+
+                if (null === $productGrapeSort) {
+                    $productGrapeSort = (new ProductGrapeSort())
+                        ->setProduct($product)
+                        ->setGrapeSort($grapeSort);
+                }
+
+                $productGrapeSort->setValue(intval($value));
+                $product->addProductGrapeSort($productGrapeSort);
+            }
+        }
+
+        // todo: loop over ratings
+        $ratings = json_decode($offer->getRatings(), true);
+
+        if (JSON_ERROR_NONE === json_last_error() AND (is_array($ratings))) {
+            foreach ($ratings as $ratingName => $value) {
+                if (strlen($ratingName) < 2) continue;
+
+                $rating = $ratingRepository->findOrCreateByName($ratingName, $this->em);
+                $uniqueSorts[$rating->getName()] = $rating->getName();
+                // make m-m relation
+                $productRating = $productRatingRepository->findOneBy([
+                    'product' => $product,
+                    'rating' => $rating
+                ]);
+
+                if (null === $productRating) {
+                    $productRating = (new ProductRating())
+                        ->setProduct($product)
+                        ->setRating($rating);
+                }
+
+                $productRating->setValue(intval($value));
+                $product->addProductRating($productRating);
+            }
+        }
+
+        $this->em->persist($product);
+        $this->em->flush();
+
+        return true;
+    }
+
+    /**
      * @Route("/backend/import_yml/{id}/step6", name="backend_import_yml_step6", methods={"GET"})
      */
-    public function step6offers(ImportYml $importYml,
+    public function step6ViewOffers(ImportYml $importYml,
                                 CountryRepository $countryRepository,
                                 CountryRegionRepository $regionRepository,
                                 AppellationRepository $appellationRepository,
@@ -572,7 +877,6 @@ class AdminImportXmlController extends AbstractController
             'row' => $importYml,
             'importYml' => $importYml,
             'offers' => $offers,
-//            'ymlVendors' => $vendors,
         ]);
     }
 

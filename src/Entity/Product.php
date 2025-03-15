@@ -277,6 +277,11 @@ class Product implements TimestampableInterface
      */
     private $appellation;
 
+    /**
+     * @ORM\Column(type="string", length=32, nullable=true)
+     */
+    private $barcode;
+
 
     public function __construct()
     {
@@ -1026,6 +1031,18 @@ class Product implements TimestampableInterface
     public function setAppellation(?Appellation $appellation): self
     {
         $this->appellation = $appellation;
+
+        return $this;
+    }
+
+    public function getBarcode(): ?string
+    {
+        return $this->barcode;
+    }
+
+    public function setBarcode(?string $barcode): self
+    {
+        $this->barcode = $barcode;
 
         return $this;
     }
