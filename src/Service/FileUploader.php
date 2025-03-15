@@ -7,6 +7,7 @@ use App\Entity\ImportLog;
 use App\Entity\Product;
 use App\Entity\Vendor;
 use App\Utils\Slugger;
+use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Ramsey\Uuid\Uuid;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -20,6 +21,7 @@ class FileUploader
     private $eventPicsSubDirectory;
     private $importFilesDirectory;
     private $httpClient;
+    private $cacheManager;
 
     public function __construct(string $uploadsDirectory,
                                 string $importFilesDirectory,
@@ -27,6 +29,7 @@ class FileUploader
                                 string $vendorLogoSubDirectory,
                                 string $vendorPicsSubDirectory,
                                 string $eventPicsSubDirectory,
+                                CacheManager $cacheManager,
                                 HttpClientInterface $httpClient)
     {
         $this->eventPicsSubDirectory = $eventPicsSubDirectory;
@@ -35,6 +38,7 @@ class FileUploader
         $this->vendorLogoSubDirectory = $vendorLogoSubDirectory;
         $this->vendorPicsSubDirectory = $vendorPicsSubDirectory;
         $this->importFilesDirectory = $importFilesDirectory;
+        $this->cacheManager = $cacheManager;
         $this->httpClient = $httpClient;
     }
 
@@ -54,6 +58,62 @@ class FileUploader
         } else {
             throw new \Exception($fileName);
         }
+    }
+
+    public function removeProductPics(Product $product)
+    {
+        if (null !== $file = $product->getAnnouncePicFile()) {
+            $fileName = sprintf('%s_%s.%s',
+                'announce',
+                $product->getSlug(),
+                $file->guessExtension()
+            );
+            $this->cacheManager->remove('uploads/' . $fileName, 'thumb_square_50');
+        }
+        if (null !== $file = $product->getAnnouncePicFile()) {
+            $fileName = sprintf('%s_%s.%s',
+                'content',
+                $product->getSlug(),
+                $file->guessExtension()
+            );
+            $this->cacheManager->remove('uploads/' . $fileName, 'thumb_square_50');
+        }
+        if (null !== $file = $product->getAnnouncePicFile()) {
+            $fileName = sprintf('%s_%s.%s',
+                'extra',
+                $product->getSlug(),
+                $file->guessExtension()
+            );
+            $this->cacheManager->remove('uploads/' . $fileName, 'thumb_square_50');
+        }
+
+        $fileName = sprintf('%s%s%s%s%s',
+            $this->getUploadsDirectory(),
+            DIRECTORY_SEPARATOR,
+            $this->productPicsSubDirectory,
+            DIRECTORY_SEPARATOR,
+            $product->getAnnouncePic()
+        );
+        if (is_file($fileName)) unlink($fileName);
+
+        $fileName = sprintf('%s%s%s%s%s',
+            $this->getUploadsDirectory(),
+            DIRECTORY_SEPARATOR,
+            $this->productPicsSubDirectory,
+            DIRECTORY_SEPARATOR,
+            $product->getContentPic()
+        );
+        if (is_file($fileName)) unlink($fileName);
+
+        $fileName = sprintf('%s%s%s%s%s',
+            $this->getUploadsDirectory(),
+            DIRECTORY_SEPARATOR,
+            $this->productPicsSubDirectory,
+            DIRECTORY_SEPARATOR,
+            $product->getExtraPic()
+        );
+        if (is_file($fileName)) unlink($fileName);
+
     }
 
 

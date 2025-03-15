@@ -321,7 +321,7 @@ class AdminProductController extends AbstractController
             $em->flush();
         }
 
-        $this->addFlash('success', 'Your changes were saved!');
+        $this->addFlash('success', 'Your changes were saved!!!');
 
         // redirect to referer
         return $this->redirect($request->headers->get('referer'));
@@ -759,23 +759,37 @@ class AdminProductController extends AbstractController
     }
 
     /**
-     * @Route("backend/element/mass_delete", name="backend_element_mass_delete", methods={"POST"})
+     * @Route("backend/product/mass_delete", name="backend_product_mass_delete", methods={"POST"})
      */
     public function massDelete(Request $request,
-                               ProductRepository $productRepository)
+                               FileUploader $fileUploader,
+                               ProductRepository $productRepository,
+                               OfferRepository $offerRepository)
     {
         $ids = $request->get('deleteId', []);
 
         if (0 === count($ids)) {
             $this->addFlash('danger', 'Please check at least one element.');
-            return $this->redirectToRoute('backend_element_index');
+            return $this->redirectToRoute('backend_product_index');
         }
 
-        $productRepository->massDeleteRows(array_keys($ids));
+        foreach ($ids as $id) {
+            $product = $productRepository->find($id);
+            $fileUploader->removeProductPics($product);
+            /** @var Offer $offer */
+            foreach ($product->getOffers() as $offer) {
+                $product->removeOffer($offer);
+                $this->em->remove($offer);
+            }
+            $offerRepository->removeByProduct($product);
+            $this->em->remove($product);
+        }
+
+        $this->em->flush();
 
         $this->addFlash('success', 'Rows deleted successfully.');
 
-        return $this->redirectToRoute('backend_element_index');
+        return $this->redirectToRoute('backend_product_index');
     }
 
     /**

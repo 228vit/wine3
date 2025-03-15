@@ -62,10 +62,9 @@
             <th>Actions</th>
         </tr>
 
-        {# table body #}
         {% for row in pagination %}
             <tr>
-                <td><input type="checkbox" name="deleteId[]" value="{{ row.id }}"></td>
+                <td><input class="deleteMe" type="checkbox" name="deleteId[]" value="{{ row.id }}"></td>
                 <td>{{ row.id }}</td>
                 <td>
                     <a href="{{ path('backend_' ~ model ~ '_edit', { 'id': row.id }) }}">{{ row.name }}</a>
@@ -125,7 +124,10 @@
         <tfoot>
             <tr>
                 <td colspan="5">
-                    <a href="" class="btn btn-sm btn-danger">delete selected</a>
+                    <a id="massDelete" class="btn btn-sm btn-danger"><span
+                        class="fa fa-exclamation" aria-hidden="true"></span>
+                        delete checked
+                    </a>
                 </td>
             </tr>
         </tfoot>
@@ -157,6 +159,29 @@
     <script>
         $(document).ready(function() {
 
+            $('#massDelete').on('click', function () {
+                if (!confirm('Are you sure???')) {
+                    return false;
+                }
+                let data = [];
+                $('.deleteMe').each(function () {
+                    if ($(this).prop('checked') == true) {
+                        data.push($(this).val());
+                    }
+                });
+                console.log(data);
+
+                $.ajax({
+                    url: "{{ path('backend_product_mass_delete') }}",
+                    data: {'deleteId': data},
+                    method: 'POST'
+                }).done(function(html) {
+                    window.location = window.location;
+                });
+                // alert(data); return false;
+                // $('#massDeleteForm').submit();
+            });
+
             $('.toggle_field').on('click', function() {
                 var product_id = $(this).attr('rel');
                 var field = $(this).attr('field');
@@ -174,7 +199,7 @@
                     // console.log($(status_id);
                     $('#'+status_id).html(html);
                 });
-            })
+            });
 
             $.wait = function( callback, seconds){
                 return window.setTimeout( callback, seconds * 1000 );
