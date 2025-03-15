@@ -759,6 +759,17 @@ class AdminProductController extends AbstractController
     }
 
     /**
+     * @Route("backend/product/mass/turn_off", name="backend_product_mass_turn_off", methods={"GET"})
+     */
+    public function massTurnOff(ProductRepository $productRepository)
+    {
+        $productRepository->turnOffAll();
+        $this->addFlash('success', 'All turned off');
+
+        return $this->redirectToRoute('backend_product_index');
+    }
+
+    /**
      * @Route("backend/product/mass_delete", name="backend_product_mass_delete", methods={"POST"})
      */
     public function massDelete(Request $request,

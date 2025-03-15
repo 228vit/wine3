@@ -415,6 +415,7 @@ class CatalogController extends AbstractController
             $this->current_filters = null;
             // default query w/sorting
             $query = $this->productRepository->getJoinedQuery($model)
+                ->andWhere($model.'.isActive = true')
                 ->orderBy($model.'.'.$session_order_field, $session_order_direction)
                 ->getQuery()
             ;

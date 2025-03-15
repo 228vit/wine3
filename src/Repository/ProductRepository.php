@@ -29,7 +29,6 @@ class ProductRepository extends ServiceEntityRepository
         return $this->createQueryBuilder($alias);
     }
 
-
     public function getTopTen()
     {
         return $this->createQueryBuilder('e')
@@ -37,6 +36,17 @@ class ProductRepository extends ServiceEntityRepository
             ->setMaxResults(10)
             ->getQuery()
             ->getResult()
+        ;
+    }
+
+    public function turnOffAll()
+    {
+        return $this->createQueryBuilder('p')
+            ->update(Product::class, 'p')
+            ->set('p.isActive', ':false')
+            ->setParameter('false', false)
+            ->getQuery()
+            ->execute()
         ;
     }
 
