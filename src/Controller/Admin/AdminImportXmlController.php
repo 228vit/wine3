@@ -494,7 +494,7 @@ class AdminImportXmlController extends AbstractController
                                 FileUploader $fileUploader): Response
     {
         $data = simplexml_load_file($importYml->getUrl());
-        $limit = 30;
+        $limit = 40;
         $currentRow = 0;
         $countries = json_decode($importYml->getCountriesMapping(), true);
         $regions = json_decode($importYml->getRegionsMapping(), true);
