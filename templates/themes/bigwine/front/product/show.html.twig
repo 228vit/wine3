@@ -5,7 +5,7 @@
 {% block body %}
     <div class="container-def">
         <div class="sec-page__wrap sec-product__wrap">
-            <div class="sec-page__top sec-top"><a class="sec-top__prev link-prev" href="#">
+            <div class="sec-page__top sec-top"><a class="sec-top__prev link-prev" href="{{ path('front_catalog') }}">
                     <span>←</span>Назад в каталог</a>
                 <div class="sec-top__line"></div>
             </div>
@@ -18,7 +18,7 @@
                     </div>
                     <div class="product-card__top-right">
                         <div class="product-card__info">
-                            <div class="product-card__cost">от {{ row.price }} £</div>
+{#                            <div class="product-card__cost">от {{ row.price }} £</div>#}
                             <a class="product-card__provider" href="#">{{ row.offers | length }} поставщиков</a>
                         </div>
                         <img class="product-card__country" src="{{ asset('svg/flags/' ~ row.country.codeAlpha2 ~ '.svg') }}" alt="">
