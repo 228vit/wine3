@@ -434,14 +434,14 @@ class AdminImportXmlController extends AbstractController
         $this->setStage($importYml, 5);
         $data = simplexml_load_file($importYml->getUrl());
 
-        $vendors = [];
         $onlyVendors = [];
         foreach ($data->shop->offers->offer as $row) {
             $avail = strval($row->attributes()->available);
             $avail = $avail === 'true' ? true : false;
             if (!$avail) continue;
 
-            $vendorName = strval($row->vendor);
+//            $vendorName = strval($row->vendor);
+            $vendorName = $this->getYmlParam($row,'tovmarka');
             if (!empty($vendorName)) {
                 $onlyVendors[$vendorName] = $vendorName;
             }
@@ -464,7 +464,8 @@ class AdminImportXmlController extends AbstractController
 //            }
         }
 
-//        dd($vendors);
+//        sort($onlyVendors);
+//        dd($onlyVendors);
 
         $inDbVendors = [];
         foreach ($vendorRepository->allAsArray() as $row) {
@@ -482,7 +483,7 @@ class AdminImportXmlController extends AbstractController
     /**
      * @Route("/backend/import_yml/{id}/make_offers", name="backend_import_yml_make_offers", methods={"GET"})
      */
-    public function makeOffers(ImportYml $importYml,
+    public function step7makeOffers(ImportYml $importYml,
                                 CountryRepository $countryRepository,
                                 CountryRegionRepository $regionRepository,
                                 AppellationRepository $appellationRepository,
@@ -493,8 +494,8 @@ class AdminImportXmlController extends AbstractController
                                 FileUploader $fileUploader): Response
     {
         $data = simplexml_load_file($importYml->getUrl());
-        $limit = 5;
-        $row = 0;
+        $limit = 10;
+        $currentRow = 0;
         $countries = json_decode($importYml->getCountriesMapping(), true);
         $regions = json_decode($importYml->getRegionsMapping(), true);
         $appellations = json_decode($importYml->getAppellationsMapping(), true);
@@ -502,26 +503,39 @@ class AdminImportXmlController extends AbstractController
 
         foreach ($data->shop->offers->offer as $row) {
             $offerId = strval($row->attributes()->id);
+            $isActive = boolval($row->attributes()->available);
+            $price = floatval($row->price);
+            $name = strval($row->name);
+            $barcode = isset($row->barcode) ? strval($row->barcode) : null;
+            $vendorName = $this->getYmlParam($row, 'tovmarka');
+
+            $vendor = null;
+            if (isset($vendors[$vendorName])) {
+                $vendorId = $vendors[$vendorName];
+                $vendor = $vendorRepository->find($vendorId);
+            } //? $vendors[$vendorName] : null;
+
             /** @var Offer $offer */
             $offer = $offerRepository->findOneBy([
                 'ymlId' => $offerId,
             ]);
 
             if ($offer) {
-                $price = strval($row->price);
-                $offer->setPrice($price);
+                // todo: update pic?
+                $offer->setPrice($price)
+                    ->setIsActive($isActive)
+                    ->setVendor($vendor)
+                ;
                 $this->em->persist($offer);
                 $this->em->flush();
 
                 $this->makeProduct($offer, $wineColorService, $wineSugarService, $fileUploader);
+                echo "update offer: {$offer->getName()} <br>";
                 continue;
             }
 
-            $name = strval($row->name);
-            $barcode = isset($row->barcode) ? strval($row->barcode) : null;
             $description = strval($row->description);
             $categoryId = strval($row->categoryId); // country - region - appel-tion
-            $price = strval($row->price);
             $picUrl = strval($row->picture);
             $appellation = null;
             $region = null;
@@ -556,15 +570,6 @@ class AdminImportXmlController extends AbstractController
                 }
             }
 
-//            $vendorName = $this->getYmlParam($row, 'tovmarka');
-            $vendorName = strval($row->vendor);
-
-            $vendor = null;
-            if (isset($vendors[$vendorName])) {
-                $vendorId = $vendors[$vendorName];
-                $vendor = $vendorRepository->find($vendorId);
-            } //? $vendors[$vendorName] : null;
-
             $grapeSort[1] = $this->getYmlParam($row, 'sortvin1');
             $valueGrapeSort[1] = $this->getYmlParam($row, 'dolyasort1');
             $grapeSort[2] = $this->getYmlParam($row, 'sortvin2');
@@ -587,11 +592,12 @@ class AdminImportXmlController extends AbstractController
             $offer = (new Offer())
                 ->setImportYml($importYml)
                 ->setYmlId($offerId)
+                ->setIsActive($isActive)
                 ->setName($name)
                 ->setBarcode($barcode)
                 ->setDescription($description)
                 ->setSlug(Slugger::urlSlug($name))
-                ->setPrice(floatval($price))
+                ->setPrice($price)
                 ->setCountry($country)
                 ->setRegion($region)
                 ->setAppellation($appellation)
@@ -605,17 +611,19 @@ class AdminImportXmlController extends AbstractController
                 ->setGrapeSort(json_encode($grapeSorts))
                 ->setPicUrl($picUrl)
             ;
+            echo "create offer: {$offer->getName()} <br>";
 
             $this->em->persist($offer);
             $this->em->flush();
 
             $this->makeProduct($offer, $wineColorService, $wineSugarService, $fileUploader);
-            ++$row;
 
-            if ($row >= $limit) break;
+            ++$currentRow;
+
+            if ($currentRow >= $limit) break;
         }
 
-        // make product, link offer
+        die();
 
         return $this->redirectToRoute('backend_import_yml_step6', [
             'id' => $importYml->getId()
@@ -634,7 +642,7 @@ class AdminImportXmlController extends AbstractController
         $productRepository = $this->em->getRepository(Product::class);
         $productRatingRepository = $this->em->getRepository(ProductRating::class);
         $productRatingRepository = $this->em->getRepository(ProductRating::class);
-
+        /** @var Product $product */
         $product = $productRepository->findOneBy([
             'barcode' => $offer->getBarcode(),
         ]);
@@ -645,9 +653,19 @@ class AdminImportXmlController extends AbstractController
             ]);
         }
 
-        if ($product) return true;
+        if ($product) {
+            $product->addOffer($offer)
+                ->setIsActive($offer->getIsActive())
+                ->setPrice($offer->getPrice())
+                ->setVendor($offer->getVendor())
+            ;
+            $this->em->persist($product);
+            $this->em->flush();
+            return true;
+        }
 
         $product = (new Product())
+            ->setIsActive($offer->getIsActive())
             ->setName($offer->getName())
             ->setContent($offer->getDescription())
             ->setVendor($offer->getVendor())
@@ -764,10 +782,11 @@ class AdminImportXmlController extends AbstractController
             }
         }
 
+        $product->addOffer($offer);
         $this->em->persist($product);
         $this->em->flush();
 
-        return true;
+        return $product;
     }
 
     /**
@@ -828,8 +847,8 @@ class AdminImportXmlController extends AbstractController
                }
             }
 
-//            $vendorName = $this->getYmlParam($row, 'tovmarka');
-            $vendorName = strval($row->vendor);;
+            $vendorName = $this->getYmlParam($row, 'tovmarka');
+//            $vendorName = strval($row->vendor);;
             $vendor = null;
             if (isset($vendors[$vendorName])) {
                 $vendor = $vendorRepository->find($vendors[$vendorName]);

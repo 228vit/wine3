@@ -195,8 +195,14 @@ class Offer implements TimestampableInterface
      */
     private $barcode;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $isActive;
+
     public function __construct()
     {
+        $this->isActive = false;
         $this->alcohol = 0;
         $this->volume = 0.7;
         $this->priceStatus = 1;
@@ -657,6 +663,18 @@ class Offer implements TimestampableInterface
     public function setBarcode(?string $barcode): self
     {
         $this->barcode = $barcode;
+
+        return $this;
+    }
+
+    public function getIsActive(): bool
+    {
+        return boolval($this->isActive);
+    }
+
+    public function setIsActive(?bool $isActive): self
+    {
+        $this->isActive = $isActive;
 
         return $this;
     }
