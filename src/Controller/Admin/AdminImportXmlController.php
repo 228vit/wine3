@@ -494,7 +494,7 @@ class AdminImportXmlController extends AbstractController
                                 FileUploader $fileUploader): Response
     {
         $data = simplexml_load_file($importYml->getUrl());
-        $limit = 10;
+        $limit = 30;
         $currentRow = 0;
         $countries = json_decode($importYml->getCountriesMapping(), true);
         $regions = json_decode($importYml->getRegionsMapping(), true);
@@ -521,16 +521,16 @@ class AdminImportXmlController extends AbstractController
             ]);
 
             if ($offer) {
-                // todo: update pic?
-                $offer->setPrice($price)
-                    ->setIsActive($isActive)
-                    ->setVendor($vendor)
-                ;
-                $this->em->persist($offer);
-                $this->em->flush();
-
-                $this->makeProduct($offer, $wineColorService, $wineSugarService, $fileUploader);
-                echo "update offer: {$offer->getName()} <br>";
+//                // todo: update pic?
+//                $offer->setPrice($price)
+//                    ->setIsActive($isActive)
+//                    ->setVendor($vendor)
+//                ;
+//                $this->em->persist($offer);
+//                $this->em->flush();
+//
+//                $this->makeProduct($offer, $wineColorService, $wineSugarService, $fileUploader);
+//                echo "update offer: {$offer->getName()} <br>";
                 continue;
             }
 
