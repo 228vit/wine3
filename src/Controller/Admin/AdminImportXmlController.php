@@ -559,10 +559,10 @@ class AdminImportXmlController extends AbstractController
         }
     }
 
-    private function isTransparent(array($arr))
-    {
-
-    }
+//    private function isTransparent(array($arr))
+//    {
+//
+//    }
 
     /**
      * @Route("/backend/import_yml/{id}/make_offers", name="backend_import_yml_make_offers", methods={"GET"})
