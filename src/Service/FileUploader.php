@@ -293,7 +293,7 @@ class FileUploader
                 $image = imagerotate($image, $rotationAngle, 0);
             }
 
-            $bgColor = imagecolorat($image, 0, 0);
+            $bgColor = imagecolorat($image, 10, 10);
 
             $width = imagesx($image);
             $height = imagesy($image);
@@ -305,9 +305,18 @@ class FileUploader
 
             for ($x = 0; $x < $width; $x++) {
                 for ($y = 0; $y < $height; $y++) {
-                    if (imagecolorat($image, $x, $y) !== $bgColor) {
+                    $colors = imagecolorsforindex($image, imagecolorat($image, $x, $y));
+                    dd($colors);
+                    /*
+                     * red => 98, green => 98, blue => 98
+                     * пробуем убрать оттенки светлосерого
+                     */
+                    if ($colors['red'] >= 254 AND $colors['green'] >= 254 AND $colors['blue'] >= 254) {
                         imagesetpixel($newImage, $x, $y, imagecolorat($image, $x, $y));
                     }
+//                    if (imagecolorat($image, $x, $y) !== $bgColor) {
+//                        imagesetpixel($newImage, $x, $y, imagecolorat($image, $x, $y));
+//                    }
                 }
             }
 

@@ -481,6 +481,90 @@ class AdminImportXmlController extends AbstractController
     }
 
     /**
+     * @Route("/backend/pixel/transp", name="backend_pixel_transp", methods={"GET"})
+     */
+    public function pixelTransparent()
+    {
+        $rotationAngle = 270;
+        $url = 'https://wine-dp-trade.ru/756483/wine/00077477_1.png';
+        try {
+            $info = pathinfo($url);
+            $extension = strtolower($info['extension']);
+
+            switch ($extension) {
+                case "png":
+                    $image = imagecreatefrompng($url);
+                    break;
+                case "gif":
+                    $image = imagecreatefromgif($url);
+                    break;
+                default:
+                    $image = imagecreatefromjpeg($url);
+            }
+
+            if (!$image) {
+                die('Failed to load image');
+            }
+            imagealphablending($image, true);
+            imagesavealpha($image, true);
+
+            if ($rotationAngle !== 0) {
+                $image = imagerotate($image, $rotationAngle, 0);
+            }
+
+            $bgColor = imagecolorat($image, 1, 1);
+
+            $width = imagesx($image);
+            $height = imagesy($image);
+
+            $newImage = imagecreatetruecolor($width, $height);
+            imagesavealpha($newImage, true);
+            $transparency = imagecolorallocatealpha($newImage, 0, 0, 0, 127);
+            imagefill($newImage, 0, 0, $transparency);
+
+            for ($x = 0; $x < $width; $x++) {
+                for ($y = 0; $y < $height; $y++) {
+                    $colors = imagecolorsforindex($image, imagecolorat($image, $x, $y));
+                    dd($colors);
+                    /*
+                     * red => 98, green => 98, blue => 98
+                     * пробуем убрать оттенки светлосерого
+                     */
+                    if ($colors['red'] >= 254 AND $colors['green'] >= 254 AND $colors['blue'] >= 254) {
+                        imagesetpixel($newImage, $x, $y, imagecolorat($image, $x, $y));
+                    }
+//                    if (imagecolorat($image, $x, $y) !== $bgColor) {
+//                        imagesetpixel($newImage, $x, $y, imagecolorat($image, $x, $y));
+//                    }
+                }
+            }
+
+            $fileName = 'offer_' . rand(100000, 999999) . '.' . $extension;
+            $path = $this->getUploadsDirectory() . DIRECTORY_SEPARATOR . $this->productPicsSubDirectory
+                . DIRECTORY_SEPARATOR . $fileName;
+
+            if (!file_exists($path)) {
+                $f = fopen($path, 'w');
+                fclose($f);
+            }
+
+            imagepng($newImage, $path);
+            imagedestroy($image);
+            imagedestroy($newImage);
+
+
+            return $this->productPicsSubDirectory . DIRECTORY_SEPARATOR . $fileName;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    private function isTransparent(array($arr))
+    {
+
+    }
+
+    /**
      * @Route("/backend/import_yml/{id}/make_offers", name="backend_import_yml_make_offers", methods={"GET"})
      */
     public function step7makeOffers(ImportYml $importYml,
@@ -494,7 +578,7 @@ class AdminImportXmlController extends AbstractController
                                 FileUploader $fileUploader): Response
     {
         $data = simplexml_load_file($importYml->getUrl());
-        $limit = 40;
+        $limit = 1;
         $currentRow = 0;
         $countries = json_decode($importYml->getCountriesMapping(), true);
         $regions = json_decode($importYml->getRegionsMapping(), true);

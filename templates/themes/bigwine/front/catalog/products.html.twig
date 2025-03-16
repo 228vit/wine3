@@ -16,11 +16,16 @@
                      src="{{ asset('svg/flags/' ~ row.country.codeAlpha2 ~ '.svg') }}">
             </div>
             <a class="product-def__body" href="{{ path('catalog_product_show', {id: row.id}) }}">
-                <img class="product-def__img" style="height: 164px;"
-                     src="{{ asset('/uploads/' ~ row.announcePic) }}" >
-                <div class="product-def__title">{{ row.name }}<br> {{ row.vendor }} {{ row.year }}</div>
+                {% if row.announcePic %}
+                    <img class="product-def__img" style="height: 164px;"
+                         src="{{ asset('/uploads/' ~ row.announcePic) }}" >
+                {% else %}
+                    <img class="product-def__img" style="height: 164px;"
+                         src="{{ asset('/images/nopic.png') }}" >
+                {% endif %}
+                <div class="product-def__title">{{ row.name | raw }}<br> {{ row.vendor }} {{ row.year }}</div>
                 <div class="product-def__info">{{ row.wineColor }}, {{ row.wineSugar }}</div>
-                <div class="product-def__cost">от {{ row.price }} EUR</div>
+                <div class="product-def__cost">от {{ row.price }} RUB</div>
                 <div class="product-def__bottom"><img class="product-def__brand"
                                                       src="{{ asset('/bigwine/img/1.png') }}" alt=""></div>
             </a>
