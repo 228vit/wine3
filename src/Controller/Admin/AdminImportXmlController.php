@@ -713,9 +713,9 @@ class AdminImportXmlController extends AbstractController
         }
 
         /** @var Food $food */
-        foreach ($offer->getFoods() as $food) {
-            $product->addFood($food);
-        }
+//        foreach ($offer->getFoods() as $food) {
+//            $product->addFood($food);
+//        }
 
         // todo: loop over grape sorts
         $grapeSorts = json_decode($offer->getGrapeSort(), true);
