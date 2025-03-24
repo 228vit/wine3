@@ -371,6 +371,7 @@ class AdminOfferController extends AbstractController
         if ($offer->getPicUrl()) {
             $picPathRelative = $fileUploader->makePng(
                 $offer->getPicUrl(),
+                $offer->getYmlId(),
                 $offer->getImportYml() ? $offer->getImportYml()->getRotatePicAngle() : 0
             );
             if ($picPathRelative) {

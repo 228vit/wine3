@@ -260,20 +260,16 @@ class FileUploader
         return $this->productPicsSubDirectory . DIRECTORY_SEPARATOR . $fileName;
     }
 
-    public function makePng(string $url, int $rotationAngle = 270)
+    public function makePng(string $url, string $id, int $rotationAngle = 270, $alpha = 20)
     {
         try {
             $info = pathinfo($url);
             $extension = strtolower($info['extension']);
+            $isPng = false;
 
             switch ($extension) {
-                case "jpg":
-                    $image = imagecreatefromjpeg($url);
-                    break;
-                case "jpeg":
-                    $image = imagecreatefromjpeg($url);
-                    break;
                 case "png":
+                    $isPng = true;
                     $image = imagecreatefrompng($url);
                     break;
                 case "gif":
@@ -293,8 +289,6 @@ class FileUploader
                 $image = imagerotate($image, $rotationAngle, 0);
             }
 
-            $bgColor = imagecolorat($image, 10, 10);
-
             $width = imagesx($image);
             $height = imagesy($image);
 
@@ -306,21 +300,24 @@ class FileUploader
             for ($x = 0; $x < $width; $x++) {
                 for ($y = 0; $y < $height; $y++) {
                     $colors = imagecolorsforindex($image, imagecolorat($image, $x, $y));
-                    dd($colors);
-                    /*
-                     * red => 98, green => 98, blue => 98
-                     * пробуем убрать оттенки светлосерого
-                     */
-                    if ($colors['red'] >= 254 AND $colors['green'] >= 254 AND $colors['blue'] >= 254) {
-                        imagesetpixel($newImage, $x, $y, imagecolorat($image, $x, $y));
+                    if ($colors['red'] <= 235 AND $colors['green'] <= 235 AND $colors['blue'] <= 235) {
+                        $pixel = imagecolorat($image, $x, $y);
+                        imagesetpixel($newImage, $x, $y, $pixel);
                     }
-//                    if (imagecolorat($image, $x, $y) !== $bgColor) {
-//                        imagesetpixel($newImage, $x, $y, imagecolorat($image, $x, $y));
+
+//                    if (!$isPng AND $colors['red'] >= 235) { // AND $colo
+//                        $pixel = imagecolorallocatealpha(
+//                            $newImage,
+//                            255, 255, 255, $alpha);
+//                        imagesetpixel($newImage, $x, $y, $pixel);
+//                    } else {
+//                        $pixel = imagecolorat($image, $x, $y);
+//                        imagesetpixel($newImage, $x, $y, $pixel);
 //                    }
                 }
             }
 
-            $fileName = 'offer_' . rand(100000, 999999) . '.' . $extension;
+            $fileName = 'offer_' . $id . '.png';
             $path = $this->getUploadsDirectory() . DIRECTORY_SEPARATOR . $this->productPicsSubDirectory
                 . DIRECTORY_SEPARATOR . $fileName;
 

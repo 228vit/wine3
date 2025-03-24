@@ -486,14 +486,21 @@ class AdminImportXmlController extends AbstractController
     public function pixelTransparent()
     {
         $rotationAngle = 270;
-        $url = 'https://wine-dp-trade.ru/756483/wine/00077477_1.png';
+        $url = 'https://wine-dp-trade.ru/756483/wine/00074911_1.png';
+//        $url = 'http://wine3.local/00075210_1.png';
+//        $url = 'http://wine3.local/00075210_1.jpg';
+        // jpg white 255, 255, 255, alpha 0
+        // png white 255, 255, 255, alpha 0
+        // png transp 255, 255, 255, alpha 0
         try {
             $info = pathinfo($url);
             $extension = strtolower($info['extension']);
+            $isPng = false;
 
             switch ($extension) {
                 case "png":
                     $image = imagecreatefrompng($url);
+                    $isPng = true;
                     break;
                 case "gif":
                     $image = imagecreatefromgif($url);
@@ -512,35 +519,42 @@ class AdminImportXmlController extends AbstractController
                 $image = imagerotate($image, $rotationAngle, 0);
             }
 
-            $bgColor = imagecolorat($image, 1, 1);
-
             $width = imagesx($image);
             $height = imagesy($image);
 
             $newImage = imagecreatetruecolor($width, $height);
             imagesavealpha($newImage, true);
+
+            // заливаем всё прозрачкой
             $transparency = imagecolorallocatealpha($newImage, 0, 0, 0, 127);
             imagefill($newImage, 0, 0, $transparency);
 
             for ($x = 0; $x < $width; $x++) {
                 for ($y = 0; $y < $height; $y++) {
                     $colors = imagecolorsforindex($image, imagecolorat($image, $x, $y));
-                    dd($colors);
-                    /*
-                     * red => 98, green => 98, blue => 98
-                     * пробуем убрать оттенки светлосерого
-                     */
-                    if ($colors['red'] >= 254 AND $colors['green'] >= 254 AND $colors['blue'] >= 254) {
-                        imagesetpixel($newImage, $x, $y, imagecolorat($image, $x, $y));
+//                    /*
+//                     * red => 98, green => 98, blue => 98
+//                     */
+//                    // если цвет околого белого - не копируем, его заменит прозрачный фон
+                    // !$isPng AND
+                    if ($colors['red'] <= 235 AND $colors['green'] <= 235 AND $colors['blue'] <= 235) {
+                        $pixel = imagecolorat($image, $x, $y);
+                        imagesetpixel($newImage, $x, $y, $pixel);
                     }
-//                    if (imagecolorat($image, $x, $y) !== $bgColor) {
-//                        imagesetpixel($newImage, $x, $y, imagecolorat($image, $x, $y));
-//                    }
+
+//                        $pixel = imagecolorallocatealpha(
+//                            $newImage, // ?
+//                            0, 0, 0, 127);
+//                        imagesetpixel($newImage, $x, $y, $pixel);
+//                    } else {
                 }
             }
 
-            $fileName = 'offer_' . rand(100000, 999999) . '.' . $extension;
-            $path = $this->getUploadsDirectory() . DIRECTORY_SEPARATOR . $this->productPicsSubDirectory
+            $this->uploadsDirectory = $this->getParameter('uploads_directory');
+            $this->productPicsSubDirectory = $this->getParameter('product_pics_subdirectory');
+
+            $fileName = 'offer_' . rand(100000, 999999) . '.png';
+            $path = $this->uploadsDirectory . DIRECTORY_SEPARATOR . $this->productPicsSubDirectory
                 . DIRECTORY_SEPARATOR . $fileName;
 
             if (!file_exists($path)) {
@@ -553,10 +567,12 @@ class AdminImportXmlController extends AbstractController
             imagedestroy($newImage);
 
 
-            return $this->productPicsSubDirectory . DIRECTORY_SEPARATOR . $fileName;
+            dd($this->productPicsSubDirectory . DIRECTORY_SEPARATOR . $fileName);
         } catch (\Exception $e) {
-            return null;
+            return new Response($e->getMessage() . ' ' . $e->getTraceAsString());
         }
+
+        return new Response('done');
     }
 
 //    private function isTransparent(array($arr))
@@ -568,14 +584,14 @@ class AdminImportXmlController extends AbstractController
      * @Route("/backend/import_yml/{id}/make_offers", name="backend_import_yml_make_offers", methods={"GET"})
      */
     public function step7makeOffers(ImportYml $importYml,
-                                CountryRepository $countryRepository,
-                                CountryRegionRepository $regionRepository,
-                                AppellationRepository $appellationRepository,
-                                OfferRepository $offerRepository,
-                                VendorRepository $vendorRepository,
-                                WineColorService $wineColorService,
-                                WineSugarService $wineSugarService,
-                                FileUploader $fileUploader): Response
+                                    CountryRepository $countryRepository,
+                                    CountryRegionRepository $regionRepository,
+                                    AppellationRepository $appellationRepository,
+                                    OfferRepository $offerRepository,
+                                    VendorRepository $vendorRepository,
+                                    WineColorService $wineColorService,
+                                    WineSugarService $wineSugarService,
+                                    FileUploader $fileUploader): Response
     {
         $data = simplexml_load_file($importYml->getUrl());
         $limit = 1;
@@ -592,6 +608,7 @@ class AdminImportXmlController extends AbstractController
             $name = strval($row->name);
             $barcode = isset($row->barcode) ? strval($row->barcode) : null;
             $vendorName = $this->getYmlParam($row, 'tovmarka');
+            $picUrl = strval($row->picture);
 
             $vendor = null;
             if (isset($vendors[$vendorName])) {
@@ -605,22 +622,21 @@ class AdminImportXmlController extends AbstractController
             ]);
 
             if ($offer) {
-//                // todo: update pic?
-//                $offer->setPrice($price)
-//                    ->setIsActive($isActive)
-//                    ->setVendor($vendor)
-//                ;
-//                $this->em->persist($offer);
-//                $this->em->flush();
+                $offer->setPrice($price)
+                    ->setPicUrl($picUrl)
+                    ->setIsActive($isActive)
+                    ->setVendor($vendor)
+                ;
+                $this->em->persist($offer);
+                $this->em->flush();
 //
-//                $this->makeProduct($offer, $wineColorService, $wineSugarService, $fileUploader);
-//                echo "update offer: {$offer->getName()} <br>";
+                $this->makeProduct($offer, $wineColorService, $wineSugarService, $fileUploader);
+                echo "update offer: {$offer->getName()} <br>";
                 continue;
             }
 
             $description = strval($row->description);
             $categoryId = strval($row->categoryId); // country - region - appel-tion
-            $picUrl = strval($row->picture);
             $appellation = null;
             $region = null;
             $country = null;
@@ -786,6 +802,7 @@ class AdminImportXmlController extends AbstractController
         if ($offer->getPicUrl()) {
             $picPathRelative = $fileUploader->makePng(
                 $offer->getPicUrl(),
+                $offer->getYmlId(),
                 $offer->getImportYml() ? $offer->getImportYml()->getRotatePicAngle() : 0
             );
             if ($picPathRelative) {
@@ -1478,7 +1495,7 @@ class AdminImportXmlController extends AbstractController
     {
         $url = 'https://wine-dp-trade.ru/756483/wine/00074546_1.png';
 
-        $imgPath = $fileUploader->makePng($url, 270);
+        $imgPath = $fileUploader->makePng($url, '756483', 270);
 
         dd($imgPath);
     }
