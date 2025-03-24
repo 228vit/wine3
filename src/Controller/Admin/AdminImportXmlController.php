@@ -746,7 +746,7 @@ class AdminImportXmlController extends AbstractController
 //            if ($currentRow >= $limit) break;
         }
 
-        die();
+        die("$currentRow >= $endImportRow");
 
         return $this->redirectToRoute('backend_import_yml_step6', [
             'id' => $importYml->getId()
