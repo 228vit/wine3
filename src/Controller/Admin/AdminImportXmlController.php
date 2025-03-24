@@ -594,7 +594,7 @@ class AdminImportXmlController extends AbstractController
                                     FileUploader $fileUploader): Response
     {
         $data = simplexml_load_file($importYml->getUrl());
-        $limit = 1;
+        $limit = 50;
         $currentRow = 0;
         $countries = json_decode($importYml->getCountriesMapping(), true);
         $regions = json_decode($importYml->getRegionsMapping(), true);
@@ -632,6 +632,10 @@ class AdminImportXmlController extends AbstractController
 //
                 $this->makeProduct($offer, $wineColorService, $wineSugarService, $fileUploader);
                 echo "update offer: {$offer->getName()} <br>";
+                ++$currentRow;
+
+                if ($currentRow >= $limit) break;
+
                 continue;
             }
 
