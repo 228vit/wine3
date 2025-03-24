@@ -584,6 +584,7 @@ class AdminImportXmlController extends AbstractController
      * @Route("/backend/import_yml/{id}/make_offers", name="backend_import_yml_make_offers", methods={"GET"})
      */
     public function step7makeOffers(ImportYml $importYml,
+                                    Request $request,
                                     CountryRepository $countryRepository,
                                     CountryRegionRepository $regionRepository,
                                     AppellationRepository $appellationRepository,
@@ -593,15 +594,22 @@ class AdminImportXmlController extends AbstractController
                                     WineSugarService $wineSugarService,
                                     FileUploader $fileUploader): Response
     {
-        $data = simplexml_load_file($importYml->getUrl());
         $limit = 50;
         $currentRow = 0;
+        $offset = $request->get('offset', 0);
+        $endImportRow = $offset + $limit;
+
+        $data = simplexml_load_file($importYml->getUrl());
         $countries = json_decode($importYml->getCountriesMapping(), true);
         $regions = json_decode($importYml->getRegionsMapping(), true);
         $appellations = json_decode($importYml->getAppellationsMapping(), true);
         $vendors = json_decode($importYml->getVendorsMapping(), true); // "Gaja" => "140"
 
         foreach ($data->shop->offers->offer as $row) {
+            if ($currentRow <= $offset) {
+                ++$currentRow;
+                continue;
+            }
             $offerId = strval($row->attributes()->id);
             $isActive = boolval($row->attributes()->available);
             $price = floatval($row->price);
@@ -634,8 +642,12 @@ class AdminImportXmlController extends AbstractController
                 echo "update offer: {$offer->getName()} <br>";
                 ++$currentRow;
 
-                if ($currentRow >= $limit) break;
-
+                if ($currentRow >= $endImportRow) {
+                    return $this->redirectToRoute('backend_import_yml_make_offers', [
+                        'id' => $importYml->getId(),
+                        'offset' => $endImportRow,
+                    ]);
+                }
                 continue;
             }
 
@@ -724,7 +736,14 @@ class AdminImportXmlController extends AbstractController
 
             ++$currentRow;
 
-            if ($currentRow >= $limit) break;
+            if ($currentRow >= $endImportRow) {
+                return $this->redirectToRoute('backend_import_yml_make_offers', [
+                    'id' => $importYml->getId(),
+                    'offset' => $endImportRow,
+                ]);
+            }
+
+//            if ($currentRow >= $limit) break;
         }
 
         die();
