@@ -5,14 +5,16 @@
 {% block body %}
     <div class="container-def">
         <div class="sec-page__wrap sec-product__wrap">
-            <div class="sec-page__top sec-top"><a class="sec-top__prev link-prev" href="#">
+            <div class="sec-page__top sec-top"><a
+                        class="sec-top__prev link-prev"
+                        href="{{ path('front_catalog') }}">
                     <span>←</span>Назад в каталог</a>
                 <div class="sec-top__line"></div>
             </div>
             <div class="sec-product__content product-card">
                 <div class="product-card__top">
                     <div class="product-card__top-left">
-                        <h1 class="product-card__title title-def title-def_sec">{{ row.name }},
+                        <h1 class="product-card__title title-def title-def_sec">{{ row.name | raw }},
                             {{ row.year }}</h1>
                         <div class="product-card__art">Артикул: {{ row.id }}</div>
                     </div>
@@ -95,11 +97,11 @@
                             <li class="product-card-descrp__el"><strong>Выдержка в емкости:</strong> {{ row.aging }}</li>
                             <li class="product-card-descrp__el"><strong>Сахар:</strong> {{ row.wineSugar }}</li>
                         </ul>
-                        <div class="product-card__media media-audio">
-                            <audio id="player" controls>
-                                <source src="../test.mp3" type="audio/mp3"/>
-                            </audio>
-                        </div>
+{#                        <div class="product-card__media media-audio">#}
+{#                            <audio id="player" controls>#}
+{#                                <source src="../test.mp3" type="audio/mp3"/>#}
+{#                            </audio>#}
+{#                        </div>#}
                     </div>
                 </div>
             </div>

@@ -12,6 +12,7 @@ use App\Entity\WineColorAlias;
 use App\Entity\WineSugar;
 use App\Entity\WineSugarAlias;
 use App\Filter\ProductFilter;
+use App\Filter\ShortProductFilter;
 use App\Form\ProductType;
 use App\Repository\AliasRepository;
 use App\Repository\EventRepository;
@@ -26,7 +27,10 @@ use App\Repository\WineSugarRepository;
 use App\Service\WineColorService;
 use App\Service\WineSugarService;
 use App\Utils\Slugger;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Form\FormErrorIterator;
@@ -207,7 +211,7 @@ class AdminProductController extends AbstractController
      *
      * @Route("backend/product/index", name="backend_product_index", methods={"GET"})
      */
-    public function indexAction(Request $request, SessionInterface $session)
+    public function index(Request $request, SessionInterface $session)
     {
         $pagination = $this->getPagination($request, $session, ProductFilter::class);
 
@@ -222,6 +226,128 @@ class AdminProductController extends AbstractController
         ));
     }
 
+    /**
+     * Lists all product entities.
+     *
+     * @Route("backend/product/no_pic", name="backend_product_no_pic", methods={"GET"})
+     */
+    public function noPic(Request $request, SessionInterface $session)
+    {
+        $pagination = $this->getPagination($request, $session, ShortProductFilter::class);
+
+        $this->filter_form = $this->createForm(ShortProductFilter::class, null, array(
+            'action' => $this->generateUrl('backend_apply_filter', ['model' => self::MODEL]),
+            'method' => 'POST',
+        ));
+
+        return $this->render('admin/product/index.html.twig', array(
+            'pagination' => $pagination,
+            'current_filters' => $this->current_filters,
+            'current_filters_string' => $this->current_filters_string,
+            'filter_form' => $this->filter_form->createView(),
+            'model' => self::MODEL,
+            'entity_name' => self::ENTITY_NAME,
+
+        ));
+    }
+
+    private function getPagination(Request $request,
+                                   SessionInterface $session,
+                                   string $filter_form_class,
+                                   string $defaultField = 'id',
+                                   string $defaultOrder = 'ASC')
+    {
+        /** @var EntityRepository $repository */
+        $repository = $this->em->getRepository(self::NS_ENTITY_NAME);
+
+        $this->filter_form = $this->createForm($filter_form_class, null, array(
+            'action' => $this->generateUrl('backend_apply_filter', ['model' => self::MODEL]),
+            'method' => 'POST',
+        ));
+
+        /** @var Query $query */
+        $query = $this->buildQuery($repository, $request, $session, $this->filter_form, self::MODEL, $defaultField, $defaultOrder);
+
+        $pagination = $this->paginator->paginate(
+            $query, /* query NOT result */
+            $request->query->getInt('page', 1)/*page number*/,
+            self::ROWS_PER_PAGE  /*limit per page*/
+        );
+
+        return $pagination;
+    }
+
+    private function __buildQuery(EntityRepository $repository,
+                                Request $request,
+                                SessionInterface $session,
+                                FormInterface $filter_form,
+                                string $model,
+                                string $defaultField = 'id',
+                                string $defaultOrder = 'ASC')
+    {
+        $sort_by = $request->query->get('sort_by', $defaultField);
+        $order = $request->query->get('order', $defaultOrder);
+        $session_filters = $session->get('admin-filters', false);
+
+        $query = $repository->createQueryBuilder($model);
+
+        if (false !== $session_filters && count($session_filters) && isset($session_filters[$model])) {
+            $this->current_filters = $session_filters[$model];
+            $filter_form->submit($this->current_filters);
+
+            $filterBuilder = $repository->createQueryBuilder($model);
+
+            foreach ($session_filters[$model] as $filter => $value) {
+                switch ($filter) {
+                    case 'isEmptyPic':
+//                        die($value);
+                        $query->andWhere($model.'.announcePic IS NULL');
+                        break;
+                    case 'name':
+//                        die($value);
+                        $query->where($model.'.name LIKE :val')
+                            ->setParameter('val', "%$value%")
+                        ;
+                        break;
+                    default:
+                        $this->current_filters_string[$filter] = $value;
+                }
+            }
+
+            $this->query
+//                ->addFilterConditions($filter_form, $filterBuilder)
+                ->orderBy($model.'.'.$sort_by, $order)
+            ;
+
+            $query = $filterBuilder->getQuery();
+
+            // vendor.id -> vendor.name
+            foreach ($session_filters[$model] as $filter => $value) {
+                switch ($filter) {
+                    case 'isEmptyPic':
+                        $country = $this->countryRepository->find($value);
+                        $this->current_filters_string[$filter] = $country ?? $value;
+                        break;
+                    case 'country':
+                        $country = $this->countryRepository->find($value);
+                        $this->current_filters_string[$filter] = $country ?? $value;
+                        break;
+                    case 'vendor':
+                        $vendor = $this->vendorRepository->find($value);
+                        $this->current_filters_string[$filter] = $vendor ?? $value;
+                        break;
+                    default:
+                        $this->current_filters_string[$filter] = $value;
+                }
+            }
+        } else {
+            $this->current_filters = null;
+        }
+
+        return $query
+            ->orderBy($model.'.'.$sort_by, $order)
+            ->getQuery();
+    }
 
     /**
      * Creates a new product entity.
@@ -357,8 +483,44 @@ class AdminProductController extends AbstractController
     }
 
     /**
-     * Displays a form to edit an existing product entity.
-     *
+     * @Route("backend/product/{id}/load_pic/{offer_id}", name="backend_product_pic_from_offer", methods={"GET"})
+     */
+    public function makeProductAction(Product $product, string $offer_id,
+                                      Request $request,
+                                      FileUploader $fileUploader,
+                                      OfferRepository $offerRepository
+    )
+    {
+        $offer = $offerRepository->find($offer_id);
+        if (!$offer) {
+            $this->addFlash('warning', 'Wrong OfferId');
+            return $this->redirectToRoute('backend_product_edit', ['id' => $product->getId()]);
+        }
+
+        if (empty($offer->getPicUrl())) {
+            $this->addFlash('warning', 'Empty Offer Pic URL');
+            return $this->redirectToRoute('backend_product_edit', ['id' => $product->getId()]);
+        }
+
+        $picPathRelative = $fileUploader->makePng(
+            $offer->getPicUrl(),
+            $offer->getYmlId(),
+            $offer->getImportYml() ? $offer->getImportYml()->getRotatePicAngle() : 0
+        );
+        if ($picPathRelative) {
+            $product
+                ->setContentPic($picPathRelative)
+                ->setAnnouncePic($picPathRelative)
+            ;
+            $this->em->persist($product);
+            $this->em->flush();
+
+            $this->addFlash('success', 'Pic refreshed: ' . $picPathRelative);
+        }
+
+        return $this->redirectToRoute('backend_product_edit', ['id' => $product->getId()]);
+    }
+        /**
      * @Route("backend/product/{id}/edit", name="backend_product_edit", methods={"GET", "POST"})
      */
     public function editAction(Request $request,

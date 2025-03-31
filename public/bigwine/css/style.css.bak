@@ -15144,7 +15144,6 @@ input, input::pleceholder {
   height: 443px;
   border-radius: 20px;
   border: 2px solid #cfdaff;
-  background: rgba(255, 255, 255, 1)
 }
 @media screen and (max-width: 991px) {
   .product-card__swiper {
@@ -15187,7 +15186,7 @@ input, input::pleceholder {
   }
 }
 .product-card__swiper-swiper {
-  margin-top: 0px;
+  margin-top: -64px;
 }
 @media screen and (max-width: 600px) {
   .product-card__swiper-swiper {
@@ -15198,7 +15197,7 @@ input, input::pleceholder {
   width: 100%;
   -o-object-fit: contain;
      object-fit: contain;
-  height: 400px;
+  height: 448px;
 }
 @media screen and (max-width: 600px) {
   .product-card__swiper-img {
@@ -15220,7 +15219,6 @@ input, input::pleceholder {
   height: 25px;
   width: auto !important;
   padding: 5px 20px;
-  background: white;
 }
 .product-card__body {
   -webkit-box-flex: 1;

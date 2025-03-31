@@ -63,8 +63,11 @@
                     <small>{{ row.shortSummary }}</small>
                     <br />
                     {% if row.product %}
-                        <a class="btn btn-sm btn-outline-primary" href="javascript:;"
-                           data-fancybox data-type="ajax" data-src="{{ path('backend_product_show', { id: row.product.id }) }}"><i class="fa fa-search"></i> смотреть карточку товара</a>
+                        <a class="btn btn-sm btn-outline-primary"
+                           href="{{ path('backend_product_edit', { id: row.product.id }) }}"><i
+                            class="fa fa-search"></i> смотреть карточку товара</a>
+{#                        <a class="btn btn-sm btn-outline-primary" href="javascript:;"#}
+{#                           data-fancybox data-type="ajax" data-src="{{ path('backend_product_show', { id: row.product.id }) }}"><i class="fa fa-search"></i> смотреть карточку товара</a>#}
                     {% else %}
                         <a class="btn btn-sm btn-primary" href="{{ path('backend_offer_link', { id: row.id }) }}"><i class="fa fa-plus"></i> привязать к карточке</a>
                     {% endif %}

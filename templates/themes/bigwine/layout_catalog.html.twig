@@ -70,6 +70,18 @@
             background: darkgray;
             color: #fff;
         }
+        .product-card__swiper-swiper {
+            margin-top: 10px;
+        }
+        .product-card__swiper-img {
+            width: 100%;
+            -o-object-fit: contain;
+            object-fit: contain;
+            height: 400px;
+        }
+        .fancybox__container {
+            --fancybox-bg: #fff;
+        }
     </style>
 </head>
 <body>
@@ -96,7 +108,7 @@
 {% include 'front/modals/modalRegister.html.twig' %}
 {% include 'front/modals/modalAuth.html.twig' %}
 
-<script src="{{ asset('/bigwine/js/main.js?ver=750') }}" ></script>
+<script src="{{ asset('/bigwine/js/main.js?ver=7500') }}" ></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" ></script>
 <script src="{{ asset('/bigwine/js/login.js?ver=1') }}" ></script>
 

@@ -145,11 +145,10 @@ trait AdminTraitController
             $model => $filters,
         ));
 
-        $referer = $request->headers->get('referer');
-        $urlParts = parse_url($referer);
-        unset($urlParts['query']);
-
-        $url = $urlParts['scheme'].'//'.$urlParts['host'].$urlParts['path'];
+//        $referer = $request->headers->get('referer');
+//        $urlParts = parse_url($referer);
+//        unset($urlParts['query']);
+//        $url = $urlParts['scheme'].'//'.$urlParts['host'].$urlParts['path'];
         // redirect to referer
         return $this->redirectToRoute("backend_{$model}_index");
     }
@@ -165,13 +164,7 @@ trait AdminTraitController
         }
 
         $session->set('admin-filters', $current_filters);
-//        $referer = $request->headers->get('referer');
-//        $urlParts = parse_url($referer);
-//        unset($urlParts['query']);
 
-//        $url = $urlParts['scheme'].'//'.$urlParts['host'].$urlParts['path'];
-        // redirect to referer
-//        return $this->redirect($request->headers->get('referer'));
         return $this->redirectToRoute("backend_{$model}_index");
     }
 

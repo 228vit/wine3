@@ -182,6 +182,28 @@
     <hr />
 
     <div class="row">
+        <div class="col-12">
+            <h2>Offers</h2>
+            <table class="table table-bordered table-striped">
+                {% for offer in row.offers %}
+                    <tr>
+                        <td><a href="{{ path('backend_offer_edit', { id: offer.id }) }}">offer</a></td>
+                        <td>{{ offer.vendor.name }}</td>
+                        <td>{{ offer.name }}</td>
+                        <td>{{ offer.price }}</td>
+                        <td><a target="_blank" href="{{ offer.picUrl }}">{{ offer.picUrl }}</a></td>
+                        <td>
+                            {% if offer.picUrl | length > 0 %}
+                            <a href="{{ path('backend_product_pic_from_offer', { id: row.id, offer_id: offer.id }) }}">Load pic from offer</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
         <div class="col-8">
             <a class="btn btn-primary" href="{{ path('backend_' ~ model ~ '_index') }}"><i class="fa fa-arrow-left"></i> Back to the list</a>
             <button class="btn btn-success" type="submit"><i class="fa fa-check"></i> Update</button>

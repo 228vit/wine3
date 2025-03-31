@@ -19,68 +19,84 @@
     <div class="row">
         <div class="col-6">
             {{ form_row(form.product) }}
+            {{ form_row(form.ymlId) }}
             {{ form_row(form.name) }}
-            {{ form_row(form.slug) }}
+            {{ form_row(form.year) }}
+            {{ form_row(form.volume) }}
+
             {{ form_row(form.category) }}
-            {{ form_row(form.supplier) }}
-            {{ form_row(form.vendor) }}
             {{ form_row(form.country) }}
             {{ form_row(form.region) }}
-            {{ form_row(form.price) }}
-            {{ form_row(form.priceStatus) }}
+            {{ form_row(form.appellation) }}
+
             {{ form_row(form.color) }}
             {{ form_row(form.type) }}
             {{ form_row(form.alcohol) }}
-
-            <!-- ratings and grape sorts -->
-            <div class="row">
-                <div class="col-4">
-                    <ul id="ratingsList" class="list-unstyled"><b>Рейтинги</b>
-                        {% for rating, value in ratings %}
-                            <li id="rating_{{ loop.index }}">
-                                <input name="rating[{{ loop.index }}][name]" value="{{ rating }}" size="5">
-                                <input name="rating[{{ loop.index }}][value]" value="{{ value }}" size="3">
-                                <a class="kill badge badge-pill badge-danger" rel="rating_{{ loop.index }}" href="javascript:;">x</a>
-                            </li>
-                        {% endfor %}
-                        <script>
-                            var newIndex = {{ ratings|length }} + 1;
-                        </script>
-                    </ul>
-                    <a id="addNewRating" class="btn btn-sm btn-success"><i class="fa fa-plus"></i> add new</a>
-                </div>
-
-                <div class="col-8">
-                    <ul id="grapeSorts" class="list-unstyled"><b>Сорта винограда</b>
-                        {% for sort, value in grapeSorts %}
-                            <li id="grapeSort_{{ loop.index }}">
-                                <input name="grapeSort[{{ loop.index }}][name]" value="{{ sort }}" size="20">
-                                <input name="grapeSort[{{ loop.index }}][value]" value="{{ value }}" size="3">
-                                <a class="kill badge badge-pill badge-danger" rel="rating_{{ loop.index }}" href="javascript:;">x</a>
-                            </li>
-                        {% endfor %}
-                        <script>
-                            var newGrapeSort = {{ grapeSorts|length }} + 1;
-                        </script>
-                    </ul>
-                    <a id="addNewGrapeSort" class="btn btn-sm btn-success"><i class="fa fa-plus"></i> add new</a>
-                </div>
-            </div>
-
         </div>
         <div class="col-6">
-            {{ form_row(form.year) }}
-            {{ form_row(form.volume) }}
+
+            {{ form_row(form.price) }}
+            {{ form_row(form.priceStatus) }}
+            {{ form_row(form.barcode) }}
+            {{ form_row(form.supplier) }}
+            {{ form_row(form.vendor) }}
+
             {{ form_row(form.packing) }}
             {{ form_row(form.serveTemperature) }}
             {{ form_row(form.fermentation) }}
             {{ form_row(form.agingType) }}
-            {{ form_row(form.appellation) }}
 
-            {{ form_row(form.foods) }}
             {{ form_row(form.decantation) }}
+            {% if row.picUrl %}
+                <div>
+                    <a href="{{ row.picUrl }}" target="_blank"><i class="fa fa-search"></i> view pic</a>
+                </div>
+            {% endif %}
+        </div>
+        <div class="col-12">
+            <strong>Description</strong>
+            {{ form_widget(form.description, { attr: { rows: 6 }}) }}
+            <hr>
         </div>
     </div>
+    <div class="row">
+        <div class="col-4">
+            {{ form_row(form.foods) }}
+        </div>
+
+        <div class="col-4">
+            <ul id="ratingsList" class="list-unstyled"><b>Рейтинги</b>
+                {% for rating, value in ratings %}
+                    <li id="rating_{{ loop.index }}">
+                        <input name="rating[{{ loop.index }}][name]" value="{{ rating }}" size="5">
+                        <input name="rating[{{ loop.index }}][value]" value="{{ value }}" size="3">
+                        <a class="kill badge badge-pill badge-danger" rel="rating_{{ loop.index }}" href="javascript:;">x</a>
+                    </li>
+                {% endfor %}
+                <script>
+                    let newIndex = {{ ratings|length }} + 1;
+                </script>
+            </ul>
+            <a id="addNewRating" class="btn btn-sm btn-success"><i class="fa fa-plus"></i> add new</a>
+        </div>
+
+        <div class="col-4">
+            <ul id="grapeSorts" class="list-unstyled"><b>Сорта винограда</b>
+                {% for sort, value in grapeSorts %}
+                    <li id="grapeSort_{{ loop.index }}">
+                        <input name="grapeSort[{{ loop.index }}][name]" value="{{ sort }}" size="20">
+                        <input name="grapeSort[{{ loop.index }}][value]" value="{{ value }}" size="3">
+                        <a class="kill badge badge-pill badge-danger" rel="rating_{{ loop.index }}" href="javascript:;">x</a>
+                    </li>
+                {% endfor %}
+                <script>
+                    let newGrapeSort = {{ grapeSorts|length }} + 1;
+                </script>
+            </ul>
+            <a id="addNewGrapeSort" class="btn btn-sm btn-success"><i class="fa fa-plus"></i> add new</a>
+        </div>
+    </div>
+
 
     {{ form_rest(form) }}
 

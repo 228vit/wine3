@@ -93,6 +93,7 @@ class OfferType extends AbstractType
 //                'attr' => ['placeholder' => 'рейтинги'],
 //                'required' => false,
 //            ])
+            ->add('barcode')
             ->add('alcohol')
             ->add('year')
             ->add('volume')
@@ -117,10 +118,10 @@ class OfferType extends AbstractType
                 'required' => false,
             ])
             ->add('decantation')
-            ->add('slug', TextType::class, [
-                'data_class' => null,
-                'required' => false,
-            ])
+//            ->add('slug', TextType::class, [
+//                'data_class' => null,
+//                'required' => false,
+//            ])
 
         ;
 

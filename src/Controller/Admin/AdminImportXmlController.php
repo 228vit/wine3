@@ -613,7 +613,7 @@ class AdminImportXmlController extends AbstractController
             $offerId = strval($row->attributes()->id);
             $isActive = boolval($row->attributes()->available);
             $price = floatval($row->price);
-            $name = strval($row->name);
+            $name = html_entity_decode(strval($row->name), ENT_QUOTES);
             $barcode = isset($row->barcode) ? strval($row->barcode) : null;
             $vendorName = $this->getYmlParam($row, 'tovmarka');
             $picUrl = strval($row->picture);
@@ -651,7 +651,8 @@ class AdminImportXmlController extends AbstractController
                 continue;
             }
 
-            $description = strval($row->description);
+            $description = html_entity_decode(strval($row->description), ENT_QUOTES);
+
             $categoryId = strval($row->categoryId); // country - region - appel-tion
             $appellation = null;
             $region = null;

@@ -116,6 +116,11 @@ class ProductFilter extends AbstractType
                 ]
             ))
             ->add('isActive', BooleanFilterType::class)
+            ->add('isEmptyPic', BooleanFilterType::class, [
+                'mapped' => false,
+                'required' => false,
+                'label' => 'With empty pics'
+            ])
         ;
     }
 
