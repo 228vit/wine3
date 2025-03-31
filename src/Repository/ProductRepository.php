@@ -29,6 +29,15 @@ class ProductRepository extends ServiceEntityRepository
         return $this->createQueryBuilder($alias);
     }
 
+    public function noPicProductQry()
+    {
+        return $this->createQueryBuilder('product')
+            ->andWhere('product.announcePic IS NULL')
+            ->orderBy('product.name', 'ASC')
+            ->getQuery()
+        ;
+    }
+
     public function getTopTen()
     {
         return $this->createQueryBuilder('e')

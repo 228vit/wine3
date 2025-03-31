@@ -231,20 +231,28 @@ class AdminProductController extends AbstractController
      *
      * @Route("backend/product/no_pic", name="backend_product_no_pic", methods={"GET"})
      */
-    public function noPic(Request $request, SessionInterface $session)
+    public function noPic(Request $request,
+                          ProductRepository $productRepository,
+                          SessionInterface $session)
     {
-        $pagination = $this->getPagination($request, $session, ShortProductFilter::class);
+        $query = $productRepository->noPicProductQry();
+
+        $pagination = $this->paginator->paginate(
+            $query, /* query NOT result */
+            $request->query->getInt('page', 1)/*page number*/,
+            self::ROWS_PER_PAGE  /*limit per page*/
+        );
 
         $this->filter_form = $this->createForm(ShortProductFilter::class, null, array(
             'action' => $this->generateUrl('backend_apply_filter', ['model' => self::MODEL]),
             'method' => 'POST',
         ));
 
-        return $this->render('admin/product/index.html.twig', array(
+        return $this->render('admin/product/no_pic.html.twig', array(
             'pagination' => $pagination,
-            'current_filters' => $this->current_filters,
-            'current_filters_string' => $this->current_filters_string,
-            'filter_form' => $this->filter_form->createView(),
+//            'current_filters' => $this->current_filters,
+//            'current_filters_string' => $this->current_filters_string,
+//            'filter_form' => $this->filter_form->createView(),
             'model' => self::MODEL,
             'entity_name' => self::ENTITY_NAME,
 

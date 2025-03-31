@@ -10,36 +10,35 @@
             <a href="{{ path('backend_dashboard') }}"><i class="fa fa-dashboard"></i> Dashboard</a>
         </li>
         <li class="breadcrumb-item active">
-            <a href="javascript:;"><i class="fa fa-table"></i> {{ entity_name }}</a>
+            <a href="javascript:;"><i class="fa fa-table"></i> Products w/o pics</a>
         </li>
     </ol>
 {% endblock %}
 
 {% block body %}
 
-    <h1 class="page-header">{{ entity_name }} list :: <small><a href="{{ path('backend_product_no_pic') }}">products w/o pics</a></small></h1>
+    <h1 class="page-header">Products w/o pics :: <small><a href="{{ path('backend_product_index') }}">all products</a></small></h1>
 
     {% include 'admin/flashes.html.twig' %}
 
-    {% if current_filters|length %}
-        <div class="alert alert-secondary" role="alert">
-            <i class="fa fa-filter"></i> Filters:
-            {% for field, filter in current_filters_string %}
-                {% if filter is iterable %}
-                    <span class="badge badge-secondary">{{ field }}: {{ filter|join(', ') }}</span>
-                {% else %}
-                    <span class="badge badge-secondary">{{ field }}: {{ filter }}</span>
-                {% endif %}
-            {% endfor %}
-            |
-            <a href="{{ path('backend_reset_filter', {'model': model}) }}"><i class="fa fa-times"></i> reset all</a>
-        </div>
-    {% endif %}
+{#    {% if current_filters|length %}#}
+{#        <div class="alert alert-secondary" role="alert">#}
+{#            <i class="fa fa-filter"></i> Filters:#}
+{#            {% for field, filter in current_filters_string %}#}
+{#                {% if filter is iterable %}#}
+{#                    <span class="badge badge-secondary">{{ field }}: {{ filter|join(', ') }}</span>#}
+{#                {% else %}#}
+{#                    <span class="badge badge-secondary">{{ field }}: {{ filter }}</span>#}
+{#                {% endif %}#}
+{#            {% endfor %}#}
+{#            |#}
+{#            <a href="{{ path('backend_reset_filter', {'model': model}) }}"><i class="fa fa-times"></i> reset all</a>#}
+{#        </div>#}
+{#    {% endif %}#}
 
-    <form action="{{ path('backend_products_update') }}" method="post">
+{#    <form action="{{ path('backend_products_update') }}" method="post">#}
     <table class="table table-striped">
         <tr>
-            <th>-</th>
             <th{% if pagination.isSorted('a.id') %} class="sorted"{% endif %}>
                 {{ knp_pagination_sortable(pagination, 'ID', 'product.id') }}
             </th>
@@ -51,9 +50,6 @@
             <th{% if pagination.isSorted('a.wineSugar') %} class="sorted"{% endif %}>
                 {{ knp_pagination_sortable(pagination, 'Sugar', 'product.wineSugar') }}
             </th>
-            <th{% if pagination.isSorted('a.price') %} class="sorted"{% endif %}>
-                {{ knp_pagination_sortable(pagination, 'Price', 'product.price') }}
-            </th>
             <th>Ann</th>
             <th>Cont</th>
             <th>Extra</th>
@@ -64,7 +60,6 @@
 
         {% for row in pagination %}
             <tr>
-                <td><input class="deleteMe" type="checkbox" name="deleteId[]" value="{{ row.id }}"></td>
                 <td>{{ row.id }}</td>
                 <td>
                     <a href="{{ path('backend_' ~ model ~ '_edit', { 'id': row.id }) }}">{{ row.name }}</a>
@@ -77,11 +72,6 @@
                 </td>
                 <td>{{ row.shortSummary }}</td>
                 <td>{{ row.wineSugar }}</td>
-                <td>
-                    <input type="number" class="input-group-sm" size="5"
-                           name="product[{{ row.id }}][price]"
-                           value="{{ row.price }}" />
-                </td>
 
                 <td>
                     {% if row.announcePic %}
@@ -124,10 +114,10 @@
         <tfoot>
             <tr>
                 <td colspan="5">
-                    <a id="massDelete" class="btn btn-sm btn-danger"><span
-                        class="fa fa-exclamation" aria-hidden="true"></span>
-                        delete checked
-                    </a>
+{#                    <a id="massDelete" class="btn btn-sm btn-danger"><span#}
+{#                        class="fa fa-exclamation" aria-hidden="true"></span>#}
+{#                        delete checked#}
+{#                    </a>#}
                 </td>
             </tr>
         </tfoot>
@@ -152,7 +142,7 @@
 
 
 {% block filter_form %}
-    {% include 'admin/common/filter_form.html.twig' with {'filter_form': filter_form} %}
+{#    {% include 'admin/common/filter_form.html.twig' with {'filter_form': filter_form} %}#}
 {% endblock %}
 
 {% block extra_scripts %}
