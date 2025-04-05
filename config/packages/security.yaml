@@ -3,6 +3,10 @@ security:
     enable_authenticator_manager: true
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     providers:
+        api_user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
         app_user_provider:
             entity:
                 class: App\Entity\User
@@ -22,6 +26,13 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+        api:
+            pattern: ^/api
+            stateless: true
+            provider: api_user_provider
+            guard:
+                authenticators:
+                    - App\Security\JwtAuthenticator
         admin_secured_area:
             pattern:   ^/backend
             lazy: true

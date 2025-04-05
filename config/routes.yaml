@@ -9,3 +9,8 @@ backend_login_check:
 _sirian_suggest:
     resource: "@SirianSuggestBundle/Resources/config/routing.yml"
     prefix:   /suggest
+
+app.swagger_ui:
+    path: /api/doc
+    methods: GET
+    defaults: { _controller: nelmio_api_doc.controller.swagger_ui }

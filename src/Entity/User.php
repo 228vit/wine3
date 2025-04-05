@@ -12,12 +12,17 @@ use Knp\DoctrineBehaviors\Model\Timestampable\TimestampableTrait;
 use Knp\DoctrineBehaviors\Model\Uuidable\UuidableMethodsTrait;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
  * @UniqueEntity(fields={"email"}, message="There is already an account with this email")
  */
-class User implements UserInterface, TimestampableInterface, UuidableInterface
+class User implements
+            UserInterface,
+            TimestampableInterface,
+            UuidableInterface,
+            PasswordAuthenticatedUserInterface
 {
     use TimestampableTrait;
     use UuidableMethodsTrait;
@@ -99,6 +104,16 @@ class User implements UserInterface, TimestampableInterface, UuidableInterface
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $company;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $accessCode;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $refreshToken;
 
     public function __construct()
     {
@@ -350,4 +365,34 @@ class User implements UserInterface, TimestampableInterface, UuidableInterface
 
         return $this;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getAccessCode()
+    {
+        return $this->accessCode;
+    }
+
+    /**
+     * @param mixed $accessCode
+     * @return User
+     */
+    public function setAccessCode($accessCode)
+    {
+        $this->accessCode = $accessCode;
+        return $this;
+    }
+
+    public function getRefreshToken()
+    {
+        return $this->refreshToken;
+    }
+
+    public function setRefreshToken($refreshToken)
+    {
+        $this->refreshToken = $refreshToken;
+        return $this;
+    }
+
 }
