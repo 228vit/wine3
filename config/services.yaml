@@ -5,6 +5,8 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     locale: 'en'
+    site_base_url: '%env(SITE_BASE_URL)%'
+    web_pic_uploads_directory: '%env(SITE_BASE_URL)%/uploads'
     uploads_directory: '%kernel.project_dir%/public/uploads'
     import_files_directory: '%kernel.project_dir%/import'
     event_pics_subdirectory: 'events'
@@ -15,7 +17,9 @@ parameters:
     admin_email: '%env(ADMIN_EMAIL)%'
     mailer_send_confirm_email: '%env(MAILER_SEND_CONFIRM_REGISTER)%'
     yandex_smartcaptcha_key: '%env(YANDEX_CAPTCHA_SERVER_KEY)%'
-    jwt_secret: MEGA_SECRET
+    jwt_secret: MEGA_SECRET_WORD
+    jwt_token_expiration: '%env(JWT_TOKEN_EXPIRATION)%'
+
     is_dev_server: '%env(IS_DEV_SERVER)%'
 
 services:
@@ -23,6 +27,11 @@ services:
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        bind:
+            $em: '@doctrine.orm.entity_manager'
+            $siteBaseUrl: '%site_base_url%'
+            $localUploadsDirectory: '%uploads_directory%'
+            $webPicUploadsDir: '%web_pic_uploads_directory%'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name

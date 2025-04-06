@@ -6,6 +6,7 @@ namespace App\Security;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -52,11 +53,14 @@ class JwtAuthenticator extends AbstractGuardAuthenticator
     {
         try {
             $credentials = str_replace('Bearer ', '', $credentials);
-            $jwt = (array) JWT::decode(
-                $credentials,
-                $this->params->get('jwt_secret'),
-                ['HS256']
-            );
+            $key = $this->params->get('jwt_secret');
+            $headers = new \stdClass();
+            $jwt = (array) JWT::decode($credentials, new Key($key, 'HS256'), $headers);
+
+//            $jwt = (array) JWT::decode(
+//                $credentials,
+//                new Key($key, 'HS256')
+//            );
 
             return $this->em->getRepository(User::class)
                 ->findOneBy([

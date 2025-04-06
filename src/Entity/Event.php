@@ -22,6 +22,11 @@ class Event
     private $id;
 
     /**
+     * @ORM\Column(type="string", length=255, nullable=false)
+     */
+    private $slug;
+
+    /**
      * @ORM\Column(type="string", length=255)
      */
     private $name;
@@ -55,11 +60,6 @@ class Event
      * @ORM\ManyToMany(targetEntity=Vendor::class, inversedBy="events")
      */
     private $vendors;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=false)
-     */
-    private $slug;
 
     /**
      * @ORM\ManyToMany(targetEntity=Supplier::class, inversedBy="events")
@@ -414,5 +414,16 @@ class Event
         return $this;
     }
 
-
+    public function asArray(): array
+    {
+        return [
+            'slug' => $this->getSlug(),
+            'name' => $this->getName(),
+            'description' => $this->getDescription(),
+            'dateTime' => $this->getDateTime() ? $this->getDateTime()->format('Y-m-d- H:i:s') : '',
+            'city' => $this->getCity(),
+            'address' => $this->getAddress(),
+            'organizer' => $this->getOrganizer()->__toString(),
+        ];
+    }
 }

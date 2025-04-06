@@ -115,6 +115,11 @@ class User implements
      */
     private $refreshToken;
 
+    /**
+     * @ORM\Column(type="boolean", options={"default": false})
+     */
+    private $isBanned;
+
     public function __construct()
     {
         $this->wineCards = new ArrayCollection();
@@ -392,6 +397,18 @@ class User implements
     public function setRefreshToken($refreshToken)
     {
         $this->refreshToken = $refreshToken;
+        return $this;
+    }
+
+    public function getIsBanned(): ?bool
+    {
+        return $this->isBanned;
+    }
+
+    public function setIsBanned(?bool $isBanned): self
+    {
+        $this->isBanned = $isBanned;
+
         return $this;
     }
 

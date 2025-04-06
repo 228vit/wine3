@@ -80,6 +80,16 @@ class EventRepository extends ServiceEntityRepository
         return 0 === (int)$res ? false : true;
     }
 
+    public function getLastTen($limit = 10)
+    {
+        return $this->createQueryBuilder('e')
+            ->orderBy('e.dateTime', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
     /**
      * @throws ORMException
      * @throws OptimisticLockException

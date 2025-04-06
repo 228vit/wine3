@@ -19,7 +19,6 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use OpenApi\Annotations as OA;
-use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -113,7 +112,7 @@ class AuthController extends AbstractController
         if ($devServer) {
             return new JsonResponse([
                 'email' => $user->getEmail(),
-                'isNew' => $user->getIsNew(),
+//                'isNew' => $user->getIsNew(),
                 'accessCode' => $user->getAccessCode(),
             ]);
         }
@@ -356,7 +355,7 @@ class AuthController extends AbstractController
             $message = (new TemplatedEmail())
                 ->from($senderEmail)
                 ->to($email)
-                ->subject('[Puzzlax] delete account notification')
+                ->subject('[Winedows] delete account notification')
                 ->htmlTemplate('front/email_templates/delete_account_notification.html.twig')
             ;
 
@@ -373,7 +372,7 @@ class AuthController extends AbstractController
         $email = (new TemplatedEmail())
             ->from($senderEmail)
             ->to($user->getEmail())
-            ->subject('[Puzzlax] access code')
+            ->subject('[Winedows] access code')
             ->htmlTemplate('front/email_templates/registration_access_code.html.twig')
             ->context([
                 'accessCode' => $user->getAccessCode(),
@@ -381,56 +380,6 @@ class AuthController extends AbstractController
         ;
 
         $this->mailer->send($email);
-    }
-
-    public function registerOld(Request $request, UserPasswordHasherInterface $passwordHasher)
-    {
-        $name = $request->get('name');
-        $email = $request->get('email');
-        $phone = $request->get('phone');
-        $password = $request->get('password');
-
-        $validator = Validation::createValidator();
-        $violations['name'] = $this->parseViolations($validator->validate($name, [
-            new Length(['min' => 4]),
-        ]));
-        $violations['email'] = $this->parseViolations($validator->validate($email, [
-            new Email(),
-            new NotBlank(),
-        ]));
-        $violations['phone'] = $this->parseViolations($validator->validate($phone, [
-            new Length(['min' => 11]),
-            new NotBlank(),
-        ]));
-        $violations['password'] = $this->parseViolations($validator->validate($password, [
-            new Length(['min' => 8]),
-        ]));
-
-        // todo: check if email is uniq
-
-        foreach ($violations as $id => $violation) {
-            if (0 === count($violation)) {
-                unset($violations[$id]);
-            }
-        }
-
-        if (count($violations) > 0) {
-            return new JsonResponse($violations, 400);
-        }
-
-        $user = new User();
-        $user->setPassword($passwordHasher->hashPassword($user, $password));
-        $user->setName($name);
-        $user->setPhone($phone);
-        $user->setEmail($email);
-
-        $em = $this->getDoctrine()->getManager();
-        $em->persist($user);
-        $em->flush();
-
-        return $this->json([
-            'user' => $user->getUsername()
-        ]);
     }
 
     private function parseViolations(ConstraintViolationListInterface $violations) {
