@@ -9,9 +9,7 @@ use App\Entity\Event;
 use App\Repository\EventRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Doctrine\ORM\EntityManagerInterface;
-use Firebase\JWT\JWT;
 use OpenApi\Annotations as OA;
-use App\DTO\EventListDTO;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -35,7 +33,7 @@ class EventController extends AbstractController
      *            @OA\Property(property="dateTime", type="string"),
      *            @OA\Property(property="city", type="string"),
      *            @OA\Property(property="address", type="string"),
-     *            @OA\Property(property="orgenizer", type="string"),
+     *            @OA\Property(property="organizer", type="string"),
      *         ),
      *     )
      * )

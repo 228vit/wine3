@@ -38,11 +38,11 @@ class ProductRepository extends ServiceEntityRepository
         ;
     }
 
-    public function getTopTen()
+    public function getTopTen(int $limit = 10)
     {
         return $this->createQueryBuilder('e')
             ->orderBy('e.name', 'ASC')
-            ->setMaxResults(10)
+            ->setMaxResults($limit)
             ->getQuery()
             ->getResult()
         ;

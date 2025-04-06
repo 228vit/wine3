@@ -47,7 +47,7 @@ class AuthController extends AbstractController
 
     /**
      * Регистрация/авторизация пользователя  в системе
-     * @Route("/api/register", name="api_register", methods={"POST"})
+     * @Route("/api/auth/request-magic-link", name="api_register", methods={"POST"})
      * @OA\Post(
      *      tags={"Auth"},
      *      @OA\RequestBody(
@@ -61,12 +61,12 @@ class AuthController extends AbstractController
      * @OA\Response(response="200", description="Пользователю на EMAIL отправлен код для входа в приложение",
      *     @OA\JsonContent(
      *         @OA\Property(property="email", type="string", example="user@email.com"),
-     *         @OA\Property(property="isNew", type="boolean", example="true|false"),
+     *         @OA\Property(property="message", type="string", example="Код и ссылка отправлены на email"),
      *         @OA\Property(property="accessCode", type="string", example="only for testers"),
      *     )
      * )
      */
-    public function register(Request $request,
+    public function getCode(Request $request,
                              UserPasswordHasherInterface $passwordHasher,
                              UserRepository $userRepository)
     {
@@ -95,9 +95,6 @@ class AuthController extends AbstractController
 
         if (null === $user) {
             $user = new User();
-            // todo: remove it before prod
-//            $user->setIsVerified(true);
-//            $user->setIsFinishedQuiz(true);
 
             $user->setPassword($passwordHasher->hashPassword($user, $password));
             $user->setName($name);
@@ -112,7 +109,7 @@ class AuthController extends AbstractController
         if ($devServer) {
             return new JsonResponse([
                 'email' => $user->getEmail(),
-//                'isNew' => $user->getIsNew(),
+                'message' => 'Код и ссылка отправлены на email',
                 'accessCode' => $user->getAccessCode(),
             ]);
         }
@@ -126,35 +123,35 @@ class AuthController extends AbstractController
             ], 500);
         }
 
-        $res['email'] = $user->getEmail();
-        $res['isNew'] = $user->getIsNew();
-        $res['accessCode'] = $user->getAccessCode();
-
-//        if (true === $user->getAutoLogin()) {
-//            $res['accessCode'] = $user->getAccessCode();
-//        }
-
-        return new JsonResponse($res);
+        return new JsonResponse([
+            'email' => $user->getEmail(),
+            'message' => 'Код и ссылка отправлены на email',
+        ]);
     }
 
     /**
-     * Подтверждение регистрации кодом из письма
-     * @Route("/api/register/confirm", name="api_register_confirm", methods={"POST"})
+     * Подтверждение регистрации/авторизации кодом из письма
+     * @Route("/api/auth/verify-code", name="api_register_confirm", methods={"POST"})
      * @OA\Post(
      *      tags={"Auth"},
      *      @OA\RequestBody(
      *          @OA\MediaType(mediaType="application/json",
      *              @OA\Schema(
      *                  @OA\Property(property="email", type="string", example="user@gmail.com"),
-     *                  @OA\Property(property="accessCode", type="integer", example=123456)
+     *                  @OA\Property(property="access_code", type="integer", example=123456)
      *              )
      *          )
      *      )
      * )
      * @OA\Response(response="200", description="Подтверждение регистрации/авторизации пользователя в системе",
      *     @OA\JsonContent(
-     *         @OA\Property(property="token", type="string", example="long hash string"),
-     *         @OA\Property(property="refreshToken", type="string", example="hash"),
+     *         @OA\Property(property="access_token", type="string", example="long hash string"),
+     *         @OA\Property(property="refresh_token", type="string", example="hash"),
+     *         @OA\Property(property="user", type="object",
+     *              @OA\Property(property="uuid", type="string"),
+     *              @OA\Property(property="name", type="string"),
+     *              @OA\Property(property="email", type="string"),
+     *         ),
      *     )
      * )
      * @OA\Response(response="400", description="Не верные данные авторизации",
@@ -208,8 +205,13 @@ class AuthController extends AbstractController
         $this->em->flush();
 
         return $this->json([
-            'token' => sprintf('%s', $jwt),
-            'refreshToken' => sprintf('%s', $refreshToken),
+            'access_token' => sprintf('%s', $jwt),
+            'refresh_token' => sprintf('%s', $refreshToken),
+            'user' => [
+                'uuid' => $user->getUuid()->toString(),
+                'email' => $user->getEmail(),
+                'name' => $user->getName(),
+            ],
         ]);
     }
 

@@ -1047,4 +1047,18 @@ class Product implements TimestampableInterface
         return $this;
     }
 
+    public function asArray(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'name' => $this->getName(),
+            'pic' => $this->getContentPic(),
+            'wine_color' => $this->getWineColor()->__toString(),
+            'wine_sugar' => $this->getWineSugar()->__toString(),
+            'description' => $this->getContent(),
+            'country' => $this->getCountry() ? $this->getCountry()->__toString() : '',
+            'year' => $this->getYear(),
+            'vendor' => $this->getVendor() ? $this->getVendor()->__toString() : '',
+        ];
+    }
 }
