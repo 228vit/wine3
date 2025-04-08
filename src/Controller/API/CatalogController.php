@@ -61,12 +61,12 @@ class CatalogController extends AbstractController
      *
      * @return Response
      */
-    public function index(ProductRepository $repository): Response
+    public function index(ProductRepository $repository, string $webPicUploadsDir): Response
     {
         $res = [];
         /** @var Product $product */
         foreach ($repository->getTopTen(20) as $product) {
-            $res[] = $product->asArray();
+            $res[] = $product->asArray($webPicUploadsDir);
         }
 
         return new JsonResponse($res);

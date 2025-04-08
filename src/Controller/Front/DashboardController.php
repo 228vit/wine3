@@ -25,14 +25,14 @@ class DashboardController extends AbstractController
         $email = (new Email())
             ->from($senderEmail)
             ->to('228vit@gmail.com')
-            ->priority(Email::PRIORITY_LOW)
+            ->priority(Email::PRIORITY_HIGH)
             ->subject('[WINE] Mailer')
             ->text('Sending emails is fun again!')
         ;
 
         $mailer->send($email);
 
-        return new Response('sent...');
+        return new Response('mail sent...');
     }
 
     /**

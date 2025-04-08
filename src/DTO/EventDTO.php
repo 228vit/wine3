@@ -50,7 +50,7 @@ final class EventDTO
         foreach ($event->getEventPics() as $eventPic) {
             if (empty($eventPic->getPic())) continue;
 
-            $this->eventPics[] = $eventPic->getPic();
+            $this->eventPics[] = $webPicUploadsDir . DIRECTORY_SEPARATOR . $eventPic->getPic();
         }
     }
 }

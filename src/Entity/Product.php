@@ -1047,12 +1047,12 @@ class Product implements TimestampableInterface
         return $this;
     }
 
-    public function asArray(): array
+    public function asArray(string $webPicUploadsDir = ''): array
     {
         return [
             'id' => $this->getId(),
             'name' => $this->getName(),
-            'pic' => $this->getContentPic(),
+            'pic' => $this->getContentPic() ? $webPicUploadsDir . DIRECTORY_SEPARATOR . $this->getContentPic() : null,
             'wine_color' => $this->getWineColor()->__toString(),
             'wine_sugar' => $this->getWineSugar()->__toString(),
             'description' => $this->getContent(),
