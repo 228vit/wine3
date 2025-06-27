@@ -75,6 +75,7 @@ class OfferType extends AbstractType
                 'expanded' => true,
             ))
 
+            ->add('slug')
             ->add('ymlId')
             ->add('name')
             ->add('description', TextareaType::class)

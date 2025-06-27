@@ -11,6 +11,9 @@ use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Ramsey\Uuid\Uuid;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Aws\S3\S3Client;
+use League\Flysystem\AwsS3V3\AwsS3V3Adapter;
+use League\Flysystem\Filesystem as FlysystemFilesystem;
 
 class FileUploader
 {
@@ -220,6 +223,49 @@ class FileUploader
             $this->getImportFilesDirectory(),
             $importLog->getCsv()
         );
+    }
+
+    public function grabProductPic(string $url, Product $product)
+    {
+        $info = pathinfo($url);
+        $extension = strtolower($info['extension']);
+
+        $ext = 'jpg';
+        switch($extension) {
+            case "jpg":
+                $img = imagecreatefromjpeg($url);
+                break;
+            case "jpeg":
+                $img = imagecreatefromjpeg($url);
+                break;
+            case "png":
+                $img = imagecreatefrompng($url);
+                $ext = 'png';
+                break;
+            case "gif":
+                $img = imagecreatefromgif($url);
+                break;
+            default:
+                $img = imagecreatefromjpeg($url);
+        }
+
+        $fileName = 'product_'.$product->getId().'.'.$ext;
+
+        $path = $this->getUploadsDirectory() . DIRECTORY_SEPARATOR .$this->productPicsSubDirectory
+            . DIRECTORY_SEPARATOR . $fileName;
+        // видимо надо создать пустой файл, что бы потом всё записалось
+        if (!file_exists($path)) {
+            $f = fopen($path, 'w');
+            fclose($f);
+        }
+
+        if ('png' === $ext) {
+            imagepng($img, $path);
+        } else {
+            imagejpeg($img, $path);
+        }
+
+        return $this->productPicsSubDirectory . DIRECTORY_SEPARATOR . $fileName;
     }
 
     public function grabOfferPic(string $url, int $rotationAngle = 270)

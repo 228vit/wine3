@@ -82,7 +82,11 @@
                             {% endif %}
                         </td>
                         <td>{{ offer.name | raw }} <br>
-                            <small>{{ offer.wineColor }}, {{ offer.sugar }}, {{ offer.alcohol }}гр, {{ offer.volume }}л. </small>
+                            <small>{{ offer.wineColor }}, {{ offer.sugar }}, {{ offer.alcohol }}гр, {{ offer.volume }}л. {{ offer.year }}
+                                {% if offer.barcode | length > 0 %}
+                                <br><i class="fa fa-barcode"></i> {{ offer.barcode }}
+                                {% endif %}
+                            </small>
                         </td>
                         <td style="height: 100px; overflow: hidden;">{{ offer.description | raw }}</td>
                         <td>{{ offer.country }} /
@@ -92,7 +96,13 @@
                         <td>{{ offer.vendor }}</td>
                         <td>{{ offer.price }}</td>
                         <td>{% if offer.pic %}
-                                <a target="_blank" href="{{ offer.pic }}">pic</a>
+                                <a class="btn btn-sm btn-success" target="_blank" href="{{ offer.pic }}">pic</a>
+                            {% endif %}
+
+                            {% if offer.productOfferId is not null %}
+                                <a class="btn btn-sm btn-primary updatePic"
+                                   data-rel="{{ offer.pic }}"
+                                   href="{{ path('backend_offer_update_pic', { id: offer.productOfferId, pic: offer.pic }) }}">update pic</a>
                             {% endif %}
                         </td>
 {#                        <td><img class="rotateThumb" src="{{ offer.pic }}" alt=""></td>#}
@@ -121,6 +131,18 @@
         $(document).ready(function () {
             $('#checkAllNewVendors').on('click', function () {
                 $('input.new-vendor').not(this).prop('checked', this.checked);
+            });
+            $('.updatePic').on('click', function (e) {
+                e.preventDefault();
+                // let pic = $(this).attr('data-rel');
+                let url = $(this).attr('href');
+                $.ajax({
+                    url: url,
+                }).done(function(data) {
+                    console.log(data);
+                });
+
+                return false;
             });
         });
     </script>

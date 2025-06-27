@@ -575,10 +575,23 @@ class AdminImportXmlController extends AbstractController
         return new Response('done');
     }
 
-//    private function isTransparent(array($arr))
-//    {
-//
-//    }
+    /**
+     * @Route("/backend/import_yml/{id}/run_import", name="backend_import_yml_run", methods={"GET"})
+     */
+    public function runImport(ImportYml $importYml)
+    {
+        $script = sprintf('%s/bin/console import:yml --id=%s',
+            $this->getParameter('kernel.project_dir'),
+            $importYml->getId()
+        );
+
+        shell_exec(sprintf('%s > /dev/null 2>&1 &', $script));
+
+        return $this->redirectToRoute('backend_user_brief_watch_ai_status', [
+            'id' => $importYml->getId()
+        ]);
+
+    }
 
     /**
      * @Route("/backend/import_yml/{id}/make_offers", name="backend_import_yml_make_offers", methods={"GET"})
@@ -594,7 +607,7 @@ class AdminImportXmlController extends AbstractController
                                     WineSugarService $wineSugarService,
                                     FileUploader $fileUploader): Response
     {
-        $limit = 50;
+        $limit = 2;
         $currentRow = 0;
         $offset = $request->get('offset', 0);
         $endImportRow = $offset + $limit;
@@ -606,7 +619,7 @@ class AdminImportXmlController extends AbstractController
         $vendors = json_decode($importYml->getVendorsMapping(), true); // "Gaja" => "140"
 
         foreach ($data->shop->offers->offer as $row) {
-            if ($currentRow <= $offset) {
+            if ($currentRow < $offset) {
                 ++$currentRow;
                 continue;
             }
@@ -624,12 +637,14 @@ class AdminImportXmlController extends AbstractController
                 $vendor = $vendorRepository->find($vendorId);
             } //? $vendors[$vendorName] : null;
 
+            echo "Offer: {$name}, ID: {$offerId} <br>";
             /** @var Offer $offer */
             $offer = $offerRepository->findOneBy([
                 'ymlId' => $offerId,
             ]);
 
             if ($offer) {
+                // update only important fields
                 $offer->setPrice($price)
                     ->setPicUrl($picUrl)
                     ->setIsActive($isActive)
@@ -637,12 +652,15 @@ class AdminImportXmlController extends AbstractController
                 ;
                 $this->em->persist($offer);
                 $this->em->flush();
-//
-                $this->makeProduct($offer, $wineColorService, $wineSugarService, $fileUploader);
                 echo "update offer: {$offer->getName()} <br>";
-                ++$currentRow;
 
+                $product = $this->makeProduct($offer, $wineColorService, $wineSugarService, $fileUploader);
+                ++$currentRow;
+                exit();
+
+                // auto redirect
                 if ($currentRow >= $endImportRow) {
+                    exit();
                     return $this->redirectToRoute('backend_import_yml_make_offers', [
                         'id' => $importYml->getId(),
                         'offset' => $endImportRow,
@@ -652,7 +670,6 @@ class AdminImportXmlController extends AbstractController
             }
 
             $description = html_entity_decode(strval($row->description), ENT_QUOTES);
-
             $categoryId = strval($row->categoryId); // country - region - appel-tion
             $appellation = null;
             $region = null;
@@ -687,23 +704,17 @@ class AdminImportXmlController extends AbstractController
                 }
             }
 
-            $grapeSort[1] = $this->getYmlParam($row, 'sortvin1');
-            $valueGrapeSort[1] = $this->getYmlParam($row, 'dolyasort1');
-            $grapeSort[2] = $this->getYmlParam($row, 'sortvin2');
-            $valueGrapeSort[2] = $this->getYmlParam($row, 'dolyasort2');
-            $grapeSort[3] = $this->getYmlParam($row, 'sortvin3');
-            $valueGrapeSort[3] = $this->getYmlParam($row, 'dolyasort3');
-            $grapeSort[4] = $this->getYmlParam($row, 'sortvin4');
-            $valueGrapeSort[4] = $this->getYmlParam($row, 'dolyasort4');
-            $grapeSort[5] = $this->getYmlParam($row, 'sortvin5');
-            $valueGrapeSort[5] = $this->getYmlParam($row, 'dolyasort5');
+            // todo: new sort grabbing
+            $grapes = [];
+            if (isset($row->grapeVarieties)) {
+                foreach ($row->grapeVarieties->grape as $grape) {
 
-            $grapeSort = array_filter($grapeSort);
-            $valueGrapeSort = array_filter($valueGrapeSort);
-
-            $grapeSorts = [];
-            if (count($grapeSort) == count($valueGrapeSort)) {
-                $grapeSorts = array_combine($grapeSort, $valueGrapeSort);
+                    $grapeName = strval($grape->attributes()->name);
+                    $percentage = strval($grape->attributes()->percentage);
+                    if (!empty($grapeName) AND !empty($percentage)) {
+                        $grapes[$grapeName] = $percentage;
+                    }
+                }
             }
 
             $offer = (new Offer())
@@ -725,14 +736,13 @@ class AdminImportXmlController extends AbstractController
                 ->setAlcohol($alcohol)
                 ->setType($wineSugar)
                 ->setColor($wineColor)
-                ->setGrapeSort(json_encode($grapeSorts))
+                ->setGrapeSort(json_encode($grapes))
                 ->setPicUrl($picUrl)
             ;
-            echo "create offer: {$offer->getName()} <br>";
 
             $this->em->persist($offer);
             $this->em->flush();
-
+            echo 'Make offer <br>';
             $this->makeProduct($offer, $wineColorService, $wineSugarService, $fileUploader);
 
             ++$currentRow;
@@ -743,8 +753,6 @@ class AdminImportXmlController extends AbstractController
                     'offset' => $endImportRow,
                 ]);
             }
-
-//            if ($currentRow >= $limit) break;
         }
 
         die("$currentRow >= $endImportRow");
@@ -757,7 +765,7 @@ class AdminImportXmlController extends AbstractController
     private function makeProduct(Offer $offer,
                                  WineColorService $wineColorService,
                                  WineSugarService $wineSugarService,
-                                 FileUploader $fileUploader)
+                                 FileUploader $fileUploader): Product
     {
         $grapeSortRepository = $this->em->getRepository(GrapeSort::class);
         $grapeSortAliasRepository = $this->em->getRepository(GrapeSortAlias::class);
@@ -765,19 +773,12 @@ class AdminImportXmlController extends AbstractController
         $ratingRepository = $this->em->getRepository(Rating::class);
         $productRepository = $this->em->getRepository(Product::class);
         $productRatingRepository = $this->em->getRepository(ProductRating::class);
-        $productRatingRepository = $this->em->getRepository(ProductRating::class);
-        /** @var Product $product */
-        $product = $productRepository->findOneBy([
-            'barcode' => $offer->getBarcode(),
-        ]);
 
-        if (null === $product) {
-            $product = $productRepository->findOneBy([
-                'name' => $offer->getName(),
-            ]);
-        }
+        /** @var Product $product */
+        $product = $productRepository->findOneByNameOrBarcode($offer->getName(), $offer->getBarcode());
 
         if ($product) {
+            echo $product->getId() . ' Product exist, link offer <br>';
             $product->addOffer($offer)
                 ->setIsActive($offer->getIsActive())
                 ->setPrice($offer->getPrice())
@@ -785,8 +786,11 @@ class AdminImportXmlController extends AbstractController
             ;
             $this->em->persist($product);
             $this->em->flush();
-            return true;
+
+            return $product;
         }
+
+        echo 'Create Product, link offer <br>';
 
         $product = (new Product())
             ->setIsActive($offer->getIsActive())
@@ -823,12 +827,11 @@ class AdminImportXmlController extends AbstractController
             ->setAgingType($offer->getAgingType())
         ;
 
+        $this->em->persist($product);
+        $this->em->flush();
+
         if ($offer->getPicUrl()) {
-            $picPathRelative = $fileUploader->makePng(
-                $offer->getPicUrl(),
-                $offer->getYmlId(),
-                $offer->getImportYml() ? $offer->getImportYml()->getRotatePicAngle() : 0
-            );
+            $picPathRelative = $fileUploader->grabProductPic($offer->getPicUrl(), $product);
             if ($picPathRelative) {
                 $product
                     ->setContentPic($picPathRelative)
@@ -836,11 +839,6 @@ class AdminImportXmlController extends AbstractController
                 ;
             }
         }
-
-        /** @var Food $food */
-//        foreach ($offer->getFoods() as $food) {
-//            $product->addFood($food);
-//        }
 
         // todo: loop over grape sorts
         $grapeSorts = json_decode($offer->getGrapeSort(), true);
@@ -857,9 +855,10 @@ class AdminImportXmlController extends AbstractController
 
                 // todo: test it!!!
                 if (null !== $alias) {
+                    /** @var GrapeSort $grapeSort */
                     $grapeSort = $alias->getParent();
                 } else {
-                    // get by name
+                    /** @var GrapeSort $grapeSort */
                     $grapeSort = $grapeSortRepository->findOrCreateByName($grapeSortName, $this->em);
                 }
 
@@ -945,6 +944,7 @@ class AdminImportXmlController extends AbstractController
             $categoryId = strval($row->categoryId);
             $price = strval($row->price);
             $pic = strval($row->picture);
+            $barcode = strval($row->barcode);
             $appellation = null;
             $region = null;
             $country = null;
@@ -980,19 +980,24 @@ class AdminImportXmlController extends AbstractController
                 $vendor = $vendor ? $vendor->getName() : null;
             } //? $vendors[$vendorName] : null;
 
-            $grapeSort1 = $this->getYmlParam($row, 'sortvin1');
-            $valueGrapeSort1 = $this->getYmlParam($row, 'dolyasort1');
-            $grapeSort2 = $this->getYmlParam($row, 'sortvin2');
-            $valueGrapeSort2 = $this->getYmlParam($row, 'dolyasort2');
-            $grapeSort3 = $this->getYmlParam($row, 'sortvin3');
-            $valueGrapeSort3 = $this->getYmlParam($row, 'dolyasort3');
-            $grapeSort4 = $this->getYmlParam($row, 'sortvin4');
-            $valueGrapeSort4 = $this->getYmlParam($row, 'dolyasort4');
+            $grapes = [];
+            if (isset($row->grapeVarieties)) {
+                foreach ($row->grapeVarieties->grape as $grape) {
+
+                    $grapeName = strval($grape->attributes()->name);
+                    $percentage = strval($grape->attributes()->percentage);
+                    if (!empty($grapeName) AND !empty($percentage)) {
+                        $grapes[] = "$grapeName: $percentage%";
+                    }
+                }
+            }
 
             $wineColor = $this->getYmlParam($row, 'typenom');
             $sugar = $this->getYmlParam($row, 'vidvina');
             $alcohol = floatval($this->getYmlParam($row, 'degree'));
             $volume = floatval($this->getYmlParam($row, 'vol'));
+            $year = floatval($this->getYmlParam($row, 'year'));
+            $grapeSorts = implode ("\n", $grapes);
 
             $offers[$offerId] = [
                 'name' => $name,
@@ -1005,17 +1010,38 @@ class AdminImportXmlController extends AbstractController
                 'vendor' => $vendor,
                 'volume' => $volume,
                 'alcohol' => $alcohol,
-                'grapeSorts' => implode ("\n", [
-                   "{$grapeSort1}: {$valueGrapeSort1}",
-                   "{$grapeSort2}: {$valueGrapeSort2}",
-                   "{$grapeSort3}: {$valueGrapeSort3}",
-                   "{$grapeSort4}: {$valueGrapeSort4}",
-                ]),
+                'year' => $year,
+                'barcode' => $barcode,
+                'grapeSorts' => $grapeSorts,
+//                'grapeSorts' => implode ("\n", [
+//                   "{$grapeSort1}: {$valueGrapeSort1}",
+//                   "{$grapeSort2}: {$valueGrapeSort2}",
+//                ]),
                 'wineColor' => $wineColor,
                 'sugar' => $sugar,
                 'productOfferId' => isset($supplierOffers[$offerId]) ? $supplierOffers[$offerId] : null,
             ];
+
+            // todo: update Offer price-pic-description, etc?
+            // 504!!!
+//            if (isset($supplierOffers[$offerId])) {
+//                $offer = $offerRepository->findOneBy([
+//                    'ymlId' => $offerId,
+//                ]);
+//                if ($offer) {
+//                    $offer->setPicUrl($pic)
+//                        ->setPrice($price)
+//                        ->setName($name)
+//                        ->setDescription($description)
+//                        ->setBarcode($barcode)
+//                        ->setGrapeSort($grapeSorts)
+//                    ;
+//                    $this->em->persist($offer);
+//                }
+//            }
         }
+
+        $this->em->flush();
 
         return $this->render('admin/import_yml/step6.html.twig', [
             'row' => $importYml,

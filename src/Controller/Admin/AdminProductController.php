@@ -27,6 +27,11 @@ use App\Repository\WineSugarRepository;
 use App\Service\WineColorService;
 use App\Service\WineSugarService;
 use App\Utils\Slugger;
+use Aws\S3\S3Client;
+use Aws\S3\ObjectUploader;
+use Aws\S3\MultipartUploader;
+use Aws\Exception\MultipartUploadException;
+
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -48,6 +53,57 @@ class AdminProductController extends AbstractController
     CONST MODEL = 'product';
     CONST ENTITY_NAME = 'Product';
     CONST NS_ENTITY_NAME = 'App:Product';
+
+    /**
+     * @Route("backend/test_s3", name="backend_test_s3", methods={"GET"})
+     */
+    public function testS3(Request $request)
+    {
+        $s3 = new S3Client([
+            'version' 	=> 'latest',
+            'region'  	=> 'default',
+            'use_path_style_endpoint' => true,
+            'credentials' => [
+                'key'	=> '6VHWXYOCRNJMZO6X116T',
+                'secret' => 'l5dIzPCfXTDeCdlXFUlmTPBun18hnPsxuroGSYh6',
+            ],
+            'endpoint' => 'https://s3.regru.cloud/'
+        ]);
+        $listBuckets = $s3->listBuckets();
+        echo '<pre>';
+        var_export($listBuckets->toArray()['Buckets']);
+        echo '</pre>';
+        $source = fopen('/var/www/wine3/public/uploads/0ce3447c06f1566e3d8c4ef205f7ad1d.png', 'rb');
+
+        $uploader = new ObjectUploader(
+            $s3,
+            'wine',
+            'barbaresco-2020.png',
+            $source
+        );
+
+        do {
+            try {
+                $result = $uploader->upload();
+                if ($result["@metadata"]["statusCode"] == '200') {
+                    print('<p>File successfully uploaded to ' . $result["ObjectURL"] . '.</p>');
+                }
+                print($result);
+            } catch (MultipartUploadException $e) {
+                rewind($source);
+                $uploader = new MultipartUploader($s3, $source, [
+                    'state' => $e->getState(),
+                ]);
+            }
+        } while (!isset($result));
+
+        fclose($source);
+
+        echo '<pre>';
+        var_export($result->toArray());
+        echo '</pre>';
+        exit();
+    }
 
     /**
      * @Route("backend/product/toggle/field", name="ajax_product_toggle_field", methods={"GET"})
@@ -971,6 +1027,16 @@ class AdminProductController extends AbstractController
         $this->addFlash('success', 'Rows deleted successfully.');
 
         return $this->redirectToRoute('backend_product_index');
+    }
+
+    /**
+     * Deletes a product entity.
+     *
+     * @Route("backend/product/{id}/delete", name="backend_product_delete_now", methods={"DELETE"})
+     */
+    public function delete(Request $request, Product $product)
+    {
+
     }
 
     /**

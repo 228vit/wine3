@@ -150,6 +150,20 @@ class AdminOfferController extends AbstractController
         ));
     }
 
+    /**
+     * @Route("backend/offer/{id}/update_pic", name="backend_offer_update_pic", methods={"GET"})
+     */
+    public function updatePic(Offer $offer, Request $request)
+    {
+        $pic = $request->query->get('pic', null);
+        if ($pic) {
+            $offer->setPicUrl($pic);
+            $this->em->persist($offer);
+            $this->em->flush();
+        }
+
+        return new JsonResponse(['status' => 'success']);
+    }
 
     /**
      * @Route("backend/offer/fix_ratings", name="backend_offer_fix_ratings", methods={"GET"})
@@ -369,11 +383,12 @@ class AdminOfferController extends AbstractController
         ;
 
         if ($offer->getPicUrl()) {
-            $picPathRelative = $fileUploader->makePng(
-                $offer->getPicUrl(),
-                $offer->getYmlId(),
-                $offer->getImportYml() ? $offer->getImportYml()->getRotatePicAngle() : 0
-            );
+            $picPathRelative = $fileUploader->grabOfferPic($offer->getPicUrl(), 0);
+//            $picPathRelative = $fileUploader->makePng(
+//                $offer->getPicUrl(),
+//                $offer->getYmlId(),
+//                $offer->getImportYml() ? $offer->getImportYml()->getRotatePicAngle() : 0
+//            );
             if ($picPathRelative) {
                 $product
                     ->setContentPic($picPathRelative)

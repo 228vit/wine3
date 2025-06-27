@@ -207,12 +207,12 @@ class App {
 		if ($('#filter-cost__slider').length) {
 			let slider = document.querySelector('#filter-cost__slider');
 			let min = 0;
-			let max = 5000;
+			let max = 50000;
 			noUiSlider.create(slider, {
-				start: [10, 2000],
+				start: [0, 50000],
 				tooltips: true,
 				connect: true,
-				step: 10,
+				step: 1000,
 				range: {
 					'min': min,
 					'max': max

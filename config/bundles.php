@@ -20,4 +20,5 @@ return [
     FOS\CKEditorBundle\FOSCKEditorBundle::class => ['all' => true],
     Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle::class => ['all' => true],
     Nelmio\ApiDocBundle\NelmioApiDocBundle::class => ['all' => true],
+    Knp\Bundle\GaufretteBundle\KnpGaufretteBundle::class => ['all' => true],
 ];

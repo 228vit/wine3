@@ -88,6 +88,21 @@ class ImportYml implements TimestampableInterface
      */
     private $offers;
 
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $importLog;
+
+    /**
+     * @ORM\Column(type="string", length=32, nullable=true)
+     */
+    private $importStatus;
+
+    /**
+     * @ORM\Column(type="string", length=1024, nullable=true)
+     */
+    private $savedYmlPath;
+
     public function __construct()
     {
         $this->rotatePicAngle = 0;
@@ -267,6 +282,42 @@ class ImportYml implements TimestampableInterface
                 $offer->setImportYml(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getImportLog(): ?string
+    {
+        return $this->importLog;
+    }
+
+    public function setImportLog(?string $importLog): self
+    {
+        $this->importLog = $importLog;
+
+        return $this;
+    }
+
+    public function getImportStatus(): ?string
+    {
+        return $this->importStatus;
+    }
+
+    public function setImportStatus(?string $importStatus): self
+    {
+        $this->importStatus = $importStatus;
+
+        return $this;
+    }
+
+    public function getSavedYmlPath(): ?string
+    {
+        return $this->savedYmlPath;
+    }
+
+    public function setSavedYmlPath(?string $savedYmlPath): self
+    {
+        $this->savedYmlPath = $savedYmlPath;
 
         return $this;
     }

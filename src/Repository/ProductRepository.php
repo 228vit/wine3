@@ -29,6 +29,18 @@ class ProductRepository extends ServiceEntityRepository
         return $this->createQueryBuilder($alias);
     }
 
+    public function findOneByNameOrBarcode(string $name, ?string $barcode)
+    {
+        return $this->createQueryBuilder('product')
+            ->where('product.name = :name')
+            ->orWhere('product.barcode = :barcode')
+            ->setParameter('name', $name)
+            ->setParameter('barcode', $barcode)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
     public function noPicProductQry()
     {
         return $this->createQueryBuilder('product')
