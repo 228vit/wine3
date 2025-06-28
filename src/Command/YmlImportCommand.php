@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Repository\AdminRepository;
+use App\Utils\Slugger;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -17,12 +18,15 @@ class YmlImportCommand extends Command
 {
     private $em;
     private $importYmlRepository;
+    private $uploadsPath;
 
     public function __construct(EntityManagerInterface $entityManager,
-                                ImportYmlRepository $importYmlRepository)
+                                ImportYmlRepository $importYmlRepository,
+                                string $localUploadsDirectory)
     {
         $this->importYmlRepository = $importYmlRepository;
         $this->em = $entityManager;
+        $this->uploadsPath = $localUploadsDirectory;
 
         parent::__construct();
     }
@@ -42,10 +46,12 @@ class YmlImportCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         $id = $input->getOption('id');
-        $offset = $input->getOption('offset');
+        $offset = intval($input->getOption('offset'));
         $offset = empty($offset) ? 0 : $offset;
         $limit = $input->getOption('limit');
-        $limit = empty($limit) ? 50 : $limit;
+        $limit = empty($limit) ? 10 : $limit;
+        $finishStep = $offset + $limit - 1; // 0+10
+//        die("l: $limit o: $offset");
 
         $importYml = $this->importYmlRepository->find($id);
 
@@ -54,20 +60,63 @@ class YmlImportCommand extends Command
             return Command::FAILURE;
         }
 
-        // do import
 //        $io->success("ID: $id, Offset: $offset, Limit: $limit");
-        $data = simplexml_load_file($importYml->getUrl());
-        $totalOffers = count($data->shop->offers->offer);
-        
-        // grab YML to local PATH, to avoid requering
+
+        // grab YML to local PATH, to avoid requery
         if (0 === $offset) {
+            $ymlContent = file_get_contents($importYml->getUrl());
+            $storedYmlPath = sprintf('%s%s.yml',
+                $this->uploadsPath . DIRECTORY_SEPARATOR . 'yml' . DIRECTORY_SEPARATOR,
+                Slugger::urlSlug($importYml->getSupplier()->getName().'-at-'.date('Y-m-d'))
+            );
 
-            $countries = json_decode($importYml->getCountriesMapping(), true);
-            $regions = json_decode($importYml->getRegionsMapping(), true);
-            $appellations = json_decode($importYml->getAppellationsMapping(), true);
-            $vendors = json_decode($importYml->getVendorsMapping(), true); // "Gaja" => "140"
+            $res = file_put_contents($storedYmlPath, $ymlContent);
 
+            if (false === $res) {
+                $io->success('YML file cannot be saved');
+                return Command::FAILURE;
+            }
+            $importYml->setSavedYmlPath($storedYmlPath);
+            $this->em->persist($importYml);
+            $this->em->flush();
         }
+
+        $countries = json_decode($importYml->getCountriesMapping(), true);
+        $regions = json_decode($importYml->getRegionsMapping(), true);
+        $appellations = json_decode($importYml->getAppellationsMapping(), true);
+        $vendors = json_decode($importYml->getVendorsMapping(), true); // "Gaja" => "140"
+
+        // do import
+        $data = simplexml_load_file($importYml->getSavedYmlPath() ? $importYml->getSavedYmlPath() : $importYml->getUrl());
+
+        $totalOffers = count($data->shop->offers->offer);
+        $currentRow = 0;
+
+        foreach ($data->shop->offers->offer as $row) {
+            $io->writeln("curr: $currentRow, finish: $finishStep, offset: $offset");
+
+            if ($currentRow < $offset) {
+                ++$currentRow;
+                continue;
+            }
+            if ($currentRow >= $finishStep) {
+                $io->writeln('break');
+                break;
+            }
+
+            $currentRow++;
+            continue;
+
+            $offerId = strval($row->attributes()->id);
+            $isActive = boolval($row->attributes()->available);
+            $price = floatval($row->price);
+            $name = html_entity_decode(strval($row->name), ENT_QUOTES);
+            $barcode = isset($row->barcode) ? strval($row->barcode) : null;
+
+            $io->writeln("id: $offerId, name: $name, price: $price");
+        }
+
+        return Command::SUCCESS;
 
         // call next batch import
         $offset = $offset + $limit;
