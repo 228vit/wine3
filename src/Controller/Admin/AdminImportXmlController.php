@@ -667,7 +667,7 @@ class AdminImportXmlController extends AbstractController
                     ]);
                 }
                 continue;
-            }
+            } // if offer
 
             $description = html_entity_decode(strval($row->description), ENT_QUOTES);
             $categoryId = strval($row->categoryId); // country - region - appel-tion

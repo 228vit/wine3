@@ -14,6 +14,12 @@ use Knp\DoctrineBehaviors\Model\Timestampable\TimestampableTrait;
  */
 class ImportYml implements TimestampableInterface
 {
+    public const STATUS_START = 'start';
+    public const STATUS_DATA_PARSED = 'data-parsed';
+    public const STATUS_DATA_SAVED = 'data-saved';
+    public const STATUS_PIC_SAVED = 'pic-saved';
+    public const STATUS_DONE = 'done';
+
     use TimestampableTrait;
 
     /**
@@ -74,11 +80,6 @@ class ImportYml implements TimestampableInterface
     private $appellationsMapping;
 
     /**
-     * @ORM\Column(type="boolean")
-     */
-    private $isComplete;
-
-    /**
      * @ORM\Column(type="integer", nullable=true)
      */
     private $rotatePicAngle;
@@ -102,6 +103,26 @@ class ImportYml implements TimestampableInterface
      * @ORM\Column(type="string", length=1024, nullable=true)
      */
     private $savedYmlPath;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $isComplete;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $totalRows;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $processedRows;
+
+    /**
+     * @ORM\Column(type="string", length=32, nullable=true)
+     */
+    private $currentRowYmlId;
 
     public function __construct()
     {
@@ -318,6 +339,42 @@ class ImportYml implements TimestampableInterface
     public function setSavedYmlPath(?string $savedYmlPath): self
     {
         $this->savedYmlPath = $savedYmlPath;
+
+        return $this;
+    }
+
+    public function getTotalRows(): ?int
+    {
+        return $this->totalRows;
+    }
+
+    public function setTotalRows(?int $totalRows): self
+    {
+        $this->totalRows = $totalRows;
+
+        return $this;
+    }
+
+    public function getProcessedRows(): ?int
+    {
+        return $this->processedRows;
+    }
+
+    public function setProcessedRows(?int $processedRows): self
+    {
+        $this->processedRows = $processedRows;
+
+        return $this;
+    }
+
+    public function getCurrentRowYmlId(): ?string
+    {
+        return $this->currentRowYmlId;
+    }
+
+    public function setCurrentRowYmlId(?string $currentRowYmlId): self
+    {
+        $this->currentRowYmlId = $currentRowYmlId;
 
         return $this;
     }
