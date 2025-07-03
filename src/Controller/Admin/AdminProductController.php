@@ -1040,6 +1040,31 @@ class AdminProductController extends AbstractController
     }
 
     /**
+     * @Route("backend/products/delete_all", name="backend_products_delete_all", methods={"GET"})
+     */
+    public function deleteAll(Request $request,
+                              FileUploader $fileUploader,
+                              ProductRepository $productRepository)
+    {
+        $products = $productRepository->findAll();
+        /** @var Product $product */
+        foreach ($products as $product) {
+            $fileUploader->removeProductPics($product);
+//            exit();
+            $product->getOffers()->clear();
+            $product->getFoods()->clear();
+
+            $this->em->remove($product);
+            $this->em->flush();
+
+            $this->addFlash('success', 'Product deleted');
+            return $this->redirectToRoute('backend_product_index');
+        }
+        // flush
+        // redirect
+    }
+
+    /**
      * Deletes a product entity.
      *
      * @Route("backend/product/{id}", name="backend_product_delete", methods={"DELETE"})

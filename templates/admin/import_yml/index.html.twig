@@ -40,6 +40,7 @@
             <th{% if pagination.isSorted('a.name') %} class="sorted"{% endif %}>
                 {{ knp_pagination_sortable(pagination, 'Name', 'import.name') }}
             </th>
+            <th>URL</th>
             <th>Поставщик</th>
             <th>Дата</th>
             <th>Стадия</th>
@@ -60,6 +61,7 @@
                             <i class="fa fa-list"></i> offers</a>
                     {% endif %}
                 </td>
+                <td>{% if row.url | length > 0 %}a{{ row.url }}</td>
                 <td>{{ row.supplier }}</td>
                 <td>{{ row.createdAt | date('d.m.Y') }}</td>
                 <td>{{ row.stage }} из 6</td>

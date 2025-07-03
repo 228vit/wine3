@@ -400,6 +400,13 @@ class Offer implements TimestampableInterface
         return $this;
     }
 
+    public function removeAllFoods(): self
+    {
+        $this->foods->clear();
+
+        return $this;
+    }
+
     public function getCategory()
     {
         return $this->category;

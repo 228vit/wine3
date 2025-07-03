@@ -85,10 +85,10 @@ class ProductType extends AbstractType
                 'expanded' => false,
             ))
 
-            ->add('type', HiddenType::class, [
-                'label' => 'Содерж.сахара',
-                'attr' => ['placeholder' => 'сладкое / сухое']
-            ])
+//            ->add('type', HiddenType::class, [
+//                'label' => 'Содерж.сахара',
+//                'attr' => ['placeholder' => 'сладкое / сухое']
+//            ])
             ->add('wineSugar', EntityType::class, array(
                 'class' => 'App:WineSugar',
                 'label' => 'Содерж.сахара',

@@ -670,7 +670,7 @@ class AdminImportXmlController extends AbstractController
             } // if offer
 
             $description = html_entity_decode(strval($row->description), ENT_QUOTES);
-            $categoryId = strval($row->categoryId); // country - region - appel-tion
+            $categoryId = strval($row->categoryId); // country - region - appellation
             $appellation = null;
             $region = null;
             $country = null;
@@ -809,8 +809,8 @@ class AdminImportXmlController extends AbstractController
             // wine color
             ->setColor($offer->getColor())
             ->setWineColor($wineColorService->getWineColor($offer->getColor()))
-            // wine sugar
-            ->setType($offer->getType())
+            // wine sugar twice!
+            ->setType($offer->getType()) // сладкое / сухое
             ->setWineSugar($wineSugarService->getWineSugar($offer->getType()))
 
             ->setAlcohol($offer->getAlcohol())
@@ -831,7 +831,7 @@ class AdminImportXmlController extends AbstractController
         $this->em->flush();
 
         if ($offer->getPicUrl()) {
-            $picPathRelative = $fileUploader->grabProductPic($offer->getPicUrl(), $product);
+            $picPathRelative = $fileUploader->saveOfferPicToS3($offer, $product);
             if ($picPathRelative) {
                 $product
                     ->setContentPic($picPathRelative)

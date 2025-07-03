@@ -169,6 +169,13 @@ class Supplier
 
         return $this;
     }
+    /**
+     * @return Collection<int, Offer>
+     */
+    public function getOffers(): Collection
+    {
+        return $this->offers;
+    }
 
     public function addOffer(Offer $offer): self
     {

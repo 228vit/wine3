@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Offer;
 use App\Entity\Supplier;
 use App\Filter\SupplierFilter;
 use App\Form\SupplierType;
@@ -14,6 +15,7 @@ use Knp\Component\Pager\Paginator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,12 +37,22 @@ class AdminSupplierController extends AbstractController
      *
      * @Route("backend/supplier/index", name="backend_supplier_index", methods={"GET"})
      */
-    public function indexAction(Request $request, SessionInterface $session)
+    public function indexAction(Request $request,
+                                SupplierRepository $supplierRepository,
+                                SessionInterface $session)
     {
-        $pagination = $this->getPagination($request, $session, SupplierFilter::class);
+//        $pagination = $this->getPagination($request, $session, SupplierFilter::class);
 
-        return $this->render('admin/common/index.html.twig', array(
-            'pagination' => $pagination,
+        $this->filter_form = $this->createForm(SupplierFilter::class, null, array(
+            'action' => $this->generateUrl('backend_apply_filter', ['model' => self::MODEL]),
+            'method' => 'POST',
+        ));
+
+        $rows = $supplierRepository->withCountOffers();
+
+        return $this->render('admin/supplier/index.html.twig', array(
+//            'pagination' => $pagination,
+            'rows' => $rows,
             'current_filters' => $this->current_filters,
             'filter_form' => $this->filter_form->createView(),
             'model' => self::MODEL,
@@ -80,7 +92,6 @@ class AdminSupplierController extends AbstractController
         ));
     }
 
-
     /**
      * Creates a new supplier entity.
      *
@@ -110,6 +121,26 @@ class AdminSupplierController extends AbstractController
             'model' => self::MODEL,
             'entity_name' => self::ENTITY_NAME,
         ));
+    }
+
+    /**
+     * Displays a form to edit an existing supplier entity.
+     *
+     * @Route("backend/supplier/{id}/remove_offers", name="backend_supplier_remove_offers", methods={"GET"})
+     */
+    public function removeOffers(Request $request,
+                                 Supplier $supplier,
+                                 FileUploader $fileUploader)
+    {
+        /** @var Offer $offer */
+        foreach ($supplier->getOffers() as $offer) {
+            $offer->removeAllFoods();
+            $this->em->remove($offer);
+        }
+        $this->em->flush();
+        $this->addFlash('success', 'All Supplier offers are deleted!');
+
+        return $this->redirectToRoute('backend_supplier_index');
     }
 
     /**

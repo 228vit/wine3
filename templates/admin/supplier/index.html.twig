@@ -1,0 +1,78 @@
+{% extends 'layout_admin.html.twig' %}
+
+{% block title %}
+    {{ entity_name }} :: admin
+{% endblock %}
+
+{% block breadcrumbs %}
+<ol class="breadcrumb">
+    <li class="breadcrumb-item">
+        <a href="{{ path('backend_dashboard') }}"><i class="fa fa-dashboard"></i> Dashboard</a>
+    </li>
+    <li class="breadcrumb-item active">
+        <span><i class="fa fa-table"></i> {{ entity_name }}</span>
+    </li>
+</ol>
+{% endblock %}
+
+{% block body %}
+
+    <h1 class="page-header">{{ entity_name }} list</h1>
+
+    {% include 'admin/flashes.html.twig' %}
+
+    {% if current_filters|length %}
+        <div class="alert alert-secondary" role="alert">
+            <i class="fa fa-filter"></i> Filters:
+            {% for field, filter in current_filters %}
+                <span class="badge badge-secondary">{{ field }}: {{ filter }}</span>
+            {% endfor %}
+            |
+            <a href="{{ path('backend_reset_filter', {'model': model}) }}"><i class="fa fa-times"></i> reset all</a>
+        </div>
+    {% endif %}
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Total Offers</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for row in rows %}
+            <tr>
+                <td>{{ row.id }}</td>
+                <td>{{ row.name }}</td>
+                <td>{{ row.totalOffers }}</td>
+                <td>
+                    <a class="btn btn-sm btn-success" href="{{ path('backend_' ~ model ~ '_edit', { 'id': row.id }) }}">
+                        <i class="fa fa-pencil" aria-hidden="true"></i> edit</a>
+                    <a class="btn btn-sm btn-danger confirm" href="{{ path('backend_supplier_remove_offers', { 'id': row.id }) }}">
+                        <i class="fa fa-exclamation" aria-hidden="true"></i> remove offers</a>
+
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {# display navigation #}
+{#    <div class="navigation">#}
+{#        {{ knp_pagination_render(pagination) }}#}
+{#        <div class="count">#}
+{#            Total rows: {{ pagination.getTotalItemCount }}#}
+{#        </div>#}
+{#    </div>#}
+
+    <p>
+        <a class="btn btn-success" href="{{ path('backend_' ~ model ~ '_new') }}">
+            <span class="fa fa-plus" aria-hidden="true"></span> Create a new {{ model }}</a>
+    </p>
+{% endblock %}
+
+
+{% block filter_form %}
+    {% include 'admin/common/filter_form.html.twig' with {'filter_form': filter_form} %}
+{% endblock %}

@@ -10,7 +10,9 @@ use App\Entity\Product;
 use App\Entity\ProductGrapeSort;
 use App\Entity\ProductRating;
 use App\Entity\Rating;
-use App\Repository\AdminRepository;
+use App\Repository\AppellationRepository;
+use App\Repository\CountryRegionRepository;
+use App\Repository\CountryRepository;
 use App\Repository\OfferRepository;
 use App\Repository\VendorRepository;
 use App\Service\FileUploader;
@@ -19,24 +21,28 @@ use App\Service\WineSugarService;
 use App\Utils\Slugger;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Console\Input\ArrayInput;
 use App\Repository\ImportYmlRepository;
 
 class YmlImportCommand extends Command
 {
     private $em;
+    private $io = null;
     private $importYmlRepository;
     private $vendorRepository;
     private $offerRepository;
+    private $appellationRepository;
+    private $countryRepository;
+    private $regionRepository;
     private $uploadsPath;
     private $wineColorService;
     private $wineSugarService;
     private $fileUploader;
+    /** @var ImportYml $importYml */
+    private $importYml = null;
     private $vendors = [];
     private $countries = [];
     private $regions = [];
@@ -46,6 +52,9 @@ class YmlImportCommand extends Command
                                 ImportYmlRepository $importYmlRepository,
                                 VendorRepository $vendorRepository,
                                 OfferRepository $offerRepository,
+                                AppellationRepository $appellationRepository,
+                                CountryRegionRepository $regionRepository,
+                                CountryRepository $countryRepository,
                                 WineColorService $wineColorService,
                                 WineSugarService $wineSugarService,
                                 FileUploader $fileUploader,
@@ -54,11 +63,15 @@ class YmlImportCommand extends Command
         $this->importYmlRepository = $importYmlRepository;
         $this->vendorRepository = $vendorRepository;
         $this->offerRepository = $offerRepository;
-        $this->em = $entityManager;
+        $this->appellationRepository = $appellationRepository;
+        $this->countryRepository = $countryRepository;
+        $this->regionRepository = $regionRepository;
         $this->uploadsPath = $localUploadsDirectory;
         $this->wineSugarService = $wineSugarService;
         $this->wineColorService = $wineColorService;
         $this->fileUploader = $fileUploader;
+
+        $this->em = $entityManager;
 
         parent::__construct();
     }
@@ -75,7 +88,7 @@ class YmlImportCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
+        $this->io = new SymfonyStyle($input, $output);
 
         $id = $input->getOption('id');
         $offset = intval($input->getOption('offset'));
@@ -85,10 +98,10 @@ class YmlImportCommand extends Command
         $finishStep = $offset + $limit - 1; // 0+10
 
         /** @var ImportYml $importYml */
-        $importYml = $this->importYmlRepository->find($id);
+        $importYml = $this->importYml = $this->importYmlRepository->find($id);
 
         if (!$importYml) {
-            $io->error('Wrong ID supported');
+            $this->io->error('Wrong ID supported');
             return Command::FAILURE;
         }
 
@@ -103,7 +116,7 @@ class YmlImportCommand extends Command
             $res = file_put_contents($storedYmlPath, $ymlContent);
 
             if (false === $res) {
-                $io->success('YML file cannot be saved');
+                $this->io->success('YML file cannot be saved');
                 return Command::FAILURE;
             }
 
@@ -136,10 +149,10 @@ class YmlImportCommand extends Command
             $offerId = strval($row->attributes()->id);
             $name = html_entity_decode(strval($row->name), ENT_QUOTES);
 
-            $io->writeln("curr: $currentRow, finish: $finishStep, offset: $offset, id: $offerId, name: $name");
+            $this->io->writeln("curr: $currentRow, finish: $finishStep, offset: $offset, id: $offerId, name: $name");
 
             if ($currentRow >= $finishStep) {
-                $io->writeln('break loop');
+                $this->io->writeln('break loop');
                 break;
             }
 
@@ -147,13 +160,15 @@ class YmlImportCommand extends Command
             $importYml->setImportStatus(ImportYml::STATUS_START);
 
             try {
+
                 $this->importOffer($row);
+
             } catch (\Exception $e) {
                 $this->em->persist($importYml);
                 $this->em->flush();
 
-                $io->error($e->getMessage());
-                $io->error($e->getTraceAsString());
+                $this->io->error($e->getMessage());
+                $this->io->error($e->getTraceAsString());
 
                 return Command::FAILURE;
             }
@@ -216,7 +231,7 @@ class YmlImportCommand extends Command
             $vendor = $this->vendorRepository->find($vendorId);
         } //? $vendors[$vendorName] : null;
 
-        echo "Offer: {$name}, ID: {$offerId} <br>";
+        $this->io->writeln("Offer: {$name}, ID: {$offerId}");
         /** @var Offer $offer */
         $offer = $this->offerRepository->findOneBy([
             'ymlId' => $offerId,
@@ -229,10 +244,45 @@ class YmlImportCommand extends Command
                 ->setIsActive($isActive)
                 ->setVendor($vendor)
             ;
-            echo "update offer: {$offer->getName()} <br>";
+            $this->io->writeln("update offer: {$offer->getName()}");
         } else {
+            if (isset($appellations[$categoryId])) {
+                $appellationInDb = $this->appellationRepository->find($this->appellations[$categoryId]);
+                if ($appellationInDb) {
+                    $appellation = $appellationInDb;
+                    $region = $appellationInDb->getCountryRegion();
+                    $country = $appellationInDb->getCountry();
+                }
+            }
+
+            if (isset($regions[$categoryId])) {
+                $regionInDb = $this->regionRepository->find($this->regions[$categoryId]);
+                if ($regionInDb) {
+                    $region = $regionInDb;
+                    $country = $regionInDb->getCountry();
+                }
+            }
+
+            if (isset($countries[$categoryId])) {
+                $countryInDb = $this->countryRepository->find($this->countries[$categoryId]);
+                if ($countryInDb) {
+                    $country = $countryInDb;
+                }
+            }
+            $grapes = [];
+            if (isset($row->grapeVarieties)) {
+                foreach ($row->grapeVarieties->grape as $grape) {
+
+                    $grapeName = strval($grape->attributes()->name);
+                    $percentage = strval($grape->attributes()->percentage);
+                    if (!empty($grapeName) AND !empty($percentage)) {
+                        $grapes[$grapeName] = $percentage;
+                    }
+                }
+            }
+
             $offer = (new Offer())
-                ->setImportYml($importYml)
+                ->setImportYml($this->importYml)
                 ->setYmlId($offerId)
                 ->setIsActive($isActive)
                 ->setName($name)
@@ -244,7 +294,7 @@ class YmlImportCommand extends Command
                 ->setRegion($region)
                 ->setAppellation($appellation)
                 ->setVendor($vendor)
-                ->setSupplier($importYml->getSupplier())
+                ->setSupplier($this->importYml->getSupplier())
                 ->setYear($year)
                 ->setVolume($volume)
                 ->setAlcohol($alcohol)
@@ -260,6 +310,7 @@ class YmlImportCommand extends Command
 
         $product = $this->makeProduct($offer);
 
+        // todo: return something?
     } // func importOffer
 
     private function makeProduct(Offer $offer): Product
@@ -287,7 +338,7 @@ class YmlImportCommand extends Command
             return $product;
         }
 
-        echo 'Create Product, link offer <br>';
+        $this->io->writeln('Create Product, link offer');
 
         $product = (new Product())
             ->setIsActive($offer->getIsActive())
@@ -329,13 +380,16 @@ class YmlImportCommand extends Command
 
         if ($offer->getPicUrl()) {
             // todo: grab to S3
-            $picPathRelative = $this->fileUploader->grabProductPic($offer->getPicUrl(), $product);
-            if ($picPathRelative) {
-                $product
-                    ->setContentPic($picPathRelative)
-                    ->setAnnouncePic($picPathRelative)
-                ;
-            }
+            try {
+                $picPathAbsolute = $this->fileUploader->saveOfferPicToS3($offer, $product);
+                if ($picPathAbsolute) {
+                    $product
+                        ->setContentPic($picPathAbsolute)
+                        ->setAnnouncePic($picPathAbsolute)
+                    ;
+                    $this->io->success('Saved Pic to S3: ' . $picPathAbsolute);
+                }
+            } catch (\Exception $e) {}
         }
 
         // todo: loop over grape sorts

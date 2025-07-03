@@ -123,12 +123,20 @@
         {% endfor %}
         <tfoot>
             <tr>
-                <td colspan="5">
+                <td colspan="6">
                     <a id="massDelete" class="btn btn-sm btn-danger"><span
                         class="fa fa-exclamation" aria-hidden="true"></span>
                         delete checked
                     </a>
                 </td>
+                <td class="text-right" colspan="7">
+                    {% if is_granted('ROLE_SUPER_ADMIN') %}
+                        <a class="btn btn-sm btn-danger delete-button confirm"
+                           href="{{ path('backend_products_delete_all') }}"><i
+                                class="fa fa-exclamation"></i> DELETE ALL</a>
+                    {% endif %}
+                </td>
+
             </tr>
         </tfoot>
     </table>

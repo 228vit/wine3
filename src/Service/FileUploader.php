@@ -4,9 +4,13 @@ namespace App\Service;
 
 use App\Entity\EventPic;
 use App\Entity\ImportLog;
+use App\Entity\Offer;
 use App\Entity\Product;
 use App\Entity\Vendor;
 use App\Utils\Slugger;
+use Aws\Exception\MultipartUploadException;
+use Aws\S3\MultipartUploader;
+use Aws\S3\ObjectUploader;
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Ramsey\Uuid\Uuid;
@@ -45,7 +49,66 @@ class FileUploader
         $this->httpClient = $httpClient;
     }
 
-    // todo:
+    public function saveOfferPicToS3(Offer $offer, Product $product): ?string
+    {
+        if (empty($offer->getPicUrl())) {
+            throw new \Exception('Empty Pic URL');
+        }
+
+        $parts = explode('.', $offer->getPicUrl());
+        $ext = 'jpg';
+        if (is_array($parts)) {
+            $ext = end($parts);
+        }
+
+        $s3 = new S3Client([
+            'version' 	=> 'latest',
+            'region'  	=> 'default',
+            'use_path_style_endpoint' => true,
+            'credentials' => [
+                'key'	=> '6VHWXYOCRNJMZO6X116T',
+                'secret' => 'l5dIzPCfXTDeCdlXFUlmTPBun18hnPsxuroGSYh6',
+            ],
+            'endpoint' => 'https://s3.regru.cloud/'
+        ]);
+
+        $source = fopen($offer->getPicUrl(), 'rb');
+
+        $fileName = Slugger::urlSlug(sprintf('%s-%s-%s.%s',
+            $offer->getSupplier()->getName(),
+            $product->getId(),
+            $offer->getName(),
+            $ext
+        ));
+
+        $uploader = new ObjectUploader(
+            $s3,
+            'wine',
+            $fileName,
+            $source
+        );
+
+        do {
+            try {
+                $result = $uploader->upload();
+                if ($result["@metadata"]["statusCode"] == '200') {
+//                    print('<p>File successfully uploaded to ' . $result["ObjectURL"] . '.</p>');
+                    return $result["ObjectURL"];
+                }
+
+            } catch (MultipartUploadException $e) {
+                rewind($source);
+                $uploader = new MultipartUploader($s3, $source, [
+                    'state' => $e->getState(),
+                ]);
+            }
+        } while (!isset($result));
+
+        fclose($source);
+
+        return null;
+    }
+
     public function removeEventPic(EventPic $eventPic)
     {
         $fileName = sprintf('%s%s%s%s%s',
@@ -65,53 +128,39 @@ class FileUploader
 
     public function removeProductPics(Product $product)
     {
-        if (null !== $file = $product->getAnnouncePicFile()) {
-            $fileName = sprintf('%s_%s.%s',
-                'announce',
-                $product->getSlug(),
-                $file->guessExtension()
-            );
-            $this->cacheManager->remove('uploads/' . $fileName, 'thumb_square_50');
+        if (null !== $product->getAnnouncePic()) {
+            $this->cacheManager->remove('uploads' . DIRECTORY_SEPARATOR . $product->getAnnouncePic());
+            echo "del announce thumb <br>";
         }
-        if (null !== $file = $product->getAnnouncePicFile()) {
-            $fileName = sprintf('%s_%s.%s',
-                'content',
-                $product->getSlug(),
-                $file->guessExtension()
-            );
-            $this->cacheManager->remove('uploads/' . $fileName, 'thumb_square_50');
+        if (null !== $product->getContentPic()) {
+            $this->cacheManager->remove('uploads' . DIRECTORY_SEPARATOR . $product->getContentPic());
+            echo "del content thumb <br>";
         }
-        if (null !== $file = $product->getAnnouncePicFile()) {
-            $fileName = sprintf('%s_%s.%s',
-                'extra',
-                $product->getSlug(),
-                $file->guessExtension()
-            );
-            $this->cacheManager->remove('uploads/' . $fileName, 'thumb_square_50');
+        if (null !== $product->getExtraPic()) {
+            $this->cacheManager->remove('uploads' . DIRECTORY_SEPARATOR . $product->getExtraPic());
+            echo "del extra thumb <br>";
         }
 
-        $fileName = sprintf('%s%s%s%s%s',
+        $fileName = sprintf('%s%s%s',
             $this->getUploadsDirectory(),
-            DIRECTORY_SEPARATOR,
-            $this->productPicsSubDirectory,
             DIRECTORY_SEPARATOR,
             $product->getAnnouncePic()
         );
-        if (is_file($fileName)) unlink($fileName);
+        echo "announce pic $fileName <br>";
+        if (is_file($fileName)) {
+            unlink($fileName);
+//            echo " deleted announce pic $fileName <br>";
+        }
 
-        $fileName = sprintf('%s%s%s%s%s',
+        $fileName = sprintf('%s%s%s',
             $this->getUploadsDirectory(),
-            DIRECTORY_SEPARATOR,
-            $this->productPicsSubDirectory,
             DIRECTORY_SEPARATOR,
             $product->getContentPic()
         );
         if (is_file($fileName)) unlink($fileName);
 
-        $fileName = sprintf('%s%s%s%s%s',
+        $fileName = sprintf('%s%s%s',
             $this->getUploadsDirectory(),
-            DIRECTORY_SEPARATOR,
-            $this->productPicsSubDirectory,
             DIRECTORY_SEPARATOR,
             $product->getExtraPic()
         );

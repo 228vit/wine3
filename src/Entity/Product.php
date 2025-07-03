@@ -191,8 +191,7 @@ class Product implements TimestampableInterface
     private $color;
 
     /**
-     * @Assert\NotBlank()
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $type;
 
