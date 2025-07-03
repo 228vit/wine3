@@ -1047,7 +1047,7 @@ class AdminProductController extends AbstractController
                               ProductRepository $productRepository)
     {
         $products = $productRepository->findAll();
-        $limit = 100;
+        $limit = 500;
         /** @var Product $product */
         foreach ($products as $i => $product) {
             $fileUploader->removeProductPics($product);
