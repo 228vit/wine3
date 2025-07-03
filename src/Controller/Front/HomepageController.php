@@ -36,12 +36,13 @@ class HomepageController extends AbstractController
      */
     public function yandexCaptcha(Request $request): Response
     {
+        $secretKey = $this->getParameter('yandex_captcha_secret_key');
         $token = $request->get('captchaToken', null);
         $ip = $request->getClientIp();
         $ch = curl_init("https://smartcaptcha.yandexcloud.net/validate");
 
         $args = [
-            "secret" => 'ysc2_e5KJHYgZWem3nzq4CzaKFbQr6xRRagwh0nw7wGSJ96aa3eb6',
+            "secret" => $secretKey,
             "token" => $token,
             "ip" => $ip, // Нужно передать IP-адрес пользователя.
         ];

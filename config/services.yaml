@@ -19,6 +19,7 @@ parameters:
     yandex_smartcaptcha_key: '%env(YANDEX_CAPTCHA_SERVER_KEY)%'
     jwt_secret: MEGA_SECRET_WORD
     jwt_token_expiration: '%env(JWT_TOKEN_EXPIRATION)%'
+    yandex_captcha_secret_key: '%env(YANDEX_CAPTCHA_SERVER_KEY)%'
 
     is_dev_server: '%env(IS_DEV_SERVER)%'
 
