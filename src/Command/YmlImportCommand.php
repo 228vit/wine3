@@ -94,7 +94,7 @@ class YmlImportCommand extends Command
         $offset = intval($input->getOption('offset'));
         $offset = empty($offset) ? 0 : $offset;
         $limit = $input->getOption('limit');
-        $limit = empty($limit) ? 10 : $limit;
+        $limit = empty($limit) ? 2 : $limit;
         $finishStep = $offset + $limit - 1; // 0+10
 
         /** @var ImportYml $importYml */
@@ -310,6 +310,7 @@ class YmlImportCommand extends Command
 
         $product = $this->makeProduct($offer);
 
+        $this->io->success('---');
         // todo: return something?
     } // func importOffer
 
@@ -326,7 +327,7 @@ class YmlImportCommand extends Command
         $product = $productRepository->findOneByNameOrBarcode($offer->getName(), $offer->getBarcode());
 
         if ($product) {
-            echo $product->getId() . ' Product exist, link offer <br>';
+            $this->io->writeln( $product->getId() . ' Product exist, link offer');
             $product->addOffer($offer)
                 ->setIsActive($offer->getIsActive())
                 ->setPrice($offer->getPrice())
@@ -379,7 +380,6 @@ class YmlImportCommand extends Command
         $this->em->flush();
 
         if ($offer->getPicUrl()) {
-            // todo: grab to S3
             try {
                 $picPathAbsolute = $this->fileUploader->saveOfferPicToS3($offer, $product);
                 if ($picPathAbsolute) {
@@ -389,7 +389,10 @@ class YmlImportCommand extends Command
                     ;
                     $this->io->success('Saved Pic to S3: ' . $picPathAbsolute);
                 }
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) {
+                $this->io->error($e->getMessage());
+                $this->io->error($e->getTraceAsString());
+            }
         }
 
         // todo: loop over grape sorts

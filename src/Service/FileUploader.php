@@ -16,8 +16,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Ramsey\Uuid\Uuid;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Aws\S3\S3Client;
-use League\Flysystem\AwsS3V3\AwsS3V3Adapter;
-use League\Flysystem\Filesystem as FlysystemFilesystem;
 
 class FileUploader
 {
@@ -29,6 +27,12 @@ class FileUploader
     private $importFilesDirectory;
     private $httpClient;
     private $cacheManager;
+    private $s3Host;
+    private $s3Version;
+    private $s3Bucket;
+    private $s3Region;
+    private $s3AccessKey;
+    private $s3SecretKey;
 
     public function __construct(string $uploadsDirectory,
                                 string $importFilesDirectory,
@@ -36,6 +40,12 @@ class FileUploader
                                 string $vendorLogoSubDirectory,
                                 string $vendorPicsSubDirectory,
                                 string $eventPicsSubDirectory,
+                                string $s3Host,
+                                string $s3Version,
+                                string $s3Bucket,
+                                string $s3Region,
+                                string $s3AccessKey,
+                                string $s3SecretKey,
                                 CacheManager $cacheManager,
                                 HttpClientInterface $httpClient)
     {
@@ -47,6 +57,12 @@ class FileUploader
         $this->importFilesDirectory = $importFilesDirectory;
         $this->cacheManager = $cacheManager;
         $this->httpClient = $httpClient;
+        $this->s3Host = $s3Host;
+        $this->s3Version = $s3Version;
+        $this->s3Bucket = $s3Bucket;
+        $this->s3Region = $s3Region;
+        $this->s3AccessKey = $s3AccessKey;
+        $this->s3SecretKey = $s3SecretKey;
     }
 
     public function saveOfferPicToS3(Offer $offer, Product $product): ?string
@@ -62,14 +78,14 @@ class FileUploader
         }
 
         $s3 = new S3Client([
-            'version' 	=> 'latest',
-            'region'  	=> 'default',
+            'version' 	=> $this->s3Version,
+            'region'  	=> $this->s3Region,
             'use_path_style_endpoint' => true,
             'credentials' => [
-                'key'	=> '6VHWXYOCRNJMZO6X116T',
-                'secret' => 'l5dIzPCfXTDeCdlXFUlmTPBun18hnPsxuroGSYh6',
+                'key'	=> $this->s3AccessKey,
+                'secret' => $this->s3SecretKey,
             ],
-            'endpoint' => 'https://s3.regru.cloud/'
+            'endpoint' => $this->s3Host
         ]);
 
         $source = fopen($offer->getPicUrl(), 'rb');
@@ -83,7 +99,7 @@ class FileUploader
 
         $uploader = new ObjectUploader(
             $s3,
-            'wine',
+            'products',
             $fileName,
             $source
         );

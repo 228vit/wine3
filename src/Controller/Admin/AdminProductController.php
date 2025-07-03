@@ -24,6 +24,7 @@ use App\Repository\WineColorAliasRepository;
 use App\Repository\WineColorRepository;
 use App\Repository\WineSugarAliasRepository;
 use App\Repository\WineSugarRepository;
+use App\Service\S3Service;
 use App\Service\WineColorService;
 use App\Service\WineSugarService;
 use App\Utils\Slugger;
@@ -57,22 +58,20 @@ class AdminProductController extends AbstractController
     /**
      * @Route("backend/test_s3", name="backend_test_s3", methods={"GET"})
      */
-    public function testS3(Request $request)
+    public function testS3(S3Service $s3Service)
     {
-        $s3 = new S3Client([
-            'version' 	=> 'latest',
-            'region'  	=> 'default',
-            'use_path_style_endpoint' => true,
-            'credentials' => [
-                'key'	=> '6VHWXYOCRNJMZO6X116T',
-                'secret' => 'l5dIzPCfXTDeCdlXFUlmTPBun18hnPsxuroGSYh6',
-            ],
-            'endpoint' => 'https://s3.regru.cloud/'
-        ]);
-        $listBuckets = $s3->listBuckets();
+        $productBucket = $s3Service->createBucket('products');
+        $listBuckets = $s3Service->listBuckets();
         echo '<pre>';
         var_export($listBuckets->toArray()['Buckets']);
         echo '</pre>';
+
+        $bucketFiles = $s3Service->getBucketFiles('wine');
+        echo '<pre>';
+        var_export($bucketFiles);
+        echo '</pre>';
+        exit();
+
         $source = fopen('/var/www/wine3/public/uploads/0ce3447c06f1566e3d8c4ef205f7ad1d.png', 'rb');
 
         $uploader = new ObjectUploader(
@@ -1051,7 +1050,6 @@ class AdminProductController extends AbstractController
         /** @var Product $product */
         foreach ($products as $i => $product) {
             $fileUploader->removeProductPics($product);
-//            exit();
             $product->getOffers()->clear();
             $product->getFoods()->clear();
 
