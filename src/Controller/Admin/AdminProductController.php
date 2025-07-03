@@ -1047,19 +1047,24 @@ class AdminProductController extends AbstractController
                               ProductRepository $productRepository)
     {
         $products = $productRepository->findAll();
+        $limit = 100;
         /** @var Product $product */
-        foreach ($products as $product) {
+        foreach ($products as $i => $product) {
             $fileUploader->removeProductPics($product);
 //            exit();
             $product->getOffers()->clear();
             $product->getFoods()->clear();
 
             $this->em->remove($product);
-            $this->em->flush();
-
-            $this->addFlash('success', 'Product deleted');
-            return $this->redirectToRoute('backend_product_index');
+            if ($i === $limit) {
+                break;
+            }
         }
+
+        $this->em->flush();
+
+        $this->addFlash('success', 'Products deleted');
+        return $this->redirectToRoute('backend_product_index');
         // flush
         // redirect
     }
